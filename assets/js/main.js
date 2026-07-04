@@ -513,6 +513,46 @@ function pickRandomMetrics(count, excludeLabels = []) {
 
 function renderMetricRow(row, metrics) {
   row.innerHTML = metrics.map((metric) => buildMetricCard(metric)).join("");
+  queueMetricScrollSync();
+}
+
+const METRIC_SCROLL_VISIBLE = 3;
+const METRIC_SCROLL_PAD_BLOCK = 24; /* 10px top + 14px bottom */
+
+function syncMetricScrollViewport() {
+  const scroll = document.querySelector(".metric-row-scroll");
+  const row = scroll?.querySelector("[data-metric-rotate]");
+  if (!scroll || !row) {
+    return;
+  }
+
+  if (!isMobileMetricView()) {
+    scroll.style.removeProperty("--metric-scroll-max");
+    return;
+  }
+
+  const cards = row.querySelectorAll(".metric");
+  if (!cards.length) {
+    return;
+  }
+
+  let cardHeight = 0;
+  cards.forEach((card) => {
+    cardHeight = Math.max(cardHeight, card.getBoundingClientRect().height);
+  });
+
+  const gap = Number.parseFloat(getComputedStyle(row).rowGap || getComputedStyle(row).gap || "16");
+  scroll.style.setProperty(
+    "--metric-scroll-max",
+    `${cardHeight * METRIC_SCROLL_VISIBLE + gap * (METRIC_SCROLL_VISIBLE - 1) + METRIC_SCROLL_PAD_BLOCK}px`
+  );
+}
+
+function queueMetricScrollSync() {
+  requestAnimationFrame(() => {
+    syncMetricScrollViewport();
+    requestAnimationFrame(syncMetricScrollViewport);
+  });
 }
 
 let currentMetricLabels = [];
@@ -566,7 +606,10 @@ initMetricRotation();
 mobileMetricView.addEventListener("change", () => {
   initMetricRotation();
   restartMetricIconAnimations();
+  queueMetricScrollSync();
 });
+
+window.addEventListener("resize", queueMetricScrollSync);
 
 function restartFeatureAnimations() {
   restartGraphLineAnimation();

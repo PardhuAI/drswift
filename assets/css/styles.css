@@ -1625,7 +1625,38 @@ p {
 
   .feature-copy .metric-row {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 16px;
+    margin-top: 0;
+  }
+
+  .metric-row-scroll {
+    max-height: var(--metric-scroll-max, none);
+    margin-top: 20px;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: y mandatory;
+    scroll-padding-block: 10px 14px;
+    scrollbar-width: none;
+    padding-block: 10px 14px;
+  }
+
+  .metric-row-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Keep card sizing; only disable lift inside the scroll viewport. */
+  .metric-row-scroll .metric-row > span {
+    transform: none;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    box-shadow: 0 3px 8px rgba(33, 49, 78, 0.06), 0 1px 2px rgba(33, 49, 78, 0.04);
+  }
+
+  .metric-row-scroll .metric-row > span:hover,
+  .metric-row-scroll .metric-row > span:focus-within {
+    transform: none;
+    box-shadow: 0 3px 8px rgba(33, 49, 78, 0.06), 0 1px 2px rgba(33, 49, 78, 0.04);
   }
 
   .metric-symbol {
