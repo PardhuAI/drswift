@@ -38,6 +38,7 @@
   --radius: 18px;
   --radius-sm: 12px;
   --container: 1180px;
+  --scroll-header-offset: 84px;
 }
 
 * {
@@ -46,6 +47,18 @@
 
 html {
   scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Free page scroll; offset anchored sections below the sticky header. */
+main > section,
+.section-heading h2[id] {
+  scroll-margin-top: var(--scroll-header-offset);
 }
 
 body {
@@ -1152,13 +1165,30 @@ p {
 /* Standalone call-to-action section with a single centered button. */
 .report-cta-inner {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
+  gap: 12px;
 }
 
 .report-cta .button {
   min-height: 52px;
   padding: 14px 30px;
   font-size: 1.125rem;
+  transition: transform 180ms ease, background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+
+.report-cta .button.secondary:hover,
+.report-cta .button.secondary:focus-visible {
+  background: var(--color-blue);
+  color: #fff;
+  border-color: var(--color-blue);
+}
+
+.report-cta .button.primary:hover,
+.report-cta .button.primary:focus-visible {
+  background: #fff;
+  color: var(--color-blue);
+  border-color: var(--color-line);
 }
 
 /* Brand-gradient accent colors for varied feature headings. */
@@ -1634,6 +1664,7 @@ p {
     margin-top: 20px;
     overflow-y: auto;
     overscroll-behavior-y: contain;
+    touch-action: pan-y;
     -webkit-overflow-scrolling: touch;
     scroll-snap-type: y mandatory;
     scroll-padding-block: 10px 14px;
