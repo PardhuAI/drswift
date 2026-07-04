@@ -1301,6 +1301,14 @@ p {
   animation-delay: 0.2s;
 }
 
+.metric-row .metric:nth-child(2) .metric-icon--check polyline {
+  animation-delay: 0.35s;
+}
+
+.metric-row .metric:nth-child(3) .metric-icon--check polyline {
+  animation-delay: 0.55s;
+}
+
 .metric-row .metric:nth-child(2) .metric-icon line,
 .metric-row .metric:nth-child(2) .metric-icon polyline {
   animation-delay: 0.35s;
@@ -1337,6 +1345,33 @@ p {
 @keyframes metricNudgeDown {
   0%, 100% { transform: translateY(-1px); }
   50% { transform: translateY(2px); }
+}
+
+.metric-row[data-metric-rotate] > span {
+  animation: metricCardIn 0.45s ease backwards;
+}
+
+.metric-row[data-metric-rotate].is-fading > span {
+  animation: metricCardOut 0.28s ease forwards;
+}
+
+@keyframes metricCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes metricCardOut {
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
 }
 
 .carousel-actions {

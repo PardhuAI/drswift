@@ -425,8 +425,152 @@ function restartMetricIconAnimations() {
   });
 }
 
+const METRIC_GLYPHS = {
+  droplet:
+    '<path d="M12 3s-5 6.2-5 10.2a5 5 0 0 0 10 0C17 9.2 12 3 12 3z" /><path d="M13.6 10.2c1.3 1.9 1.6 3.9 0.9 5.8" />',
+  heart: '<path d="M12 20s-7-4.6-7-10a4 4 0 0 1 7-2.4A4 4 0 0 1 19 10c0 5.4-7 10-7 10z" />',
+  sun: '<circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" />',
+  thyroid:
+    '<path d="M6 12c0-3.3 2.7-6 6-6s6 2.7 6 6-2.7 6-6 6" /><path d="M12 8v8M9 10.5h6" />',
+  glucose:
+    '<path d="M4 18h16" /><path d="M7 15l3-4 3 3 4-6" /><circle cx="18" cy="7" r="1.5" />',
+  kidney:
+    '<path d="M8.5 8.5c-2 2-2 5.5 0 7.5s5.5 2 7.5 0 2-5.5 0-7.5-5.5-2-7.5 0z" /><path d="M12 8v8" />',
+};
+
+const BADGE_ICONS = {
+  check:
+    '<svg class="metric-icon metric-icon--check" viewBox="0 0 24 24"><polyline pathLength="100" points="4 12 9 17 20 6" /></svg>',
+  up: '<svg class="metric-icon metric-icon--up" viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5" /><polyline points="5 12 12 5 19 12" /></svg>',
+  down:
+    '<svg class="metric-icon metric-icon--down" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19" /><polyline points="19 12 12 19 5 12" /></svg>',
+};
+
+const METRIC_POOL = [
+  { label: "HbA1c", value: "5.2%", status: "Healthy", tone: "good", glyph: "droplet", badge: "check" },
+  {
+    label: "Cholesterol",
+    value: "252 mg/dL",
+    status: "Borderline",
+    tone: "alert",
+    glyph: "heart",
+    badge: "up",
+  },
+  { label: "Vitamin D", value: "30 ng/mL", status: "Review", tone: "warn", glyph: "sun", badge: "down" },
+  { label: "LDL Cholesterol", value: "98 mg/dL", status: "Optimal", tone: "good", glyph: "heart", badge: "check" },
+  { label: "TSH", value: "2.1 mIU/L", status: "Normal", tone: "good", glyph: "thyroid", badge: "check" },
+  {
+    label: "Fasting Glucose",
+    value: "92 mg/dL",
+    status: "Healthy",
+    tone: "good",
+    glyph: "glucose",
+    badge: "check",
+  },
+];
+
+const DEFAULT_METRICS = METRIC_POOL.slice(0, 3);
+
+function buildMetricCard(metric) {
+  const glyph = METRIC_GLYPHS[metric.glyph] || METRIC_GLYPHS.droplet;
+  const badge = BADGE_ICONS[metric.badge] || BADGE_ICONS.check;
+
+  return `
+    <span class="metric metric--${metric.tone}">
+      <span class="metric-symbol" aria-hidden="true">
+        <svg class="metric-glyph" viewBox="0 0 24 24">${glyph}</svg>
+      </span>
+      <span class="metric-info">
+        <strong>${metric.label}</strong>
+        <span class="metric-value">${metric.value}</span>
+        <small>${metric.status}</small>
+      </span>
+      <span class="metric-badge" aria-hidden="true">${badge}</span>
+    </span>
+  `;
+}
+
+function pickRandomMetrics(count, excludeLabels = []) {
+  const pool = METRIC_POOL.filter((metric) => !excludeLabels.includes(metric.label));
+  const source = pool.length >= count ? pool : METRIC_POOL;
+
+  for (let attempt = 0; attempt < 24; attempt += 1) {
+    const shuffled = [...source].sort(() => Math.random() - 0.5);
+    const picked = shuffled.slice(0, count);
+    const allHealthy = picked.every((metric) => metric.tone === "good");
+
+    if (!allHealthy) {
+      return picked;
+    }
+  }
+
+  const mixed = source.filter((metric) => metric.tone !== "good");
+  const healthy = source.filter((metric) => metric.tone === "good").sort(() => Math.random() - 0.5);
+  const anchor = mixed[Math.floor(Math.random() * mixed.length)];
+
+  return [anchor, ...healthy].slice(0, count);
+}
+
+function renderMetricRow(row, metrics) {
+  row.innerHTML = metrics.map((metric) => buildMetricCard(metric)).join("");
+}
+
+let currentMetricLabels = [];
+
+const mobileMetricView = window.matchMedia("(max-width: 879px)");
+
+function isMobileMetricView() {
+  return mobileMetricView.matches;
+}
+
+function metricsForViewport() {
+  return isMobileMetricView() ? METRIC_POOL : DEFAULT_METRICS;
+}
+
+function rotateMetrics(animate = true) {
+  const row = document.querySelector("[data-metric-rotate]");
+  if (!row || isMobileMetricView()) {
+    return;
+  }
+
+  const metrics = pickRandomMetrics(3, animate ? currentMetricLabels : []);
+
+  if (animate && row.childElementCount) {
+    row.classList.add("is-fading");
+    window.setTimeout(() => {
+      row.classList.remove("is-fading");
+      renderMetricRow(row, metrics);
+      currentMetricLabels = metrics.map((metric) => metric.label);
+      restartMetricIconAnimations();
+    }, 280);
+    return;
+  }
+
+  renderMetricRow(row, metrics);
+  currentMetricLabels = metrics.map((metric) => metric.label);
+}
+
+function initMetricRotation() {
+  const row = document.querySelector("[data-metric-rotate]");
+  if (!row) {
+    return;
+  }
+
+  const metrics = metricsForViewport();
+  renderMetricRow(row, metrics);
+  currentMetricLabels = metrics.map((metric) => metric.label);
+}
+
+initMetricRotation();
+
+mobileMetricView.addEventListener("change", () => {
+  initMetricRotation();
+  restartMetricIconAnimations();
+});
+
 function restartFeatureAnimations() {
   restartGraphLineAnimation();
+  rotateMetrics();
   restartMetricIconAnimations();
 }
 
