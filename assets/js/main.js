@@ -57,7 +57,10 @@ if (heroItem4 && quickCards && !prefersReducedMotion) {
   heroItem4.addEventListener(
     "animationend",
     (event) => {
-      if (event.animationName === "hero-point-reveal") {
+      if (
+        event.animationName === "hero-point-reveal" &&
+        window.matchMedia("(min-width: 880px)").matches
+      ) {
         restartQuickCardAnimations();
       }
     },
@@ -150,16 +153,15 @@ document.querySelectorAll("[data-scroll-target]").forEach((button) => {
   });
 });
 
-// Hover-to-pan: while the pointer is over the quick-select section, auto-scroll
-// the cards. Left half pans them right (toward the start), right half pans them
-// left (toward the end); speed ramps up toward the edges with a center dead zone.
+// Hover-to-pan: desktop only (touch/mousemove on mobile caused runaway scrolling).
 const panSection = document.querySelector(".quick-select");
 const panTarget = document.getElementById("quick-cards");
+const desktopCarousel = window.matchMedia("(min-width: 880px)");
 
 // Shared so hover-pan pauses while the user is manually dragging the cards.
 let isDraggingCards = false;
 
-if (panSection && panTarget && !prefersReducedMotion) {
+if (panSection && panTarget && !prefersReducedMotion && desktopCarousel.matches) {
   const MAX_PAN_SPEED = 2; // px per frame at the far edges (slow, readable)
   const DEAD_ZONE = 0.08; // fraction around center with no movement
   let pointerX = null;
@@ -215,6 +217,118 @@ if (panSection && panTarget && !prefersReducedMotion) {
   panSection.addEventListener("mouseleave", () => {
     pointerX = null;
   });
+}
+
+// Mobile: gently nudge one card to the right once, then stop (scrollability hint).
+const mobileCarousel = window.matchMedia("(max-width: 879px)");
+const MOBILE_NUDGE_DELAY_MS = 900;
+const MOBILE_NUDGE_DURATION_MS = 1100;
+
+function getQuickCardStep() {
+  const firstCard = panTarget?.querySelector(".quick-card");
+  return firstCard ? firstCard.getBoundingClientRect().width + 16 : 176;
+}
+
+function nudgeMobileCarouselOnce() {
+  if (
+    prefersReducedMotion ||
+    !mobileCarousel.matches ||
+    !panTarget ||
+    panTarget.dataset.nudged === "true" ||
+    panTarget.scrollWidth <= panTarget.clientWidth + 8
+  ) {
+    return;
+  }
+
+  panTarget.dataset.nudged = "true";
+  const nudgeTimer = window.setTimeout(() => {
+    if (panTarget.scrollLeft > 4) {
+      return;
+    }
+    animateScrollBy(panTarget, getQuickCardStep(), MOBILE_NUDGE_DURATION_MS);
+  }, MOBILE_NUDGE_DELAY_MS);
+
+  const cancelNudge = () => {
+    window.clearTimeout(nudgeTimer);
+  };
+
+  panTarget.addEventListener("scroll", cancelNudge, { once: true, passive: true });
+  panTarget.addEventListener("touchstart", cancelNudge, { once: true, passive: true });
+}
+
+if (panSection && panTarget && !prefersReducedMotion) {
+  const nudgeObserver = new IntersectionObserver(
+    (entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        nudgeMobileCarouselOnce();
+        nudgeObserver.disconnect();
+      }
+    },
+    { threshold: 0.35 }
+  );
+
+  nudgeObserver.observe(panSection);
+
+  window.addEventListener("load", nudgeMobileCarouselOnce);
+  mobileCarousel.addEventListener("change", () => {
+    if (mobileCarousel.matches) {
+      nudgeMobileCarouselOnce();
+    }
+  });
+}
+
+// Mobile swipe hint: show for 5s when quick-select enters view, once per page load.
+const swipeHint = document.querySelector(".quick-select__hint.swipe-hint");
+const SWIPE_HINT_DURATION_MS = 5000;
+
+function showSwipeHintOnce() {
+  if (
+    !swipeHint ||
+    swipeHint.dataset.shown === "true" ||
+    !mobileCarousel.matches
+  ) {
+    return;
+  }
+
+  swipeHint.dataset.shown = "true";
+  swipeHint.classList.add("is-active");
+  swipeHint.setAttribute("aria-hidden", "false");
+
+  window.setTimeout(() => {
+    swipeHint.classList.remove("is-active");
+    swipeHint.setAttribute("aria-hidden", "true");
+  }, SWIPE_HINT_DURATION_MS);
+}
+
+if (panSection && swipeHint) {
+  const swipeHintObserver = new IntersectionObserver(
+    (entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        showSwipeHintOnce();
+        swipeHintObserver.disconnect();
+      }
+    },
+    { threshold: 0.35 }
+  );
+
+  swipeHintObserver.observe(panSection);
+}
+
+// Audience heading: gentle left-right wobble while the section is in view.
+const audienceSection = document.querySelector(".audience-tests");
+const audienceHeading = document.querySelector(".audience-tests .section-heading");
+
+if (audienceSection && audienceHeading && !prefersReducedMotion) {
+  const audienceHeadingObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        audienceHeading.classList.toggle("is-playing", entry.isIntersecting);
+      });
+    },
+    { threshold: 0.12 }
+  );
+
+  audienceHeadingObserver.observe(audienceSection);
 }
 
 // Click-hold-drag: press on the cards and drag left/right to scroll manually.

@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 80" role="img" aria-labelledby="title">
+  <title id="title">Swipe hint</title>
+
+  <defs>
+    <linearGradient id="blueGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1f8df5"/>
+      <stop offset="1" stop-color="#0f5dc8"/>
+    </linearGradient>
+
+    <filter id="tinyShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#0b2d57" flood-opacity="0.18"/>
+    </filter>
+
+    <style>
+      :root {
+        --blue: #1667d9;
+      }
+
+      .arrowLeft,
+      .arrowRight {
+        fill: none;
+        stroke: url(#blueGrad);
+        stroke-width: 11;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        filter: url(#tinyShadow);
+      }
+
+      .swipeText {
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 26px;
+        font-weight: 600;
+        fill: var(--blue);
+      }
+
+      .arrowLeft {
+        animation: leftPulse 3.4s ease-in-out infinite;
+        transform-origin: 51px 40px;
+      }
+
+      .arrowRight {
+        animation: rightPulse 3.4s ease-in-out infinite;
+        transform-origin: 469px 40px;
+      }
+
+      @keyframes leftPulse {
+        0%, 52%, 100% {
+          opacity: 0.35;
+          transform: translateX(0) scale(0.94);
+        }
+        70%, 84% {
+          opacity: 0.9;
+          transform: translateX(-10px) scale(1.02);
+        }
+      }
+
+      @keyframes rightPulse {
+        0%, 10%, 60%, 100% {
+          opacity: 0.35;
+          transform: translateX(0) scale(0.94);
+        }
+        28%, 44% {
+          opacity: 0.9;
+          transform: translateX(10px) scale(1.02);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .arrowLeft,
+        .arrowRight {
+          animation: none !important;
+          opacity: 1;
+        }
+      }
+    </style>
+  </defs>
+
+  <path class="arrowLeft" d="M78 40 L40 40 M40 40 L58 22 M40 40 L58 58"/>
+  <text class="swipeText" x="260" y="48" text-anchor="middle">swipe</text>
+  <path class="arrowRight" d="M442 40 L480 40 M480 40 L462 22 M480 40 L462 58"/>
+</svg>

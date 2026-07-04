@@ -1,0 +1,238 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="800" viewBox="0 0 1080 800" role="img" aria-labelledby="title desc">
+  <title id="title">Scroll left or right hint animation</title>
+  <desc id="desc">Animated SVG showing cards, left and right arrows, and a swipe gesture to indicate horizontal scrolling.</desc>
+
+  <defs>
+    <linearGradient id="cardGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f4f8ff"/>
+    </linearGradient>
+
+    <linearGradient id="blueGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1f8df5"/>
+      <stop offset="1" stop-color="#0f5dc8"/>
+    </linearGradient>
+
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#12345a" flood-opacity="0.14"/>
+    </filter>
+
+    <filter id="tinyShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#0b2d57" flood-opacity="0.18"/>
+    </filter>
+
+    <clipPath id="viewportClip">
+      <rect x="120" y="230" width="840" height="270" rx="44"/>
+    </clipPath>
+
+    <style>
+      :root {
+        --blue: #1667d9;
+        --text: #12345a;
+        --muted: #7d8da8;
+        --border: #dbe8f7;
+      }
+
+      .background {
+        fill: #ffffff;
+      }
+
+      .titleText {
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 42px;
+        font-weight: 700;
+        fill: var(--text);
+        letter-spacing: -0.6px;
+      }
+
+      .subText {
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 24px;
+        font-weight: 300;
+        fill: var(--muted);
+      }
+
+      .viewport {
+        fill: #f8fbff;
+        stroke: var(--border);
+        stroke-width: 2;
+      }
+
+      .card {
+        fill: url(#cardGrad);
+        stroke: #d8e6f7;
+        stroke-width: 2;
+      }
+
+      .cardLine {
+        stroke: #d8e6f7;
+        stroke-width: 14;
+        stroke-linecap: round;
+      }
+
+      .cardDot {
+        fill: #1f8df5;
+        opacity: 0.9;
+      }
+
+      .cardsTrack {
+        animation: cardsSwipe 3.4s ease-in-out infinite;
+      }
+
+      @keyframes cardsSwipe {
+        0%, 14% { transform: translateX(0px); }
+        38%, 50% { transform: translateX(-155px); }
+        76%, 88% { transform: translateX(155px); }
+        100% { transform: translateX(0px); }
+      }
+
+      .arrowLeft, .arrowRight {
+        fill: none;
+        stroke: url(#blueGrad);
+        stroke-width: 11;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        filter: url(#tinyShadow);
+      }
+
+      .arrowLeft {
+        animation: leftPulse 3.4s ease-in-out infinite;
+        transform-origin: 205px 610px;
+      }
+
+      .arrowRight {
+        animation: rightPulse 3.4s ease-in-out infinite;
+        transform-origin: 875px 610px;
+      }
+
+      @keyframes leftPulse {
+        0%, 52%, 100% { opacity: 0.35; transform: translateX(0) scale(0.94); }
+        70%, 84% { opacity: 0.9; transform: translateX(-10px) scale(1.02); }
+      }
+
+      @keyframes rightPulse {
+        0%, 10%, 60%, 100% { opacity: 0.35; transform: translateX(0) scale(0.94); }
+        28%, 44% { opacity: 0.9; transform: translateX(10px) scale(1.02); }
+      }
+
+      .handGroup {
+        animation: handSwipe 3.4s ease-in-out infinite;
+        transform-origin: 540px 570px;
+      }
+
+      @keyframes handSwipe {
+        0%, 10% { transform: translateX(0px) rotate(0deg); opacity: 0; }
+        18% { opacity: 1; }
+        38%, 50% { transform: translateX(120px) rotate(1deg); opacity: 1; }
+        60% { opacity: 0; }
+        68% { transform: translateX(0px) rotate(0deg); opacity: 0; }
+        76% { opacity: 1; }
+        88% { transform: translateX(-120px) rotate(-1deg); opacity: 1; }
+        100% { transform: translateX(0px) rotate(0deg); opacity: 0; }
+      }
+
+      .trailRight {
+        animation: trailRight 3.4s ease-in-out infinite;
+      }
+
+      .trailLeft {
+        animation: trailLeft 3.4s ease-in-out infinite;
+      }
+
+      @keyframes trailRight {
+        0%, 16%, 60%, 100% { opacity: 0; stroke-dashoffset: 180; }
+        24% { opacity: 0.55; stroke-dashoffset: 120; }
+        44% { opacity: 0; stroke-dashoffset: 0; }
+      }
+
+      @keyframes trailLeft {
+        0%, 66%, 100% { opacity: 0; stroke-dashoffset: 180; }
+        76% { opacity: 0.55; stroke-dashoffset: 120; }
+        92% { opacity: 0; stroke-dashoffset: 0; }
+      }
+
+      .hintPill {
+        fill: #eef6ff;
+        stroke: #d7e9ff;
+        stroke-width: 2;
+      }
+
+      .hintText {
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 26px;
+        font-weight: 600;
+        fill: var(--blue);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .cardsTrack, .arrowLeft, .arrowRight, .handGroup, .trailRight, .trailLeft {
+          animation: none !important;
+        }
+        .arrowLeft, .arrowRight { opacity: 1; }
+        .handGroup { opacity: 1; }
+      }
+    </style>
+  </defs>
+
+  <rect class="background" width="1080" height="800"/>
+
+  <text class="titleText" x="540" y="112" text-anchor="middle">Swipe to explore</text>
+  <text class="subText" x="540" y="154" text-anchor="middle">Scroll left or right to see more cards</text>
+
+  <rect class="viewport" x="120" y="230" width="840" height="270" rx="44" filter="url(#softShadow)"/>
+
+  <g clip-path="url(#viewportClip)">
+    <g class="cardsTrack">
+      <rect class="card" x="-70" y="275" width="190" height="180" rx="32"/>
+      <circle class="cardDot" cx="-25" cy="325" r="18"/>
+      <line class="cardLine" x1="-25" y1="370" x2="75" y2="370"/>
+      <line class="cardLine" x1="-25" y1="410" x2="45" y2="410"/>
+
+      <rect class="card" x="155" y="275" width="190" height="180" rx="32"/>
+      <circle class="cardDot" cx="200" cy="325" r="18"/>
+      <line class="cardLine" x1="200" y1="370" x2="300" y2="370"/>
+      <line class="cardLine" x1="200" y1="410" x2="270" y2="410"/>
+
+      <rect class="card" x="380" y="275" width="190" height="180" rx="32"/>
+      <circle class="cardDot" cx="425" cy="325" r="18"/>
+      <line class="cardLine" x1="425" y1="370" x2="525" y2="370"/>
+      <line class="cardLine" x1="425" y1="410" x2="495" y2="410"/>
+
+      <rect class="card" x="605" y="275" width="190" height="180" rx="32"/>
+      <circle class="cardDot" cx="650" cy="325" r="18"/>
+      <line class="cardLine" x1="650" y1="370" x2="750" y2="370"/>
+      <line class="cardLine" x1="650" y1="410" x2="720" y2="410"/>
+
+      <rect class="card" x="830" y="275" width="190" height="180" rx="32"/>
+      <circle class="cardDot" cx="875" cy="325" r="18"/>
+      <line class="cardLine" x1="875" y1="370" x2="975" y2="370"/>
+      <line class="cardLine" x1="875" y1="410" x2="945" y2="410"/>
+
+      <rect class="card" x="1055" y="275" width="190" height="180" rx="32"/>
+      <circle class="cardDot" cx="1100" cy="325" r="18"/>
+      <line class="cardLine" x1="1100" y1="370" x2="1200" y2="370"/>
+      <line class="cardLine" x1="1100" y1="410" x2="1170" y2="410"/>
+    </g>
+  </g>
+
+  <path class="trailRight" d="M 482 592 C 540 558, 620 558, 688 592" fill="none" stroke="#1f8df5" stroke-width="8" stroke-linecap="round" stroke-dasharray="180" stroke-dashoffset="180" opacity="0"/>
+  <path class="trailLeft" d="M 598 592 C 540 558, 460 558, 392 592" fill="none" stroke="#1f8df5" stroke-width="8" stroke-linecap="round" stroke-dasharray="180" stroke-dashoffset="180" opacity="0"/>
+
+  <g class="handGroup" filter="url(#tinyShadow)">
+    <path d="M520 588 C520 568 536 552 556 552 C574 552 588 566 588 584 L588 616 L612 600 C622 594 636 598 642 608 C648 618 646 631 637 638 L584 678 C568 690 546 692 528 680 L492 656 C482 649 479 635 486 625 C493 615 507 612 517 619 L532 629 L532 588 Z" fill="#ffffff" stroke="#c7d9ef" stroke-width="3"/>
+    <rect x="536" y="515" width="40" height="92" rx="20" fill="#ffffff" stroke="#c7d9ef" stroke-width="3"/>
+    <circle cx="556" cy="536" r="7" fill="#1f8df5" opacity="0.9"/>
+  </g>
+
+  <path class="arrowLeft" d="M232 610 L194 610 M194 610 L212 592 M194 610 L212 628"/>
+  <path class="arrowRight" d="M848 610 L886 610 M886 610 L868 592 M886 610 L868 628"/>
+
+  <g>
+    <rect class="hintPill" x="366" y="694" width="348" height="62" rx="31"/>
+    <text class="hintText" x="540" y="735" text-anchor="middle">Drag or swipe sideways</text>
+  </g>
+
+  <metadata>
+    Dr Swift Diagnostics scroll hint animated SVG. CSS-only motion. Transparent ownership metadata.
+  </metadata>
+</svg>
