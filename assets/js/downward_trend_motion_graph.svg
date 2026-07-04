@@ -1,0 +1,278 @@
+<svg width="1080" height="800" viewBox="0 0 1080 800" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Animated downward trend line over 12 months</title>
+  <desc id="desc">A clean white card showing a line graph trending downward over twelve months, animated from left to right with a downward arrow.</desc>
+
+  <style>
+    :root {
+      --blue: #246BFE;
+      --blue-soft: #E9F0FF;
+      --text: #0F172A;
+      --muted: #64748B;
+      --grid: #D9E4F7;
+      --down: #EF7D22;
+      --down-soft: #FFF2E7;
+      --green: #16A34A;
+      --border: #D8E2F2;
+    }
+
+    .card-bg {
+      fill: #ffffff;
+    }
+
+    .panel {
+      fill: #ffffff;
+      stroke: var(--border);
+      stroke-width: 2;
+    }
+
+    .title {
+      font-family: Inter, Arial, sans-serif;
+      font-size: 42px;
+      font-weight: 750;
+      fill: var(--text);
+      letter-spacing: -0.8px;
+    }
+
+    .subtitle {
+      font-family: Inter, Arial, sans-serif;
+      font-size: 22px;
+      font-weight: 400;
+      fill: var(--muted);
+    }
+
+    .axis-label, .month-label {
+      font-family: Inter, Arial, sans-serif;
+      font-size: 18px;
+      font-weight: 500;
+      fill: var(--blue);
+    }
+
+    .value-label {
+      font-family: Inter, Arial, sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      fill: var(--down);
+    }
+
+    .small-label {
+      font-family: Inter, Arial, sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      fill: var(--muted);
+    }
+
+    .grid-line {
+      stroke: var(--grid);
+      stroke-width: 1.4;
+      stroke-dasharray: 7 9;
+    }
+
+    .axis {
+      stroke: var(--blue);
+      stroke-width: 3;
+      stroke-linecap: round;
+    }
+
+    .trend-shadow {
+      stroke: rgba(239, 125, 34, 0.18);
+      stroke-width: 20;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 1120;
+      stroke-dashoffset: 1120;
+      animation: drawLine 3.2s ease-out 0.4s forwards;
+    }
+
+    .trend-line {
+      stroke: var(--down);
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 1120;
+      stroke-dashoffset: 1120;
+      animation: drawLine 3.2s ease-out 0.4s forwards;
+    }
+
+    .dot {
+      fill: #ffffff;
+      stroke: var(--down);
+      stroke-width: 6;
+      transform-box: fill-box;
+      transform-origin: center;
+      opacity: 0;
+      animation: popDot 0.45s ease-out forwards;
+    }
+
+    .dot.latest {
+      fill: var(--down);
+      stroke: #ffffff;
+      stroke-width: 5;
+      filter: url(#softShadow);
+      animation: popDot 0.45s ease-out 3.45s forwards, pulseLatest 1.6s ease-in-out 4.1s infinite;
+    }
+
+    .arrow-group {
+      opacity: 0;
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: arrowArrive 0.75s ease-out 3.55s forwards, arrowFloat 1.7s ease-in-out 4.3s infinite;
+    }
+
+    .status-pill {
+      fill: var(--down-soft);
+      stroke: rgba(239, 125, 34, 0.22);
+      stroke-width: 1.5;
+    }
+
+    .status-text {
+      font-family: Inter, Arial, sans-serif;
+      font-size: 22px;
+      font-weight: 750;
+      fill: var(--down);
+    }
+
+    .data-chip {
+      fill: var(--blue-soft);
+      stroke: rgba(36, 107, 254, 0.16);
+      stroke-width: 1.5;
+    }
+
+    .chip-text {
+      font-family: Inter, Arial, sans-serif;
+      font-size: 18px;
+      font-weight: 650;
+      fill: var(--blue);
+    }
+
+    @keyframes drawLine {
+      to { stroke-dashoffset: 0; }
+    }
+
+    @keyframes popDot {
+      0% { opacity: 0; transform: scale(0.3); }
+      70% { opacity: 1; transform: scale(1.18); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes arrowArrive {
+      0% { opacity: 0; transform: translate(-34px, -34px) scale(0.75); }
+      100% { opacity: 1; transform: translate(0, 0) scale(1); }
+    }
+
+    @keyframes arrowFloat {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(8px, 8px); }
+    }
+
+    @keyframes pulseLatest {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.18); }
+    }
+
+    .dot-1 { animation-delay: 0.7s; }
+    .dot-2 { animation-delay: 0.95s; }
+    .dot-3 { animation-delay: 1.2s; }
+    .dot-4 { animation-delay: 1.45s; }
+    .dot-5 { animation-delay: 1.7s; }
+    .dot-6 { animation-delay: 1.95s; }
+    .dot-7 { animation-delay: 2.2s; }
+    .dot-8 { animation-delay: 2.45s; }
+    .dot-9 { animation-delay: 2.7s; }
+    .dot-10 { animation-delay: 2.95s; }
+    .dot-11 { animation-delay: 3.2s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .trend-shadow, .trend-line, .dot, .dot.latest, .arrow-group {
+        animation: none !important;
+        opacity: 1 !important;
+        stroke-dashoffset: 0 !important;
+      }
+    }
+  </style>
+
+  <defs>
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#0F172A" flood-opacity="0.13"/>
+    </filter>
+
+    <marker id="arrowHead" markerWidth="18" markerHeight="18" refX="9" refY="9" orient="auto" markerUnits="strokeWidth">
+      <path d="M2 2 L16 9 L2 16 Z" fill="#EF7D22"/>
+    </marker>
+  </defs>
+
+  <rect class="card-bg" width="1080" height="800" rx="0"/>
+
+  <!-- 15% breathing-space-inspired layout -->
+  <rect class="panel" x="88" y="78" width="904" height="644" rx="36"/>
+
+  <text class="title" x="132" y="142">12-month trend motion graphic</text>
+  <text class="subtitle" x="132" y="180">Line animates downward across the period</text>
+
+  <rect class="status-pill" x="768" y="113" width="168" height="54" rx="27"/>
+  <text class="status-text" x="794" y="148">Down trend</text>
+
+  <rect class="data-chip" x="132" y="211" width="202" height="44" rx="22"/>
+  <text class="chip-text" x="155" y="239">Last 12 months</text>
+
+  <rect class="data-chip" x="350" y="211" width="240" height="44" rx="22"/>
+  <text class="chip-text" x="373" y="239">CSS-only animation</text>
+
+  <!-- Plot area: x 152-928, y 286-604 -->
+  <line class="grid-line" x1="152" y1="286" x2="928" y2="286"/>
+  <line class="grid-line" x1="152" y1="366" x2="928" y2="366"/>
+  <line class="grid-line" x1="152" y1="446" x2="928" y2="446"/>
+  <line class="grid-line" x1="152" y1="526" x2="928" y2="526"/>
+
+  <line class="axis" x1="152" y1="604" x2="928" y2="604"/>
+  <line class="axis" x1="152" y1="604" x2="152" y2="276"/>
+
+  <text class="axis-label" x="144" y="641">12 months →</text>
+  <text class="axis-label" transform="translate(111 548) rotate(-90)">Value</text>
+
+  <!-- Month ticks -->
+  <g>
+    <line class="axis" x1="152" y1="604" x2="152" y2="615" stroke-width="2"/>
+    <line class="axis" x1="293" y1="604" x2="293" y2="615" stroke-width="2"/>
+    <line class="axis" x1="434" y1="604" x2="434" y2="615" stroke-width="2"/>
+    <line class="axis" x1="575" y1="604" x2="575" y2="615" stroke-width="2"/>
+    <line class="axis" x1="716" y1="604" x2="716" y2="615" stroke-width="2"/>
+    <line class="axis" x1="857" y1="604" x2="857" y2="615" stroke-width="2"/>
+
+    <text class="month-label" x="135" y="648">M1</text>
+    <text class="month-label" x="276" y="648">M3</text>
+    <text class="month-label" x="417" y="648">M5</text>
+    <text class="month-label" x="558" y="648">M7</text>
+    <text class="month-label" x="699" y="648">M9</text>
+    <text class="month-label" x="833" y="648">M11</text>
+  </g>
+
+  <!-- Trend path: starts high, ends low -->
+  <path class="trend-shadow" d="M164 318 C220 296 259 306 310 333 C360 360 396 354 448 385 C498 414 529 421 576 448 C626 477 662 471 710 501 C759 531 797 548 846 563 C879 573 904 580 922 590"/>
+  <path class="trend-line" d="M164 318 C220 296 259 306 310 333 C360 360 396 354 448 385 C498 414 529 421 576 448 C626 477 662 471 710 501 C759 531 797 548 846 563 C879 573 904 580 922 590"/>
+
+  <!-- Dots along path -->
+  <circle class="dot dot-1" cx="164" cy="318" r="11"/>
+  <circle class="dot dot-2" cx="239" cy="303" r="11"/>
+  <circle class="dot dot-3" cx="310" cy="333" r="11"/>
+  <circle class="dot dot-4" cx="384" cy="358" r="11"/>
+  <circle class="dot dot-5" cx="448" cy="385" r="11"/>
+  <circle class="dot dot-6" cx="520" cy="419" r="11"/>
+  <circle class="dot dot-7" cx="576" cy="448" r="11"/>
+  <circle class="dot dot-8" cx="650" cy="474" r="11"/>
+  <circle class="dot dot-9" cx="710" cy="501" r="11"/>
+  <circle class="dot dot-10" cx="786" cy="541" r="11"/>
+  <circle class="dot dot-11" cx="846" cy="563" r="11"/>
+  <circle class="dot latest" cx="922" cy="590" r="15"/>
+
+  <text class="value-label" x="160" y="292">Start</text>
+  <text class="value-label" x="838" y="555">Lower</text>
+
+  <!-- Animated down arrow at end -->
+  <g class="arrow-group">
+    <line x1="864" y1="520" x2="936" y2="592" stroke="#EF7D22" stroke-width="10" stroke-linecap="round" marker-end="url(#arrowHead)"/>
+    <circle cx="848" cy="504" r="26" fill="#FFF2E7" stroke="rgba(239,125,34,0.25)" stroke-width="2"/>
+    <path d="M838 497 L848 507 L861 491" stroke="#EF7D22" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <text class="small-label" x="690" y="690">Replace M1–M12 and values with your own data using CSS/JS.</text>
+</svg>

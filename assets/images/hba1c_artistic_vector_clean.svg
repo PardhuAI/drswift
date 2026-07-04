@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="800" viewBox="0 0 1080 800">
+  <defs>
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#2ea44f" flood-opacity="0.14"/>
+    </filter>
+    <filter id="dotShadow" x="-80%" y="-80%" width="260%" height="260%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#000000" flood-opacity="0.18"/>
+    </filter>
+    <linearGradient id="fadeBlue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a63d8" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#1a63d8" stop-opacity="0.00"/>
+    </linearGradient>
+    <linearGradient id="healthTrend" x1="260" y1="274" x2="900" y2="500" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ff7900"/>
+      <stop offset="38%" stop-color="#ff7900"/>
+      <stop offset="41%" stop-color="#2ea44f"/>
+      <stop offset="100%" stop-color="#2ea44f"/>
+    </linearGradient>
+  </defs>
+
+  <style>
+    .trend-line-shadow,
+    .trend-line-main {
+      stroke-dasharray: 1000;
+      stroke-dashoffset: 1000;
+      animation: drawTrendLine 3.2s ease-out 0.4s forwards;
+    }
+
+    @keyframes drawTrendLine {
+      to { stroke-dashoffset: 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .trend-line-shadow,
+      .trend-line-main {
+        animation: none !important;
+        stroke-dashoffset: 0 !important;
+      }
+    }
+  </style>
+
+  <rect width="1080" height="800" fill="#ffffff"/>
+
+  <!-- 15% clear whitespace is preserved around the main chart composition -->
+
+  <!-- Chart title -->
+  <text x="918" y="280" text-anchor="end" font-family="Inter, SF Pro Display, Arial, sans-serif" font-size="46" font-weight="400" fill="#095bd8">HbA1c</text>
+
+  <!-- Axes -->
+  <line x1="172" y1="590" x2="918" y2="590" stroke="#095bd8" stroke-width="5" stroke-linecap="round"/>
+  <path d="M918 590 L894 578 L894 602 Z" fill="#095bd8"/>
+  <line x1="172" y1="590" x2="172" y2="154" stroke="#095bd8" stroke-width="5" stroke-linecap="round"/>
+  <path d="M172 154 L160 178 L184 178 Z" fill="#095bd8"/>
+
+  <!-- Gentle artistic area wash under the curve -->
+  <path d="M260 274 C330 294, 392 356, 500 382 C568 398, 622 468, 740 485 C806 496, 864 498, 900 500 L900 590 L260 590 Z"
+        fill="url(#fadeBlue)"/>
+
+  <!-- Vertical guide strokes for visual anchoring -->
+  <line x1="260" y1="284" x2="260" y2="590" stroke="#8db9ff" stroke-width="2" stroke-dasharray="4 8" stroke-linecap="round"/>
+  <line x1="500" y1="392" x2="500" y2="590" stroke="#8db9ff" stroke-width="2" stroke-dasharray="4 8" stroke-linecap="round"/>
+  <line x1="740" y1="495" x2="740" y2="590" stroke="#8db9ff" stroke-width="2" stroke-dasharray="4 8" stroke-linecap="round"/>
+  <line x1="900" y1="510" x2="900" y2="590" stroke="#8db9ff" stroke-width="2" stroke-dasharray="4 8" stroke-linecap="round"/>
+
+  <!-- Main health trend line: orange (borderline) → green (healthy), animated left-to-right -->
+  <path class="trend-line-shadow"
+        pathLength="1000"
+        d="M260 274 C330 294, 392 356, 500 382 C568 398, 622 468, 740 485 C806 496, 864 498, 900 500"
+        fill="none" stroke="url(#healthTrend)" stroke-width="8" stroke-linecap="round" filter="url(#softShadow)"/>
+  <path class="trend-line-main"
+        pathLength="1000"
+        d="M260 274 C330 294, 392 356, 500 382 C568 398, 622 468, 740 485 C806 496, 864 498, 900 500"
+        fill="none" stroke="url(#healthTrend)" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Data dots -->
+  <circle cx="260" cy="274" r="18" fill="#ffffff" filter="url(#dotShadow)"/>
+  <circle cx="260" cy="274" r="13" fill="#ff7900"/>
+  <circle cx="500" cy="382" r="18" fill="#ffffff" filter="url(#dotShadow)"/>
+  <circle cx="500" cy="382" r="13" fill="#2ea44f"/>
+  <circle cx="740" cy="485" r="18" fill="#ffffff" filter="url(#dotShadow)"/>
+  <circle cx="740" cy="485" r="13" fill="#2ea44f"/>
+  <circle cx="900" cy="500" r="18" fill="#ffffff" filter="url(#dotShadow)"/>
+  <circle cx="900" cy="500" r="13" fill="#2ea44f"/>
+
+  <!-- Labels above dots -->
+  <text x="260" y="192" text-anchor="middle" font-family="Inter, SF Pro Display, Arial, sans-serif" font-size="42" font-weight="200" fill="#ff7900">6.0</text>
+  <text x="260" y="228" text-anchor="middle" font-family="Inter, SF Pro Display, Arial, sans-serif" font-size="24" font-weight="200" fill="#ff7900">Borderline High</text>
+
+  <text x="500" y="326" text-anchor="middle" font-family="Inter, SF Pro Display, Arial, sans-serif" font-size="40" font-weight="200" fill="#2ea44f">5.6</text>
+  <text x="500" y="360" text-anchor="middle" font-family="Inter, SF Pro Display, Arial, sans-serif" font-size="24" font-weight="200" fill="#2ea44f">Good</text>
+
+  <text x="740" y="430" text-anchor="middle" font-family="Inter, SF Pro Display, Arial, sans-serif" font-size="40" font-weight="200" fill="#2ea44f">5.2</text>
+  <text x="740" y="464" text-anchor="middle" font-family="Inter, SF Pro Display, Arial, sans-serif" font-size="24" font-weight="200" fill="#2ea44f">Healthy</text>
+
+  <text x="900" y="445" text-anchor="middle" font-family="Inter, SF Pro Display, Arial, sans-serif" font-size="40" font-weight="200" fill="#2ea44f">5.1</text>
+  <text x="900" y="479" text-anchor="middle" font-family="Inter, SF Pro Display, Arial, sans-serif" font-size="24" font-weight="200" fill="#2ea44f">Healthy</text>
+
+  <!-- X-axis dates -->
+  <text x="260" y="634" text-anchor="middle" font-family="Inter, SF Pro Display, Arial, sans-serif" font-size="26" font-weight="200" fill="#095bd8">04-09-24</text>
+  <text x="500" y="634" text-anchor="middle" font-family="Inter, SF Pro Display, Arial, sans-serif" font-size="26" font-weight="200" fill="#095bd8">28-09-24</text>
+  <text x="740" y="634" text-anchor="middle" font-family="Inter, SF Pro Display, Arial, sans-serif" font-size="26" font-weight="200" fill="#095bd8">17-11-24</text>
+  <text x="900" y="634" text-anchor="middle" font-family="Inter, SF Pro Display, Arial, sans-serif" font-size="26" font-weight="200" fill="#095bd8">05-01-25</text>
+
+  <!-- X-axis label -->
+  <text x="540" y="674" text-anchor="middle" font-family="Inter, SF Pro Display, Arial, sans-serif" font-size="30" font-weight="200" fill="#095bd8">
+    See your health over the years.. →
+  </text>
+</svg>

@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hero headline animations — pick one</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <style>
+      body {
+        background: linear-gradient(#fafcff, #ffffff);
+      }
+
+      .picker-header {
+        padding: 32px 0 12px;
+        text-align: center;
+      }
+
+      .picker-header h1 {
+        margin: 0 0 8px;
+        font-size: clamp(1.35rem, 3vw, 1.85rem);
+        color: var(--color-ink);
+      }
+
+      .picker-header p {
+        margin: 0 auto;
+        max-width: 36rem;
+        color: var(--color-muted);
+      }
+
+      .picker-grid {
+        display: grid;
+        gap: 28px;
+        padding: 24px 0 56px;
+      }
+
+      .picker-card {
+        padding: 22px;
+        background: #fff;
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-card);
+      }
+
+      .picker-card__head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+
+      .picker-card__title {
+        margin: 0;
+        font-size: 1.05rem;
+        color: var(--color-blue-dark);
+      }
+
+      .picker-card__desc {
+        margin: 4px 0 0;
+        font-size: 0.92rem;
+        color: var(--color-muted);
+      }
+
+      .replay-btn {
+        padding: 8px 16px;
+        border: 1px solid var(--color-line);
+        border-radius: 10px;
+        background: #fff;
+        color: var(--color-blue);
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 160ms ease, box-shadow 160ms ease;
+      }
+
+      .replay-btn:hover,
+      .replay-btn:focus-visible {
+        background: var(--color-blue-soft);
+        outline: none;
+      }
+
+      .hero-preview {
+        min-height: 132px;
+        padding: 28px;
+        background: linear-gradient(#fafcff, #ffffff);
+        border: 1px solid #e8eef6;
+        border-radius: var(--radius-sm);
+      }
+
+      .hero-preview .hero-statement {
+        margin: 0;
+      }
+
+      /* ── Option 1: calm fade + colored-word stagger ── */
+      .anim-1 .hero-line-one {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+
+      .anim-1.play .hero-line-one {
+        animation: a1-line 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      .anim-1 .hero-line-two span {
+        opacity: 0;
+        transform: translateY(18px) scale(0.96);
+        display: inline-block;
+      }
+
+      .anim-1.play .hero-line-two .c-red {
+        animation: a1-word 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.72s forwards;
+      }
+
+      .anim-1.play .hero-line-two .c-yellow {
+        animation: a1-word 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.92s forwards;
+      }
+
+      .anim-1.play .hero-line-two .c-health {
+        animation: a1-word 0.55s cubic-bezier(0.22, 1, 0.36, 1) 1.12s forwards;
+      }
+
+      @keyframes a1-line {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes a1-word {
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      /* ── Option 2: word cascade with blur settle ── */
+      .anim-2 .w {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(22px);
+        filter: blur(6px);
+      }
+
+      .anim-2 .w + .w {
+        margin-left: 0.28em;
+      }
+
+      .anim-2.play .hero-line-one .w:nth-child(1) { animation: a2-word 0.5s ease 0.05s forwards; }
+      .anim-2.play .hero-line-one .w:nth-child(2) { animation: a2-word 0.5s ease 0.17s forwards; }
+      .anim-2.play .hero-line-one .w:nth-child(3) { animation: a2-word 0.5s ease 0.29s forwards; }
+      .anim-2.play .hero-line-one .w:nth-child(4) { animation: a2-word 0.5s ease 0.41s forwards; }
+
+      .anim-2 .hero-line-two span {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(22px);
+        filter: blur(6px);
+      }
+
+      .anim-2.play .hero-line-two .c-red { animation: a2-word 0.52s ease 0.62s forwards; }
+      .anim-2.play .hero-line-two .c-yellow { animation: a2-word 0.52s ease 0.78s forwards; }
+      .anim-2.play .hero-line-two .c-health { animation: a2-word 0.52s ease 0.94s forwards; }
+
+      @keyframes a2-word {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+          filter: blur(0);
+        }
+      }
+
+      /* ── Option 3: line wipe + spring pop ── */
+      .anim-3 .hero-line-one {
+        opacity: 1;
+        clip-path: inset(0 100% 0 0);
+      }
+
+      .anim-3.play .hero-line-one {
+        animation: a3-wipe 0.85s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+      }
+
+      .anim-3 .hero-line-two span {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(110%) rotate(2deg);
+        transform-origin: left bottom;
+      }
+
+      .anim-3.play .hero-line-two .c-red {
+        animation: a3-pop 0.62s cubic-bezier(0.34, 1.45, 0.64, 1) 0.78s forwards;
+      }
+
+      .anim-3.play .hero-line-two .c-yellow {
+        animation: a3-pop 0.62s cubic-bezier(0.34, 1.45, 0.64, 1) 0.98s forwards;
+      }
+
+      .anim-3.play .hero-line-two .c-health {
+        animation: a3-pop 0.62s cubic-bezier(0.34, 1.45, 0.64, 1) 1.18s forwards;
+      }
+
+      @keyframes a3-wipe {
+        to {
+          clip-path: inset(0 0 0 0);
+        }
+      }
+
+      @keyframes a3-pop {
+        0% {
+          opacity: 0;
+          transform: translateY(110%) rotate(2deg);
+        }
+        70% {
+          opacity: 1;
+          transform: translateY(-6%) rotate(-0.5deg);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0) rotate(0);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .anim-1 .hero-line-one,
+        .anim-1 .hero-line-two span,
+        .anim-2 .w,
+        .anim-2 .hero-line-two span,
+        .anim-3 .hero-line-one,
+        .anim-3 .hero-line-two span {
+          opacity: 1 !important;
+          transform: none !important;
+          filter: none !important;
+          clip-path: none !important;
+          animation: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="picker-header container">
+      <h1>Hero headline animation picker</h1>
+      <p>
+        Same copy and colors as the live hero. Watch each option, hit <strong>Replay</strong>, then tell me
+        <strong>Option 1</strong>, <strong>Option 2</strong>, or <strong>Option 3</strong> to ship on the homepage.
+      </p>
+    </header>
+
+    <main class="container picker-grid">
+      <section class="picker-card" aria-labelledby="opt-1-title">
+        <div class="picker-card__head">
+          <div>
+            <h2 class="picker-card__title" id="opt-1-title">Option 1 — Soft fade &amp; stagger</h2>
+            <p class="picker-card__desc">Line one lifts in gently; <em>See → Your → Health.</em> follow with a calm stagger.</p>
+          </div>
+          <button class="replay-btn" type="button" data-target="anim-1">Replay</button>
+        </div>
+        <div class="hero-preview anim-1 play" id="anim-1">
+          <h1 class="hero-statement">
+            <span class="hero-line-one">See More Than Numbers,</span>
+            <span class="hero-line-two">
+              <span class="c-red">See</span>
+              <span class="c-yellow">Your</span>
+              <span class="c-health">Health.</span>
+            </span>
+          </h1>
+        </div>
+      </section>
+
+      <section class="picker-card" aria-labelledby="opt-2-title">
+        <div class="picker-card__head">
+          <div>
+            <h2 class="picker-card__title" id="opt-2-title">Option 2 — Word cascade</h2>
+            <p class="picker-card__desc">Every word drifts up and sharpens; line two keeps the color rhythm.</p>
+          </div>
+          <button class="replay-btn" type="button" data-target="anim-2">Replay</button>
+        </div>
+        <div class="hero-preview anim-2 play" id="anim-2">
+          <h1 class="hero-statement">
+            <span class="hero-line-one">
+              <span class="w">See</span>
+              <span class="w">More</span>
+              <span class="w">Than</span>
+              <span class="w">Numbers,</span>
+            </span>
+            <span class="hero-line-two">
+              <span class="c-red">See</span>
+              <span class="c-yellow">Your</span>
+              <span class="c-health">Health.</span>
+            </span>
+          </h1>
+        </div>
+      </section>
+
+      <section class="picker-card" aria-labelledby="opt-3-title">
+        <div class="picker-card__head">
+          <div>
+            <h2 class="picker-card__title" id="opt-3-title">Option 3 — Wipe &amp; spring pop</h2>
+            <p class="picker-card__desc">Line one wipes left-to-right; colored words bounce in with a light spring.</p>
+          </div>
+          <button class="replay-btn" type="button" data-target="anim-3">Replay</button>
+        </div>
+        <div class="hero-preview anim-3 play" id="anim-3">
+          <h1 class="hero-statement">
+            <span class="hero-line-one">See More Than Numbers,</span>
+            <span class="hero-line-two">
+              <span class="c-red">See</span>
+              <span class="c-yellow">Your</span>
+              <span class="c-health">Health.</span>
+            </span>
+          </h1>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      function replayAnimation(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.remove("play");
+        void el.offsetWidth;
+        el.classList.add("play");
+      }
+
+      document.querySelectorAll(".replay-btn").forEach((btn) => {
+        btn.addEventListener("click", () => replayAnimation(btn.dataset.target));
+      });
+
+      window.addEventListener("load", () => {
+        ["anim-1", "anim-2", "anim-3"].forEach((id, index) => {
+          setTimeout(() => replayAnimation(id), index * 350);
+        });
+      });
+    </script>
+  </body>
+</html>
