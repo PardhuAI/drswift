@@ -471,6 +471,26 @@ const METRIC_POOL = [
 
 const DEFAULT_METRICS = METRIC_POOL.slice(0, 3);
 
+/* Fixed corner cards on the insights image — unique tests, not rotated with the copy row. */
+const OVERLAY_METRICS = {
+  left: {
+    label: "Hemoglobin",
+    value: "13.1 g/dL",
+    status: "Healthy",
+    tone: "good",
+    glyph: "droplet",
+    badge: "check",
+  },
+  right: {
+    label: "E2",
+    value: "62 pg/mL",
+    status: "Healthy",
+    tone: "good",
+    glyph: "thyroid",
+    badge: "check",
+  },
+};
+
 function buildMetricCard(metric) {
   const glyph = METRIC_GLYPHS[metric.glyph] || METRIC_GLYPHS.droplet;
   const badge = BADGE_ICONS[metric.badge] || BADGE_ICONS.check;
@@ -513,7 +533,38 @@ function pickRandomMetrics(count, excludeLabels = []) {
 
 function renderMetricRow(row, metrics) {
   row.innerHTML = metrics.map((metric) => buildMetricCard(metric)).join("");
-  queueMetricScrollSync();
+  if (row.closest(".metric-row-scroll")) {
+    queueMetricScrollSync();
+  }
+}
+
+function getMetricRows() {
+  return [...document.querySelectorAll(".metric-row-scroll [data-metric-rotate]")];
+}
+
+function renderOverlayMetrics() {
+  const overlay = document.querySelector(".insights-image-overlay");
+  if (!overlay) {
+    return;
+  }
+
+  if (isMobileMetricView()) {
+    overlay.querySelectorAll("[data-metric-overlay]").forEach((slot) => {
+      slot.innerHTML = "";
+    });
+    return;
+  }
+
+  const left = overlay.querySelector('[data-metric-overlay="left"]');
+  const right = overlay.querySelector('[data-metric-overlay="right"]');
+
+  if (left) {
+    left.innerHTML = buildMetricCard(OVERLAY_METRICS.left);
+  }
+
+  if (right) {
+    right.innerHTML = buildMetricCard(OVERLAY_METRICS.right);
+  }
 }
 
 const METRIC_SCROLL_VISIBLE = 3;
@@ -568,37 +619,38 @@ function metricsForViewport() {
 }
 
 function rotateMetrics(animate = true) {
-  const row = document.querySelector("[data-metric-rotate]");
-  if (!row || isMobileMetricView()) {
+  const rows = getMetricRows();
+  if (!rows.length || isMobileMetricView()) {
     return;
   }
 
   const metrics = pickRandomMetrics(3, animate ? currentMetricLabels : []);
 
-  if (animate && row.childElementCount) {
-    row.classList.add("is-fading");
+  if (animate && rows[0].childElementCount) {
+    rows.forEach((row) => row.classList.add("is-fading"));
     window.setTimeout(() => {
-      row.classList.remove("is-fading");
-      renderMetricRow(row, metrics);
+      rows.forEach((row) => row.classList.remove("is-fading"));
+      rows.forEach((row) => renderMetricRow(row, metrics));
       currentMetricLabels = metrics.map((metric) => metric.label);
       restartMetricIconAnimations();
     }, 280);
     return;
   }
 
-  renderMetricRow(row, metrics);
+  rows.forEach((row) => renderMetricRow(row, metrics));
   currentMetricLabels = metrics.map((metric) => metric.label);
 }
 
 function initMetricRotation() {
-  const row = document.querySelector("[data-metric-rotate]");
-  if (!row) {
+  const rows = getMetricRows();
+  if (!rows.length) {
     return;
   }
 
   const metrics = metricsForViewport();
-  renderMetricRow(row, metrics);
+  rows.forEach((row) => renderMetricRow(row, metrics));
   currentMetricLabels = metrics.map((metric) => metric.label);
+  renderOverlayMetrics();
 }
 
 initMetricRotation();

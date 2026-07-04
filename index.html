@@ -209,22 +209,26 @@
           </div>
 
           <div class="feature-grid">
-            <div class="feature-pair">
-              <div class="feature-image card-surface photo-card photo-card--phone">
-                <picture class="photo-card__picture">
-                  <source media="(max-width: 879px)" srcset="assets/images/siddharth-vyas-wlXQ-oVjcF4-unsplash-3.webp" type="image/webp">
-                  <source media="(max-width: 879px)" srcset="assets/images/siddharth-vyas-wlXQ-oVjcF4-unsplash-3.jpg">
-                  <source srcset="assets/images/siddharth-vyas-wlXQ-oVjcF4-unsplash-2.webp" type="image/webp">
+            <div class="feature-pair feature-pair--insights">
+              <div class="feature-image card-surface photo-card photo-card--insights" aria-label="Health Insights app preview">
+                <picture>
+                  <source media="(max-width: 879px)" srcset="assets/images/health-insights-768.webp" type="image/webp" />
+                  <source media="(max-width: 879px)" srcset="assets/images/health-insights-768.jpg" />
+                  <source srcset="assets/images/health-insights-1280.webp" type="image/webp" />
                   <img
                     class="photo-card__img"
-                    src="assets/images/siddharth-vyas-wlXQ-oVjcF4-unsplash-2.jpg"
-                    alt="Patient scheduling a diagnostic test on their phone outdoors"
-                    width="1920"
-                    height="1280"
+                    src="assets/images/health-insights-1280.jpg"
+                    alt="Health Insights screen showing HbA1c, cholesterol, vitamin D, and hemoglobin at a glance"
+                    width="1280"
+                    height="853"
                     loading="lazy"
                     decoding="async"
-                  >
+                  />
                 </picture>
+                <div class="insights-image-overlay" aria-hidden="true">
+                  <div class="insights-overlay-card insights-overlay-card--left" data-metric-overlay="left"></div>
+                  <div class="insights-overlay-card insights-overlay-card--right" data-metric-overlay="right"></div>
+                </div>
               </div>
               <article class="feature-copy">
                 <h3 class="accent-blue">See health insights at a glance</h3>
