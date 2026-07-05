@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sign in | Dr.Swift Diagnostics</title>
+    <meta name="description" content="Sign in to your Dr.Swift account to view reports, family profiles, and health insights.">
+    <link rel="stylesheet" href="assets/css/styles.css">
+  </head>
+  <body class="auth-page">
+    <header class="site-header" id="site-header">
+      <nav class="navbar container" aria-label="Primary navigation">
+        <a class="brand" href="index.html" aria-label="Dr.Swift Diagnostics home">
+          <img class="brand-mark" src="assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="40" height="40">
+          <span>Dr.Swift Diagnostics</span>
+        </a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu">
+          <span class="sr-only">Menu</span><span></span><span></span><span></span>
+        </button>
+        <div class="nav-menu" id="primary-menu">
+          <div class="nav-links">
+            <a href="tests.html">Tests</a>
+            <a href="reports.html">Reports</a>
+            <a href="about.html">About</a>
+          </div>
+          <div class="nav-actions" aria-label="Account links">
+            <a class="active" href="login.html">Sign in</a>
+            <a href="doctors.html">Doctors</a>
+            <a class="button primary nav-cta" href="tests.html">Book a test</a>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="auth-shell">
+      <div class="container" style="display:grid;place-items:center;">
+        <div class="auth-card">
+          <div class="auth-card__header">
+            <p class="eyebrow">Welcome back</p>
+            <h1>Sign in to Dr.Swift</h1>
+            <p>View reports, family profiles, and health insights.</p>
+          </div>
+          <form class="auth-form" data-auth-form novalidate>
+            <div class="form-field">
+              <label for="login-email">Email or phone</label>
+              <input id="login-email" type="text" name="email" autocomplete="username" placeholder="you@email.com" required>
+            </div>
+            <div class="form-field">
+              <label for="login-password">Password</label>
+              <input id="login-password" type="password" name="password" autocomplete="current-password" required>
+            </div>
+            <div class="form-row-split">
+              <label class="form-check">
+                <input type="checkbox" name="remember">
+                <span>Remember me</span>
+              </label>
+              <a href="forgot-password.html">Forgot password?</a>
+            </div>
+            <button class="button primary full" type="submit">Sign in</button>
+            <p class="auth-success" data-auth-success hidden>Signed in successfully. Backend connection coming soon.</p>
+          </form>
+          <div class="auth-divider">or</div>
+          <a class="button secondary full" href="whatsapp.html">Continue with WhatsApp</a>
+          <p class="auth-alt">New to Dr.Swift? <a href="signup.html">Create an account</a></p>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-bottom" style="margin-top:0;border-top:0;padding-top:0;">
+        <p>&copy; 2026 Dr.Swift Diagnostics. <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></p>
+      </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/auth.js"></script>
+  </body>
+</html>

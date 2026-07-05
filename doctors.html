@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Doctors portal | Dr.Swift Diagnostics</title>
+    <meta name="description" content="Doctor and partner portal for Dr.Swift Diagnostics — refer patients and access shared reports.">
+    <link rel="stylesheet" href="assets/css/styles.css">
+  </head>
+  <body class="auth-page">
+    <header class="site-header" id="site-header">
+      <nav class="navbar container" aria-label="Primary navigation">
+        <a class="brand" href="index.html"><img class="brand-mark" src="assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="40" height="40"><span>Dr.Swift Diagnostics</span></a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu"><span class="sr-only">Menu</span><span></span><span></span><span></span></button>
+        <div class="nav-menu" id="primary-menu">
+          <div class="nav-links"><a href="tests.html">Tests</a><a href="reports.html">Reports</a><a href="about.html">About</a></div>
+          <div class="nav-actions"><a href="login.html">Sign in</a><a class="active" href="doctors.html">Doctors</a><a class="button primary nav-cta" href="tests.html">Book a test</a></div>
+        </div>
+      </nav>
+    </header>
+    <main class="auth-shell">
+      <div class="container">
+        <div class="auth-card auth-card--wide">
+          <div class="auth-split">
+            <aside class="auth-split__aside">
+              <p class="overline">For healthcare partners</p>
+              <h2>Doctors portal</h2>
+              <p>Refer patients, track at-home collections, and view shared reports with consent.</p>
+              <ul class="auth-split__list">
+                <li>Patient referral dashboard</li>
+                <li>Shared report access (with consent)</li>
+                <li>Corporate &amp; clinic partnerships</li>
+              </ul>
+              <a class="button secondary" href="about.html#contact">Partner with us</a>
+            </aside>
+            <div>
+              <div class="auth-card__header" style="text-align:left;">
+                <h1>Doctor sign in</h1>
+                <p>Access your partner dashboard.</p>
+              </div>
+              <form class="auth-form" data-auth-form novalidate>
+                <div class="form-field">
+                  <label for="doc-email">Work email</label>
+                  <input id="doc-email" type="email" name="email" autocomplete="username" required>
+                </div>
+                <div class="form-field">
+                  <label for="doc-password">Password</label>
+                  <input id="doc-password" type="password" name="password" autocomplete="current-password" required>
+                </div>
+                <button class="button primary full" type="submit">Sign in to portal</button>
+                <p class="auth-success" data-auth-success hidden>Portal sign-in placeholder — backend coming soon.</p>
+              </form>
+              <p class="auth-alt">Need access? <a href="about.html#contact">Contact partnerships</a></p>
+              <p class="auth-alt">Patient looking for reports? <a href="login.html">Customer sign in</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer class="site-footer"><div class="container footer-bottom" style="margin-top:0;border-top:0;"><p>&copy; 2026 Dr.Swift Diagnostics</p></div></footer>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/auth.js"></script>
+  </body>
+</html>

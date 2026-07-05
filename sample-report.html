@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sample report | Dr.Swift Diagnostics</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+  </head>
+  <body>
+    <header class="site-header" id="site-header">
+      <nav class="navbar container" aria-label="Primary navigation">
+        <a class="brand" href="index.html"><img class="brand-mark" src="assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="40" height="40"><span>Dr.Swift Diagnostics</span></a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu"><span class="sr-only">Menu</span><span></span><span></span><span></span></button>
+        <div class="nav-menu" id="primary-menu">
+          <div class="nav-links"><a href="tests.html">Tests</a><a href="reports.html">Reports</a><a href="about.html">About</a></div>
+          <div class="nav-actions"><a href="login.html">Sign in</a><a href="doctors.html">Doctors</a><a class="button primary nav-cta" href="tests.html">Book a test</a></div>
+        </div>
+      </nav>
+    </header>
+    <main>
+      <section class="page-section section-bg-soft">
+        <div class="container page-grid-2">
+          <article class="info-card">
+            <p class="overline">Sample report</p>
+            <h1>Preview a Dr.Swift report</h1>
+            <p>See how we present current vs. past values, reference ranges, and downloadable PDFs.</p>
+            <div class="cta-band__actions cta-band__actions--start">
+              <button class="button primary" type="button" data-auth-form onclick="this.nextElementSibling.hidden=false;this.disabled=true">Download sample PDF</button>
+              <p class="auth-success" hidden>PDF download will be connected to storage later.</p>
+              <a class="button secondary" href="login.html">Sign in for real reports</a>
+            </div>
+          </article>
+          <div class="media-slot media-slot--wide has-image">
+            <img src="assets/images/health-insights-1280.jpg" alt="Sample health insights dashboard" loading="lazy">
+          </div>
+        </div>
+      </section>
+      <section class="page-section section-bg-white">
+        <div class="container">
+          <div class="report-features">
+            <article class="report-feature"><div class="report-feature__icon"><svg viewBox="0 0 24 24"><path d="M4 19h16M6 16l3-5 3 3 4-6 3 4"/></svg></div><div><h3>Trend graphs</h3><p>HbA1c, cholesterol, and more over time.</p></div></article>
+            <article class="report-feature"><div class="report-feature__icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/></svg></div><div><h3>Insight cards</h3><p>Color-coded healthy, borderline, and high.</p></div></article>
+            <article class="report-feature"><div class="report-feature__icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16h16V8z"/></svg></div><div><h3>Doctor PDF</h3><p>Print-ready format for visits.</p></div></article>
+            <article class="report-feature"><div class="report-feature__icon"><svg viewBox="0 0 24 24"><path d="M16 11c1.7 0 3-1.3 3-3S17.7 5 16 5s-3 1.3-3 3 1.3 3 3 3z"/></svg></div><div><h3>Family profiles</h3><p>Switch between household members.</p></div></article>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer"><div class="container footer-bottom" style="margin-top:0;padding:24px 0;"><p>&copy; 2026 Dr.Swift Diagnostics</p></div></footer>
+    <script src="assets/js/main.js"></script>
+  </body>
+</html>

@@ -4,20 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Tests | Dr.Swift Diagnostics</title>
-    <meta name="description" content="Browse lab tests from Dr.Swift Diagnostics.">
+    <meta name="description" content="Browse at-home lab tests from Dr.Swift Diagnostics — book online, app, or WhatsApp.">
     <link rel="stylesheet" href="assets/css/styles.css">
   </head>
-  <body>
-    <header class="site-header">
+  <body class="tests-page">
+    <header class="site-header" id="site-header">
       <nav class="navbar container" aria-label="Primary navigation">
         <a class="brand" href="index.html" aria-label="Dr.Swift Diagnostics home">
-          <img
-            class="brand-mark"
-            src="assets/images/drswift_leaf_logo_precise_trace.svg"
-            alt=""
-            width="40"
-            height="40"
-          >
+          <img class="brand-mark" src="assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="40" height="40">
           <span>Dr.Swift Diagnostics</span>
         </a>
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu">
@@ -25,49 +19,319 @@
         </button>
         <div class="nav-menu" id="primary-menu">
           <div class="nav-links">
-            <a class="active" href="tests.html">tests</a>
-            <a href="reports.html">reports</a>
-            <a href="about.html">about</a>
+            <a class="active" href="tests.html">Tests</a>
+            <a href="reports.html">Reports</a>
+            <a href="about.html">About</a>
           </div>
-          <div class="nav-actions">
-            <a href="#">login/signup</a><a href="#">doctors</a><a href="#">customer</a>
+          <div class="nav-actions" aria-label="Account links">
+            <a href="login.html">Sign in</a>
+            <a href="doctors.html">Doctors</a>
+            <a class="button primary nav-cta" href="tests.html">Book a test</a>
           </div>
         </div>
       </nav>
     </header>
 
-    <main class="placeholder-page">
-      <section class="container placeholder-panel">
-        <p class="eyebrow">Tests</p>
-        <h1>Tests catalog coming soon.</h1>
-        <p>This placeholder is ready for Cloudflare Pages and will become the full test listing page.</p>
-        <a class="button primary" href="index.html">Back home</a>
+    <main>
+      <section class="tests-hero section-pad">
+        <div class="container">
+          <div class="tests-hero__frame">
+            <div class="tests-hero__copy">
+              <p class="eyebrow">Tests catalog</p>
+              <h1>Book the right panel for your health goals</h1>
+              <p>
+                At-home collection with results in the app — insights, trend graphs, and
+                family profiles included with every panel.
+              </p>
+              <div class="tests-hero__actions">
+                <a class="button primary" href="#catalog">Browse all tests</a>
+                <a class="button secondary" href="whatsapp.html">Book via WhatsApp</a>
+              </div>
+            </div>
+            <ul class="tests-trust-list" aria-label="Why book with Dr.Swift">
+              <li>
+                <span class="tests-trust-list__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg>
+                </span>
+                <span>At-home sample collection</span>
+              </li>
+              <li>
+                <span class="tests-trust-list__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                </span>
+                <span>Most results in 24–48 hours</span>
+              </li>
+              <li>
+                <span class="tests-trust-list__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M16 11c1.7 0 3-1.3 3-3S17.7 5 16 5s-3 1.3-3 3 1.3 3 3 3zM8 11c1.7 0 3-1.3 3-3S9.7 5 8 5 5 6.3 5 8s1.3 3 3 3zM16 13c-2.8 0-5 1.6-5 3.5V20h10v-3.5C21 14.6 18.8 13 16 13zM8 13c-.5 0-1 .1-1.4.2C4.8 13.9 3 15.4 3 17.2V20h7v-3.5C10 14.6 8.8 13 8 13z"/></svg>
+                </span>
+                <span>One account, whole family</span>
+              </li>
+              <li>
+                <span class="tests-trust-list__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M12 3l7 4v6c0 5-3.5 8-7 8s-7-3-7-8V7l7-4z"/><path d="M9 12l2 2 4-4"/></svg>
+                </span>
+                <span>Accredited lab processing</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="tests-categories section-pad-sm section-bg-soft" aria-label="Browse by category">
+        <div class="container">
+          <p class="tests-categories__label">Jump to category</p>
+          <div class="tests-categories__scroll horizontal-scroll">
+            <a class="tests-category-chip is-active" href="#catalog" data-filter="all">All tests</a>
+            <a class="tests-category-chip" href="#catalog" data-filter="heart">Heart health</a>
+            <a class="tests-category-chip" href="#catalog" data-filter="diabetes">Diabetes</a>
+            <a class="tests-category-chip" href="#catalog" data-filter="women">Women's health</a>
+            <a class="tests-category-chip" href="#catalog" data-filter="thyroid">Thyroid</a>
+            <a class="tests-category-chip" href="#catalog" data-filter="full-body">Full body</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="catalog-section section-pad section-bg-white" id="catalog">
+        <div class="container">
+          <div class="catalog-header">
+            <div class="catalog-header__copy">
+              <p class="overline">Full catalog</p>
+              <h2>All health tests</h2>
+              <p class="catalog-meta">8 panels · at-home collection · insights included</p>
+            </div>
+          </div>
+
+          <div class="catalog-toolbar-wrap">
+            <p class="catalog-toolbar__label">Filter</p>
+            <div class="catalog-toolbar horizontal-scroll" role="tablist" aria-label="Filter tests by category">
+              <button class="filter-pill is-active" type="button" data-filter="all">All tests</button>
+              <button class="filter-pill" type="button" data-filter="heart">Heart health</button>
+              <button class="filter-pill" type="button" data-filter="diabetes">Diabetes</button>
+              <button class="filter-pill" type="button" data-filter="women">Women's health</button>
+              <button class="filter-pill" type="button" data-filter="thyroid">Thyroid</button>
+              <button class="filter-pill" type="button" data-filter="full-body">Full body</button>
+            </div>
+          </div>
+
+          <div class="catalog-grid" id="catalog-grid">
+            <article class="test-card test-card--catalog" data-category="all diabetes">
+              <div class="test-image photo-thumb photo-thumb--blood">
+                <span class="test-badge test-badge--popular">Popular</span>
+                <span class="test-badge test-badge--category">General</span>
+              </div>
+              <div class="test-body">
+                <h3>Complete Blood Count</h3>
+                <p>Checks blood cells, anemia indicators, and infection clues.</p>
+                <ul class="test-meta">
+                  <li>At-home collection</li>
+                  <li>24–48 hr results</li>
+                </ul>
+                <div class="price-row">
+                  <span class="price">$29</span>
+                  <span class="old-price">$45</span>
+                </div>
+                <a class="button primary full" href="book.html?test=CBC">Book test</a>
+              </div>
+            </article>
+
+            <article class="test-card test-card--catalog" data-category="all heart">
+              <div class="test-image photo-thumb photo-thumb--heart">
+                <span class="test-badge test-badge--category">Heart</span>
+              </div>
+              <div class="test-body">
+                <h3>Lipid Profile</h3>
+                <p>Measures cholesterol, triglycerides, HDL, and LDL.</p>
+                <ul class="test-meta">
+                  <li>At-home collection</li>
+                  <li>24–48 hr results</li>
+                </ul>
+                <div class="price-row">
+                  <span class="price">$39</span>
+                  <span class="old-price">$58</span>
+                </div>
+                <a class="button primary full" href="book.html?test=Lipid">Book test</a>
+              </div>
+            </article>
+
+            <article class="test-card test-card--catalog" data-category="all thyroid">
+              <div class="test-image photo-thumb photo-thumb--thyroid">
+                <span class="test-badge test-badge--category">Thyroid</span>
+              </div>
+              <div class="test-body">
+                <h3>Thyroid Profile</h3>
+                <p>Includes T3, T4, and TSH for thyroid screening.</p>
+                <ul class="test-meta">
+                  <li>At-home collection</li>
+                  <li>24–48 hr results</li>
+                </ul>
+                <div class="price-row">
+                  <span class="price">$35</span>
+                  <span class="old-price">$52</span>
+                </div>
+                <a class="button primary full" href="book.html?test=Thyroid">Book test</a>
+              </div>
+            </article>
+
+            <article class="test-card test-card--catalog" data-category="all">
+              <div class="test-image photo-thumb photo-thumb--vitamin">
+                <span class="test-badge test-badge--category">Wellness</span>
+              </div>
+              <div class="test-body">
+                <h3>Vitamin D Test</h3>
+                <p>Useful for fatigue, bone health, and wellness checks.</p>
+                <ul class="test-meta">
+                  <li>At-home collection</li>
+                  <li>24–48 hr results</li>
+                </ul>
+                <div class="price-row">
+                  <span class="price">$31</span>
+                  <span class="old-price">$49</span>
+                </div>
+                <a class="button primary full" href="book.html?test=Vitamin%20D">Book test</a>
+              </div>
+            </article>
+
+            <article class="test-card test-card--catalog" data-category="all full-body">
+              <div class="test-image photo-thumb photo-thumb--body">
+                <span class="test-badge test-badge--category">Full body</span>
+              </div>
+              <div class="test-body">
+                <h3>Full Body Checkup</h3>
+                <p>A broad wellness panel for annual preventive testing.</p>
+                <ul class="test-meta">
+                  <li>At-home collection</li>
+                  <li>48 hr results</li>
+                </ul>
+                <div class="price-row">
+                  <span class="price">$99</span>
+                  <span class="old-price">$149</span>
+                </div>
+                <a class="button primary full" href="book.html?test=Full%20Body">Book test</a>
+              </div>
+            </article>
+
+            <article class="test-card test-card--catalog" data-category="all diabetes">
+              <div class="test-image photo-thumb photo-thumb--blood">
+                <span class="test-badge test-badge--category">Diabetes</span>
+              </div>
+              <div class="test-body">
+                <h3>HbA1c &amp; Glucose</h3>
+                <p>Diabetes screening with trend-friendly follow-up markers.</p>
+                <ul class="test-meta">
+                  <li>At-home collection</li>
+                  <li>24–48 hr results</li>
+                </ul>
+                <div class="price-row">
+                  <span class="price">$34</span>
+                  <span class="old-price">$48</span>
+                </div>
+                <a class="button primary full" href="book.html?test=HbA1c">Book test</a>
+              </div>
+            </article>
+
+            <article class="test-card test-card--catalog" data-category="all women">
+              <div class="test-image photo-thumb photo-thumb--her">
+                <span class="test-badge test-badge--category">Women's</span>
+              </div>
+              <div class="test-body">
+                <h3>Women's Hormone Panel</h3>
+                <p>Key hormones for cycle health, fertility, and postpartum care.</p>
+                <ul class="test-meta">
+                  <li>At-home collection</li>
+                  <li>48 hr results</li>
+                </ul>
+                <div class="price-row">
+                  <span class="price">$79</span>
+                  <span class="old-price">$99</span>
+                </div>
+                <a class="button primary full" href="book.html?test=Hormone">Book test</a>
+              </div>
+            </article>
+
+            <article class="test-card test-card--catalog" data-category="all">
+              <div class="test-image photo-thumb photo-thumb--thyroid">
+                <span class="test-badge test-badge--category">Kidney</span>
+              </div>
+              <div class="test-body">
+                <h3>Kidney Function Panel</h3>
+                <p>Creatinine, eGFR, and electrolytes for renal health monitoring.</p>
+                <ul class="test-meta">
+                  <li>At-home collection</li>
+                  <li>24–48 hr results</li>
+                </ul>
+                <div class="price-row">
+                  <span class="price">$42</span>
+                  <span class="old-price">$60</span>
+                </div>
+                <a class="button primary full" href="book.html?test=Kidney">Book test</a>
+              </div>
+            </article>
+          </div>
+
+          <p class="catalog-empty" id="catalog-empty" hidden>No tests in this category yet. Try another filter or browse all tests.</p>
+
+          <div class="tests-cta-band band-cta">
+            <div class="tests-cta-band__copy">
+              <h2>Not sure which test to choose?</h2>
+              <p>Message us on WhatsApp or call our care team — we will help you pick the right panel.</p>
+            </div>
+            <div class="tests-cta-band__actions">
+              <a class="button outline-light" href="whatsapp.html">WhatsApp us</a>
+              <a class="button primary" href="about.html#contact">Contact support</a>
+            </div>
+          </div>
+        </div>
       </section>
     </main>
 
     <footer class="site-footer">
-      <div class="container footer-grid">
-        <div>
-          <a class="brand footer-brand" href="index.html">
-            <span class="brand-mark">DS</span>
+      <div class="container footer-grid footer-grid--expanded">
+        <div class="footer-brand-col">
+          <a class="brand footer-brand" href="index.html" aria-label="Dr.Swift Diagnostics home">
+            <img class="brand-mark" src="assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="40" height="40">
             <span>Dr.Swift Diagnostics</span>
           </a>
-          <p>Simple lab testing, clear reports, and helpful diagnostic support.</p>
+          <p class="footer-tagline">At-home lab tests, clear reports, and health insights for your whole family.</p>
+          <div class="footer-social" aria-label="Social links">
+            <a href="#" aria-label="LinkedIn">in</a>
+            <a href="#" aria-label="X">X</a>
+            <a href="#" aria-label="YouTube">YT</a>
+            <a href="#" aria-label="Instagram">IG</a>
+          </div>
         </div>
         <div>
-          <h2>Links</h2>
-          <a href="tests.html">Tests</a>
-          <a href="reports.html">Reports</a>
-          <a href="about.html">About</a>
+          <h2 class="footer-col-title">Our Tests</h2>
+          <a href="tests.html">Browse all tests</a>
+          <a href="tests.html#catalog">By category</a>
+          <a href="index.html#audience-tests-heading">For Him / Her / Family</a>
+          <a href="promotions.html">Promotions</a>
         </div>
         <div>
-          <h2>Contact</h2>
-          <p>support@drswift.example</p>
-          <p>(555) 014-2200</p>
+          <h2 class="footer-col-title">Resources</h2>
+          <a href="reports.html">View reports</a>
+          <a href="sample-report.html">Sample report</a>
+          <a href="index.html#faq">FAQs</a>
+          <a href="help.html">Help center</a>
+        </div>
+        <div>
+          <h2 class="footer-col-title">Account</h2>
+          <a href="login.html">Login / Sign up</a>
+          <a href="doctors.html">Doctors portal</a>
+          <a href="app.html">Customer app</a>
+          <a href="whatsapp.html">WhatsApp booking</a>
+        </div>
+        <div>
+          <h2 class="footer-col-title">Company</h2>
+          <a href="about.html">About us</a>
+          <a href="about.html#contact">Contact</a>
+          <a href="privacy.html">Privacy policy</a>
+          <a href="terms.html">Terms of service</a>
         </div>
       </div>
       <div class="container footer-bottom">
         <p>&copy; 2026 Dr.Swift Diagnostics. All rights reserved.</p>
+        <a href="privacy-choices.html">Privacy choices</a>
       </div>
     </footer>
 

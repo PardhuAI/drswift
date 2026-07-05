@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Book a test | Dr.Swift Diagnostics</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+  </head>
+  <body class="auth-page">
+    <header class="site-header" id="site-header">
+      <nav class="navbar container" aria-label="Primary navigation">
+        <a class="brand" href="index.html"><img class="brand-mark" src="assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="40" height="40"><span>Dr.Swift Diagnostics</span></a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu"><span class="sr-only">Menu</span><span></span><span></span><span></span></button>
+        <div class="nav-menu" id="primary-menu">
+          <div class="nav-links"><a href="tests.html">Tests</a><a href="reports.html">Reports</a><a href="about.html">About</a></div>
+          <div class="nav-actions"><a href="login.html">Sign in</a><a href="doctors.html">Doctors</a><a class="button primary nav-cta" href="tests.html">Book a test</a></div>
+        </div>
+      </nav>
+    </header>
+    <main class="auth-shell">
+      <div class="container" style="display:grid;place-items:center;">
+        <div class="auth-card auth-card--wide">
+          <div class="auth-card__header">
+            <p class="eyebrow">At-home collection</p>
+            <h1>Book your test</h1>
+            <p>Fill in details below — payment and scheduling backend coming soon.</p>
+          </div>
+          <form class="auth-form" data-auth-form id="book-form" novalidate>
+            <div class="form-field">
+              <label for="book-test">Select test</label>
+              <select id="book-test" name="test" required>
+                <option value="">Choose a panel</option>
+                <option>Complete Blood Count</option>
+                <option>Lipid Profile</option>
+                <option>Thyroid Profile</option>
+                <option>Vitamin D Test</option>
+                <option>Full Body Checkup</option>
+                <option>HbA1c &amp; Glucose</option>
+                <option>Women's Hormone Panel</option>
+                <option>Kidney Function Panel</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="book-name">Full name</label>
+              <input id="book-name" type="text" name="name" required>
+            </div>
+            <div class="form-field">
+              <label for="book-phone">Phone</label>
+              <input id="book-phone" type="tel" name="phone" required>
+            </div>
+            <div class="form-field">
+              <label for="book-address">Collection address</label>
+              <textarea id="book-address" name="address" required></textarea>
+            </div>
+            <div class="form-field">
+              <label for="book-date">Preferred date</label>
+              <input id="book-date" type="date" name="date" required>
+            </div>
+            <button class="button primary full" type="submit">Request booking</button>
+            <p class="auth-success" data-auth-success hidden>Booking request received. We will connect payment &amp; scheduling soon.</p>
+          </form>
+          <p class="auth-alt">Or <a href="whatsapp.html">book via WhatsApp</a> · <a href="login.html">Sign in</a> for faster checkout</p>
+        </div>
+      </div>
+    </main>
+    <footer class="site-footer"><div class="container footer-bottom" style="margin-top:0;border-top:0;"><p>&copy; 2026 Dr.Swift Diagnostics</p></div></footer>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script>
+      const params = new URLSearchParams(location.search);
+      const test = params.get("test");
+      const select = document.getElementById("book-test");
+      if (test && select) {
+        [...select.options].forEach((opt) => {
+          if (opt.text.toLowerCase().includes(test.toLowerCase())) opt.selected = true;
+        });
+      }
+    </script>
+  </body>
+</html>
