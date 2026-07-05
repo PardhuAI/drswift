@@ -981,12 +981,11 @@ p {
   flex: 0 0 auto;
   width: auto;
   min-width: 140px;
-  height: 32px;
-  min-height: 32px;
-  padding-inline: 14px;
+  min-height: 40px;
+  padding: 9px 16px;
   background: var(--color-blue);
   color: #fff;
-  font-weight: 100;
+  font-weight: 700;
   white-space: nowrap;
 }
 
@@ -1021,20 +1020,10 @@ p {
   gap: 0;
 }
 
-.quick-select__hint.swipe-hint {
-  display: none;
-  justify-content: center;
-  align-items: center;
-  min-height: 38px;
-  margin-top: 2px;
-  color: var(--color-muted);
-  pointer-events: none;
-}
-
-.swipe-hint__svg {
-  display: block;
-  height: 32px;
-  width: auto;
+.quick-select__cards {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 32px, #000 calc(100% - 32px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 32px, #000 calc(100% - 32px), transparent 100%);
 }
 
 @media (max-width: 879px) {
@@ -1046,10 +1035,6 @@ p {
     padding-bottom: 12px;
   }
 
-  .quick-select__hint.swipe-hint.is-active {
-    display: flex;
-  }
-
   .quick-select.section-pad {
     padding-top: 22px;
     padding-bottom: 32px;
@@ -1057,12 +1042,6 @@ p {
 
   .quick-select .section-heading {
     margin-bottom: 18px;
-  }
-}
-
-@media (min-width: 880px) {
-  .quick-select__hint.swipe-hint {
-    display: none !important;
   }
 }
 
@@ -2778,6 +2757,9 @@ p {
   position: relative;
   display: grid;
   place-items: center;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   overflow: hidden;
   border-radius: var(--radius);
   border: 1px dashed rgba(30, 91, 215, 0.28);
@@ -2863,6 +2845,11 @@ p {
   display: grid;
   gap: 28px;
   scroll-margin-top: calc(var(--scroll-header-offset) + 18px);
+}
+
+.page-grid-2 > * {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .info-card {
@@ -3962,13 +3949,16 @@ main > section + section {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  min-height: 40px;
   color: var(--color-muted);
   font-size: 0.88rem;
 }
 
 .form-check input {
-  width: 16px;
-  height: 16px;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  font-size: 16px;
   accent-color: var(--color-blue);
 }
 
