@@ -739,7 +739,6 @@ if (newsletterForm && newsletterSuccess) {
 const catalogGrid = document.getElementById("catalog-grid");
 const catalogEmpty = document.getElementById("catalog-empty");
 const filterButtons = document.querySelectorAll(".catalog-toolbar .filter-pill");
-const categoryChips = document.querySelectorAll(".tests-category-chip");
 
 function applyCatalogFilter(filter) {
   if (!catalogGrid) {
@@ -766,9 +765,6 @@ function applyCatalogFilter(filter) {
     button.classList.toggle("is-active", button.getAttribute("data-filter") === filter);
   });
 
-  categoryChips.forEach((chip) => {
-    chip.classList.toggle("is-active", chip.getAttribute("data-filter") === filter);
-  });
 }
 
 function setCatalogFilter(filter) {
@@ -778,15 +774,5 @@ function setCatalogFilter(filter) {
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => {
     setCatalogFilter(button.getAttribute("data-filter") || "all");
-  });
-});
-
-categoryChips.forEach((chip) => {
-  chip.addEventListener("click", (event) => {
-    const filter = chip.getAttribute("data-filter") || "all";
-    setCatalogFilter(filter);
-    if (filter !== "all") {
-      event.preventDefault();
-    }
   });
 });

@@ -23,7 +23,7 @@ Use these prompts to generate or source photography. Drop finished files into `a
 
 | File | Slot ID | Dimensions | Prompt |
 |------|---------|------------|--------|
-| `wellness-family.jpg` (+ `.webp`) | `wellness-family` | 1200×900 (4:3) | *Multigenerational Indian family in a sunlit living room — grandmother, parents, and young child — one person holding a phone showing a health app, others engaged warmly, plants and soft furnishings, aspirational but relatable home wellness moment, no white coats, editorial lifestyle photography* |
+| `wellness-family.jpg` (+ `.webp`) | `wellness-family` | 1200×900 (4:3) | ✅ Integrated — *Multigenerational Indian family in a sunlit living room — grandmother, parents, and young child — one person holding a phone showing a health app, others engaged warmly, plants and soft furnishings, aspirational but relatable home wellness moment, no white coats, editorial lifestyle photography* |
 
 **Where it goes:** Homepage → “One account for everyone you care about” section (left column).
 
@@ -40,15 +40,15 @@ Use these prompts to generate or source photography. Drop finished files into `a
 
 | File | Slot ID | Dimensions | Prompt |
 |------|---------|------------|--------|
-| `about-team.jpg` (+ `.webp`) | `about-team` | 1200×900 (4:3) | *Friendly Dr.Swift phlebotomist in neat casual medical attire (no scary PPE) arriving at an Indian apartment doorstep with a compact sample kit, warm morning light, patient smiling at door, professional but approachable, trust and care emphasis, lifestyle documentary style* |
+| `about-team.jpg` (+ `.webp`) | `about-team` | 1200×900 (4:3) | ✅ Integrated — *Friendly Dr.Swift phlebotomist in neat casual medical attire (no scary PPE) arriving at an Indian apartment doorstep with a compact sample kit, warm morning light, patient smiling at door, professional but approachable, trust and care emphasis, lifestyle documentary style* |
 
 **Where it goes:** About page → mission section (right column).
 
 ---
 
-## 4. Test catalog card thumbnails (optional upgrades)
+## 4. Test catalog card thumbnails
 
-Current cards use branded gradient placeholders. Replace individually when ready:
+Current cards use generated photography/abstract thumbnails. Replace individually only if stronger brand-owned photography becomes available:
 
 | File | Test | Dimensions | Prompt |
 |------|------|------------|--------|
@@ -58,6 +58,7 @@ Current cards use branded gradient placeholders. Replace individually when ready
 | `test-vitamin-d.jpg` | Vitamin D | 600×400 | *Morning sunlight through a window onto a kitchen table with citrus and a glass of water, warm golden light, vitality and wellness mood* |
 | `test-full-body.jpg` | Full Body Checkup | 600×400 | *Active Indian adult stretching or walking in a park at golden hour, preventive health and annual checkup feeling, energetic but calm* |
 | `test-womens-health.jpg` | Women's Hormone Panel | 600×400 | *Indian woman in her 30s reading peacefully by a window with soft green plants, self-care and hormonal wellness mood, natural light, not clinical* |
+| `test-kidney.jpg` | Kidney Function Panel | 600×400 | *Hydration-focused wellness still life with clear water glass, fresh cucumber or mint, soft blue-green ceramic, clean tabletop, natural daylight, no anatomy or lab equipment* |
 
 **After adding to a test card:**
 ```html
@@ -80,7 +81,7 @@ Current cards use branded gradient placeholders. Replace individually when ready
 
 | File | Use | Prompt |
 |------|-----|--------|
-| `app-mockup.jpg` | Hero phone mockup | *iPhone-style device floating at slight angle showing Dr.Swift app home screen: family profile switcher, health insight cards (HbA1c, cholesterol), navy and teal brand accents, soft gradient background, photorealistic product shot style* |
+| `app-mockup.jpg` | Hero phone mockup | ✅ Integrated — *iPhone-style device floating at slight angle showing Dr.Swift app home screen: family profile switcher, health insight cards (HbA1c, cholesterol), navy and teal brand accents, soft gradient background, photorealistic product shot style* |
 
 ---
 
@@ -96,10 +97,10 @@ Current cards use branded gradient placeholders. Replace individually when ready
 
 ## Quick checklist
 
-- [ ] `wellness-family.jpg` — homepage family section
-- [ ] `about-team.jpg` — about page
-- [ ] `app-mockup.jpg` — app landing page hero
-- [ ] Test thumbnails (optional, 6 files)
-- [ ] Replace placeholder labels by adding `has-image` class + `<img>` tag
+- [x] `wellness-family.jpg` — homepage family section
+- [x] `about-team.jpg` — about page
+- [x] `app-mockup.jpg` — app landing page hero
+- [x] Test thumbnails (6 prompted files + kidney catalog thumbnail)
+- [x] Replace placeholder labels by adding `has-image` class + `<img>` tag
 
-When you have images, share the files and we can wire them in and remove the placeholder labels.
+When brand-owned images are available later, replace these files in `assets/images/` and keep the same filenames to avoid markup changes.

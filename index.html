@@ -9,6 +9,7 @@
       content="Dr.Swift Diagnostics offers clean, simple health testing, report access, and care-friendly lab services."
     >
     <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
   <body>
     <header class="site-header" id="site-header">
@@ -156,10 +157,14 @@
 
       <section class="quick-links section-pad-sm section-bg-white">
         <div class="container quick-link-list" aria-label="Quick links">
-          <a href="promotions.html">see promotions</a>
-          <a href="tests.html">see all tests</a>
-          <a href="tests.html">see all categories</a>
-          <a href="help.html">help</a>
+          <a href="promotions.html">
+            <span>Promotions</span>
+            <small>Seasonal packages and offers</small>
+          </a>
+          <a href="help.html">
+            <span>Need help choosing?</span>
+            <small>Get guidance before you book</small>
+          </a>
         </div>
       </section>
 
@@ -301,12 +306,12 @@
                     }
 
                     .report-table-svg .bg { fill: var(--white); }
-                    .report-table-svg .title { font: 200 28px Inter, Arial, sans-serif; fill: var(--ink); letter-spacing: -0.3px; }
+                    .report-table-svg .title { font: 200 28px Inter, Arial, sans-serif; fill: var(--ink); letter-spacing: 0; }
                     .report-table-svg .meta { font: 200 20px Inter, Arial, sans-serif; fill: var(--muted); }
                     .report-table-svg .meta-value { fill: var(--ink); }
                     .report-table-svg .rule { stroke: var(--line); stroke-width: 1; }
                     .report-table-svg .rule-strong { stroke: var(--line-strong); stroke-width: 1.25; }
-                    .report-table-svg .th { font: 200 26px Inter, Arial, sans-serif; fill: var(--ink); letter-spacing: -0.1px; }
+                    .report-table-svg .th { font: 200 26px Inter, Arial, sans-serif; fill: var(--ink); letter-spacing: 0; }
                     .report-table-svg .th-sub { font: 200 18px Inter, Arial, sans-serif; fill: var(--muted); }
                     .report-table-svg .test-name { font: 200 24px Inter, Arial, sans-serif; fill: var(--ink); }
                     .report-table-svg .patient-info { font: 200 24px Inter, Arial, sans-serif; fill: var(--ink); }
@@ -438,6 +443,7 @@
           <div class="test-cards horizontal-scroll" id="test-cards" data-scroll-container>
             <article class="test-card test-card--catalog">
               <div class="test-image photo-thumb photo-thumb--blood">
+                <img src="assets/images/test-cbc.jpg" alt="" loading="lazy" decoding="async">
                 <span class="test-badge test-badge--popular">Popular</span>
                 <span class="test-badge test-badge--category">General</span>
               </div>
@@ -458,6 +464,7 @@
 
             <article class="test-card test-card--catalog">
               <div class="test-image photo-thumb photo-thumb--heart">
+                <img src="assets/images/test-heart.jpg" alt="" loading="lazy" decoding="async">
                 <span class="test-badge test-badge--category">Heart</span>
               </div>
               <div class="test-body">
@@ -477,6 +484,7 @@
 
             <article class="test-card test-card--catalog">
               <div class="test-image photo-thumb photo-thumb--thyroid">
+                <img src="assets/images/test-thyroid.jpg" alt="" loading="lazy" decoding="async">
                 <span class="test-badge test-badge--category">Thyroid</span>
               </div>
               <div class="test-body">
@@ -496,6 +504,7 @@
 
             <article class="test-card test-card--catalog">
               <div class="test-image photo-thumb photo-thumb--vitamin">
+                <img src="assets/images/test-vitamin-d.jpg" alt="" loading="lazy" decoding="async">
                 <span class="test-badge test-badge--category">Wellness</span>
               </div>
               <div class="test-body">
@@ -515,6 +524,7 @@
 
             <article class="test-card test-card--catalog">
               <div class="test-image photo-thumb photo-thumb--body">
+                <img src="assets/images/test-full-body.jpg" alt="" loading="lazy" decoding="async">
                 <span class="test-badge test-badge--category">Full body</span>
               </div>
               <div class="test-body">
@@ -537,9 +547,16 @@
 
       <section class="wellness-program section-pad section-bg-white" aria-labelledby="wellness-heading">
         <div class="container wellness-split">
-          <div class="media-slot media-slot--hero-ratio" data-image-id="wellness-family">
-            <!-- Replace with: assets/images/wellness-family.jpg -->
-            <span class="media-slot__label">Image slot: wellness-family<br>See docs/IMAGE_PROMPTS.md</span>
+          <div class="media-slot media-slot--hero-ratio has-image" data-image-id="wellness-family">
+            <picture>
+              <source srcset="assets/images/wellness-family.webp" type="image/webp">
+              <img
+                src="assets/images/wellness-family.jpg"
+                alt="Family reviewing health profiles together at home"
+                loading="lazy"
+                decoding="async"
+              >
+            </picture>
           </div>
           <article class="wellness-copy">
             <p class="overline">Whole-family health</p>
@@ -705,11 +722,11 @@
             <span>Dr.Swift Diagnostics</span>
           </a>
           <p class="footer-tagline">At-home lab tests, clear reports, and health insights for your whole family.</p>
-          <div class="footer-social" aria-label="Social links">
-            <a href="#" aria-label="LinkedIn">in</a>
-            <a href="#" aria-label="X">X</a>
-            <a href="#" aria-label="YouTube">YT</a>
-            <a href="#" aria-label="Instagram">IG</a>
+          <div class="footer-social" aria-label="Contact shortcuts">
+            <a href="mailto:care@drswift.health" aria-label="Email Dr.Swift">Email</a>
+            <a href="whatsapp.html" aria-label="Book on WhatsApp">WA</a>
+            <a href="app.html" aria-label="Open customer app page">App</a>
+            <a href="doctors.html" aria-label="Doctors portal">MD</a>
           </div>
         </div>
         <div>
