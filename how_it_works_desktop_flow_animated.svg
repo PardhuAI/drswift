@@ -1,0 +1,266 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="800" viewBox="0 0 1080 800" role="img" aria-labelledby="title desc">
+  <title id="title">Dr Swift Diagnostics How It Works Desktop Flow</title>
+  <desc id="desc">Animated desktop SVG showing four steps: book tests on phone, phlebo travels on scooter, sample collection, and results ready online.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f4f9ff"/>
+    </linearGradient>
+    <linearGradient id="blueLine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7db4ff"/>
+      <stop offset="0.55" stop-color="#4e8df5"/>
+      <stop offset="1" stop-color="#2c6fe8"/>
+    </linearGradient>
+    <linearGradient id="phoneScreen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f2f7ff"/>
+    </linearGradient>
+    <linearGradient id="scooterBody" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#41a3ff"/>
+      <stop offset="1" stop-color="#2268d9"/>
+    </linearGradient>
+    <linearGradient id="softGreen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#45c36f"/>
+      <stop offset="1" stop-color="#159546"/>
+    </linearGradient>
+    <linearGradient id="softOrange" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffbf3d"/>
+      <stop offset="1" stop-color="#f28a00"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#15365f" flood-opacity="0.12"/>
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#15365f" flood-opacity="0.10"/>
+    </filter>
+    <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <clipPath id="roundPhone">
+      <rect x="0" y="0" width="82" height="142" rx="20"/>
+    </clipPath>
+    <style>
+      :root { --ink:#121a31; --muted:#66758f; --blue:#2b6de8; --green:#16a34a; --orange:#f28a00; }
+      .font { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .title { font-size: 38px; font-weight: 750; letter-spacing: -1.2px; fill: var(--ink); }
+      .sub { font-size: 16px; font-weight: 420; fill: var(--muted); }
+      .stepTitle { font-size: 18px; font-weight: 760; fill: var(--ink); letter-spacing: -0.25px; }
+      .stepSub { font-size: 13px; font-weight: 450; fill: var(--muted); }
+      .small { font-size: 10px; fill: var(--muted); font-weight: 600; }
+      .tiny { font-size: 8.5px; fill: var(--muted); font-weight: 500; }
+      .value { font-size: 14px; font-weight: 760; fill: var(--green); }
+      .card { fill: rgba(255,255,255,.88); stroke: #d8e3f4; stroke-width: 1; filter:url(#cardShadow); }
+      .connector { fill:none; stroke:url(#blueLine); stroke-width:4.5; stroke-linecap:round; stroke-dasharray:1120; stroke-dashoffset:1120; animation: drawConnector 4.8s ease forwards .35s; }
+      .connectorGhost { fill:none; stroke:#d8e7fb; stroke-width:4.5; stroke-linecap:round; opacity:.9; }
+      .station { fill:#fff; stroke:#6aa5ff; stroke-width:4; filter:url(#softGlow); transform-origin:center; animation: stationPulse 2.1s ease-in-out infinite; }
+      .step { opacity:0; transform: translateY(18px); animation: stepIn .7s cubic-bezier(.2,.8,.2,1) forwards; }
+      #step1 { animation-delay:.15s; }
+      #step2 { animation-delay:1.25s; }
+      #step3 { animation-delay:2.35s; }
+      #step4 { animation-delay:3.45s; }
+      .tap { transform-origin:center; animation: tapPulse 1.65s ease-in-out infinite .8s; }
+      .phoneCard1 { opacity:0; transform: translateY(9px); animation: miniSlide .65s ease forwards .7s; }
+      .phoneCard2 { opacity:0; transform: translateY(9px); animation: miniSlide .65s ease forwards .95s; }
+      .phoneCard3 { opacity:0; transform: translateY(9px); animation: miniSlide .65s ease forwards 1.2s; }
+      .scooter { transform-origin: center; animation: scooterBounce .65s ease-in-out infinite; }
+      .wheel { transform-box: fill-box; transform-origin: center; animation: wheelSpin .85s linear infinite; }
+      .roadDash { animation: roadMove 1.15s linear infinite; }
+      .handMove { transform-origin: 655px 424px; animation: handWave 1.8s ease-in-out infinite; }
+      .sampleTube { opacity:0; transform: translateY(10px); animation: tubePop .8s ease forwards 2.9s; }
+      .notif { opacity:0; transform: translateY(-10px); animation: notifyIn .75s ease forwards 4.05s; }
+      .resultRow1 { opacity:0; transform: translateX(-8px); animation: miniSlideX .55s ease forwards 4.2s; }
+      .resultRow2 { opacity:0; transform: translateX(-8px); animation: miniSlideX .55s ease forwards 4.45s; }
+      .resultRow3 { opacity:0; transform: translateX(-8px); animation: miniSlideX .55s ease forwards 4.7s; }
+      .checkPop { transform-box: fill-box; transform-origin:center; animation: checkPop 1.6s ease-in-out infinite 4.9s; }
+      @keyframes drawConnector { to { stroke-dashoffset:0; } }
+      @keyframes stationPulse { 0%,100%{ transform:scale(1); opacity:.95;} 50%{ transform:scale(1.1); opacity:1;} }
+      @keyframes stepIn { to { opacity:1; transform: translateY(0); } }
+      @keyframes tapPulse { 0%,100%{ transform:scale(.65); opacity:.1;} 45%{ transform:scale(1.35); opacity:.5;} 75%{ transform:scale(1.9); opacity:0;} }
+      @keyframes miniSlide { to { opacity:1; transform: translateY(0); } }
+      @keyframes miniSlideX { to { opacity:1; transform: translateX(0); } }
+      @keyframes scooterBounce { 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(-4px);} }
+      @keyframes wheelSpin { to { transform: rotate(360deg); } }
+      @keyframes roadMove { from{ transform:translateX(0);} to{ transform:translateX(-36px);} }
+      @keyframes handWave { 0%,100%{ transform:rotate(0deg);} 50%{ transform:rotate(-6deg);} }
+      @keyframes tubePop { to { opacity:1; transform: translateY(0); } }
+      @keyframes notifyIn { to { opacity:1; transform: translateY(0); } }
+      @keyframes checkPop { 0%,100%{ transform:scale(1);} 50%{ transform:scale(1.16);} }
+      @media (prefers-reduced-motion: reduce) {
+        .connector,.step,.tap,.phoneCard1,.phoneCard2,.phoneCard3,.scooter,.wheel,.roadDash,.handMove,.sampleTube,.notif,.resultRow1,.resultRow2,.resultRow3,.checkPop,.station { animation:none!important; opacity:1!important; transform:none!important; stroke-dashoffset:0!important; }
+      }
+    </style>
+  </defs>
+
+  <rect width="1080" height="800" fill="url(#bg)"/>
+  <circle cx="175" cy="150" r="92" fill="#eaf4ff" opacity=".55"/>
+  <circle cx="918" cy="128" r="130" fill="#e9fff2" opacity=".45"/>
+  <circle cx="536" cy="690" r="170" fill="#eef6ff" opacity=".55"/>
+
+  <text class="font title" x="60" y="76">How it works</text>
+  <text class="font sub" x="60" y="106">Book online, we collect at home, and your results arrive clearly explained.</text>
+
+  <path class="connectorGhost" d="M154 415 C238 315 329 315 414 415 S592 515 674 415 S840 315 928 415"/>
+  <path class="connector" d="M154 415 C238 315 329 315 414 415 S592 515 674 415 S840 315 928 415"/>
+
+  <circle class="station" cx="154" cy="415" r="11"/>
+  <circle class="station" cx="414" cy="415" r="11" style="animation-delay:.25s"/>
+  <circle class="station" cx="674" cy="415" r="11" style="animation-delay:.5s"/>
+  <circle class="station" cx="928" cy="415" r="11" style="animation-delay:.75s"/>
+
+  <!-- STEP 1 -->
+  <g id="step1" class="step">
+    <rect class="card" x="55" y="165" width="220" height="430" rx="32"/>
+    <text class="font stepTitle" x="80" y="220">1. Book tests</text>
+    <text class="font stepSub" x="80" y="245">Select tests on your phone</text>
+    <g transform="translate(124 285)">
+      <rect x="0" y="0" width="94" height="162" rx="23" fill="#111827"/>
+      <rect x="6" y="7" width="82" height="148" rx="19" fill="url(#phoneScreen)"/>
+      <rect x="35" y="12" width="24" height="5" rx="2.5" fill="#111827" opacity=".9"/>
+      <!-- tiny logo mark -->
+      <g transform="translate(21 27) scale(.18)">
+        <path d="M90 30 C130 60 145 95 120 135 C100 112 74 94 90 30Z" fill="#6e34b7"/>
+        <path d="M48 88 C85 78 112 104 122 141 C84 132 54 124 48 88Z" fill="#d83913"/>
+        <path d="M62 150 C94 137 116 141 124 142 C102 160 83 176 57 173Z" fill="#ffc226"/>
+        <path d="M135 147 C157 160 166 184 151 210 C130 194 121 175 135 147Z" fill="#1598e5"/>
+        <path d="M172 144 C193 130 210 136 218 155 C201 164 183 164 172 144Z" fill="#42bf63"/>
+      </g>
+      <text class="font tiny" x="40" y="34" fill="#121a31">Dr Swift</text>
+      <g class="phoneCard1">
+        <rect x="13" y="48" width="68" height="23" rx="8" fill="#f8fbff" stroke="#dbe7f8"/>
+        <circle cx="25" cy="59.5" r="5" fill="#eaf8ef"/>
+        <text class="font tiny" x="35" y="62">CBC</text>
+      </g>
+      <g class="phoneCard2">
+        <rect x="13" y="77" width="68" height="23" rx="8" fill="#f8fbff" stroke="#dbe7f8"/>
+        <circle cx="25" cy="88.5" r="5" fill="#fff5db"/>
+        <text class="font tiny" x="35" y="91">HbA1c</text>
+      </g>
+      <g class="phoneCard3">
+        <rect x="16" y="113" width="62" height="22" rx="11" fill="#2b6de8"/>
+        <text class="font tiny" x="31" y="127" fill="#fff">Book</text>
+      </g>
+      <circle class="tap" cx="73" cy="125" r="16" fill="#2b6de8"/>
+    </g>
+    <text class="font stepSub" x="80" y="540">Quick search, cart, and booking</text>
+  </g>
+
+  <!-- STEP 2 -->
+  <g id="step2" class="step">
+    <rect class="card" x="315" y="165" width="220" height="430" rx="32"/>
+    <text class="font stepTitle" x="340" y="220">2. Phlebo arrives</text>
+    <text class="font stepSub" x="340" y="245">Home collection on schedule</text>
+    <g transform="translate(340 322)">
+      <g class="scooter">
+        <circle class="wheel" cx="40" cy="122" r="20" fill="#111827"/>
+        <circle cx="40" cy="122" r="10" fill="#fff"/>
+        <circle class="wheel" cx="130" cy="122" r="20" fill="#111827"/>
+        <circle cx="130" cy="122" r="10" fill="#fff"/>
+        <path d="M35 108 C52 83 87 75 111 91 C128 101 140 108 151 111 C143 123 126 130 101 128 L61 128 C45 128 33 121 35 108Z" fill="url(#scooterBody)"/>
+        <path d="M86 76 L119 76 C129 76 135 82 137 92 L142 110" fill="none" stroke="#2563eb" stroke-width="8" stroke-linecap="round"/>
+        <path d="M57 86 C70 62 94 55 111 68" fill="none" stroke="#60a5fa" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="158" cy="104" r="7" fill="#ffc226"/>
+        <rect x="60" y="54" width="36" height="28" rx="7" fill="#eef6ff" stroke="#bcd5f7"/>
+        <!-- rider -->
+        <circle cx="83" cy="36" r="15" fill="#d58b5d"/>
+        <path d="M71 26 C78 11 96 18 99 30 C91 25 83 25 71 26Z" fill="#1f2937"/>
+        <path d="M74 51 C83 45 96 47 105 58 L119 83 L95 86 L82 66 Z" fill="#46b36a"/>
+        <path d="M102 59 L126 77" stroke="#d58b5d" stroke-width="7" stroke-linecap="round"/>
+        <path d="M80 63 L63 89" stroke="#d58b5d" stroke-width="7" stroke-linecap="round"/>
+        <rect x="108" y="52" width="32" height="38" rx="8" fill="#f7fafc" stroke="#dbe7f8"/>
+        <path d="M116 63 H132 M116 72 H132" stroke="#93a6c2" stroke-width="2" stroke-linecap="round"/>
+      </g>
+      <g transform="translate(0 158)">
+        <rect x="2" y="0" width="168" height="5" rx="2.5" fill="#dbe7f8"/>
+        <g class="roadDash">
+          <rect x="8" y="14" width="28" height="4" rx="2" fill="#9bc4fb"/>
+          <rect x="62" y="14" width="28" height="4" rx="2" fill="#9bc4fb"/>
+          <rect x="116" y="14" width="28" height="4" rx="2" fill="#9bc4fb"/>
+          <rect x="170" y="14" width="28" height="4" rx="2" fill="#9bc4fb"/>
+        </g>
+      </g>
+    </g>
+    <text class="font stepSub" x="340" y="540">Route updates and collection bag</text>
+  </g>
+
+  <!-- STEP 3 -->
+  <g id="step3" class="step">
+    <rect class="card" x="575" y="165" width="220" height="430" rx="32"/>
+    <text class="font stepTitle" x="600" y="220">3. Sample collected</text>
+    <text class="font stepSub" x="600" y="245">Safe doorstep collection</text>
+    <g transform="translate(600 305)">
+      <!-- doorway -->
+      <rect x="14" y="28" width="64" height="132" rx="10" fill="#eef6ff" stroke="#d7e6f9"/>
+      <rect x="27" y="52" width="38" height="108" rx="6" fill="#ffffff" stroke="#dce7f6"/>
+      <circle cx="58" cy="105" r="3" fill="#9aa9bd"/>
+      <!-- patient -->
+      <circle cx="52" cy="34" r="15" fill="#c97f55"/>
+      <path d="M39 28 C43 13 61 14 66 28 C58 24 49 24 39 28Z" fill="#1f2937"/>
+      <path d="M36 56 C49 47 65 48 78 58 L78 112 L34 112 Z" fill="#8b5cf6" opacity=".9"/>
+      <path d="M37 72 L16 90" stroke="#c97f55" stroke-width="7" stroke-linecap="round"/>
+      <!-- phlebo -->
+      <circle cx="138" cy="36" r="15" fill="#d58b5d"/>
+      <path d="M126 27 C133 14 151 19 154 31 C145 27 137 26 126 27Z" fill="#111827"/>
+      <path d="M124 58 C137 48 153 49 166 61 L169 116 L122 116 Z" fill="#45b66d"/>
+      <path class="handMove" d="M124 74 L94 92" stroke="#d58b5d" stroke-width="7" stroke-linecap="round"/>
+      <path d="M160 76 L179 98" stroke="#d58b5d" stroke-width="7" stroke-linecap="round"/>
+      <rect x="166" y="92" width="28" height="32" rx="7" fill="#f8fbff" stroke="#d6e5f7"/>
+      <path d="M173 102 H187 M173 111 H187" stroke="#93a6c2" stroke-width="2" stroke-linecap="round"/>
+      <g class="sampleTube">
+        <rect x="88" y="82" width="13" height="44" rx="6" fill="#fff" stroke="#a8c5e9"/>
+        <rect x="90" y="104" width="9" height="18" rx="4" fill="#e94335" opacity=".76"/>
+        <rect x="86" y="76" width="17" height="8" rx="3" fill="#8bb7ff"/>
+      </g>
+      <g transform="translate(72 140)" class="checkPop">
+        <circle cx="38" cy="20" r="20" fill="url(#softGreen)"/>
+        <path d="M29 20 L36 27 L49 13" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+    </g>
+    <text class="font stepSub" x="600" y="540">Barcode, bag, and secure handoff</text>
+  </g>
+
+  <!-- STEP 4 -->
+  <g id="step4" class="step">
+    <rect class="card" x="835" y="165" width="220" height="430" rx="32"/>
+    <text class="font stepTitle" x="860" y="220">4. Results online</text>
+    <text class="font stepSub" x="860" y="245">Clear insights, not just numbers</text>
+    <g transform="translate(899 282)">
+      <rect x="0" y="0" width="92" height="176" rx="24" fill="#111827"/>
+      <rect x="7" y="8" width="78" height="160" rx="19" fill="url(#phoneScreen)"/>
+      <rect x="33" y="13" width="25" height="5" rx="2.5" fill="#111827" opacity=".9"/>
+      <g class="notif">
+        <rect x="-37" y="35" width="94" height="30" rx="15" fill="#fff" stroke="#d8e3f4" filter="url(#cardShadow)"/>
+        <circle cx="-21" cy="50" r="8" fill="#eaf8ef"/>
+        <path d="M-25 50 L-22 54 L-16 45" fill="none" stroke="#16a34a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <text class="font tiny" x="-9" y="53" fill="#121a31">Report ready</text>
+      </g>
+      <text class="font tiny" x="18" y="35" fill="#121a31" style="font-weight:750">Health Insights</text>
+      <g class="resultRow1">
+        <rect x="15" y="47" width="62" height="28" rx="10" fill="#fff" stroke="#dce7f6"/>
+        <text class="font tiny" x="22" y="59" fill="#121a31">HbA1c</text>
+        <text class="font tiny" x="22" y="70" fill="#16a34a">5.2 Healthy</text>
+      </g>
+      <g class="resultRow2">
+        <rect x="15" y="82" width="62" height="28" rx="10" fill="#fff" stroke="#dce7f6"/>
+        <text class="font tiny" x="22" y="94" fill="#121a31">Vitamin D</text>
+        <text class="font tiny" x="22" y="105" fill="#f28a00">Low</text>
+      </g>
+      <g class="resultRow3">
+        <rect x="15" y="117" width="62" height="28" rx="10" fill="#fff" stroke="#dce7f6"/>
+        <text class="font tiny" x="22" y="129" fill="#121a31">Trend</text>
+        <polyline points="23,139 34,134 45,137 57,128 69,130" fill="none" stroke="#2b6de8" stroke-width="2" stroke-linecap="round"/>
+      </g>
+    </g>
+    <text class="font stepSub" x="860" y="540">Simple cards and history graphs</text>
+  </g>
+
+  <g opacity=".55">
+    <circle cx="165" cy="672" r="3" fill="#b8d8ff"/>
+    <circle cx="189" cy="672" r="3" fill="#b8d8ff"/>
+    <circle cx="213" cy="672" r="3" fill="#b8d8ff"/>
+    <circle cx="830" cy="672" r="3" fill="#cdebd8"/>
+    <circle cx="854" cy="672" r="3" fill="#cdebd8"/>
+    <circle cx="878" cy="672" r="3" fill="#cdebd8"/>
+  </g>
+</svg>
