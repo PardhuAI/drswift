@@ -6,6 +6,7 @@
     <title>Tests | Dr.Swift Diagnostics</title>
     <meta name="description" content="Browse at-home lab tests from Dr.Swift Diagnostics — book online, app, or WhatsApp.">
     <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
   <body class="tests-page">
     <header class="site-header" id="site-header">
@@ -51,43 +52,29 @@
             <ul class="tests-trust-list" aria-label="Why book with Dr.Swift">
               <li>
                 <span class="tests-trust-list__icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg>
+                  <svg class="ds-icon ds-icon--trust"><use href="assets/icons/drswift-sprite.svg#icon-home-collection"/></svg>
                 </span>
                 <span>At-home sample collection</span>
               </li>
               <li>
                 <span class="tests-trust-list__icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                  <svg class="ds-icon ds-icon--trust"><use href="assets/icons/drswift-sprite.svg#icon-fast-results"/></svg>
                 </span>
                 <span>Most results in 24–48 hours</span>
               </li>
               <li>
                 <span class="tests-trust-list__icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24"><path d="M16 11c1.7 0 3-1.3 3-3S17.7 5 16 5s-3 1.3-3 3 1.3 3 3 3zM8 11c1.7 0 3-1.3 3-3S9.7 5 8 5 5 6.3 5 8s1.3 3 3 3zM16 13c-2.8 0-5 1.6-5 3.5V20h10v-3.5C21 14.6 18.8 13 16 13zM8 13c-.5 0-1 .1-1.4.2C4.8 13.9 3 15.4 3 17.2V20h7v-3.5C10 14.6 8.8 13 8 13z"/></svg>
+                  <svg class="ds-icon ds-icon--trust"><use href="assets/icons/drswift-sprite.svg#icon-report-profiles"/></svg>
                 </span>
                 <span>One account, whole family</span>
               </li>
               <li>
                 <span class="tests-trust-list__icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24"><path d="M12 3l7 4v6c0 5-3.5 8-7 8s-7-3-7-8V7l7-4z"/><path d="M9 12l2 2 4-4"/></svg>
+                  <svg class="ds-icon ds-icon--trust"><use href="assets/icons/drswift-sprite.svg#icon-accredited"/></svg>
                 </span>
                 <span>Accredited lab processing</span>
               </li>
             </ul>
-          </div>
-        </div>
-      </section>
-
-      <section class="tests-categories section-pad-sm section-bg-soft" aria-label="Browse by category">
-        <div class="container">
-          <p class="tests-categories__label">Jump to category</p>
-          <div class="tests-categories__scroll horizontal-scroll">
-            <a class="tests-category-chip is-active" href="#catalog" data-filter="all">All tests</a>
-            <a class="tests-category-chip" href="#catalog" data-filter="heart">Heart health</a>
-            <a class="tests-category-chip" href="#catalog" data-filter="diabetes">Diabetes</a>
-            <a class="tests-category-chip" href="#catalog" data-filter="women">Women's health</a>
-            <a class="tests-category-chip" href="#catalog" data-filter="thyroid">Thyroid</a>
-            <a class="tests-category-chip" href="#catalog" data-filter="full-body">Full body</a>
           </div>
         </div>
       </section>
@@ -105,18 +92,19 @@
           <div class="catalog-toolbar-wrap">
             <p class="catalog-toolbar__label">Filter</p>
             <div class="catalog-toolbar horizontal-scroll" role="tablist" aria-label="Filter tests by category">
-              <button class="filter-pill is-active" type="button" data-filter="all">All tests</button>
-              <button class="filter-pill" type="button" data-filter="heart">Heart health</button>
-              <button class="filter-pill" type="button" data-filter="diabetes">Diabetes</button>
-              <button class="filter-pill" type="button" data-filter="women">Women's health</button>
-              <button class="filter-pill" type="button" data-filter="thyroid">Thyroid</button>
-              <button class="filter-pill" type="button" data-filter="full-body">Full body</button>
+              <button class="filter-pill is-active" type="button" data-filter="all"><svg class="ds-icon ds-icon--pill" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-filter-all"/></svg><span>All tests</span></button>
+              <button class="filter-pill" type="button" data-filter="heart"><svg class="ds-icon ds-icon--pill" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-heart"/></svg><span>Heart health</span></button>
+              <button class="filter-pill" type="button" data-filter="diabetes"><svg class="ds-icon ds-icon--pill" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-diabetes"/></svg><span>Diabetes</span></button>
+              <button class="filter-pill" type="button" data-filter="women"><svg class="ds-icon ds-icon--pill" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-women"/></svg><span>Women's health</span></button>
+              <button class="filter-pill" type="button" data-filter="thyroid"><svg class="ds-icon ds-icon--pill" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-thyroid"/></svg><span>Thyroid</span></button>
+              <button class="filter-pill" type="button" data-filter="full-body"><svg class="ds-icon ds-icon--pill" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-full-body"/></svg><span>Full body</span></button>
             </div>
           </div>
 
           <div class="catalog-grid" id="catalog-grid">
             <article class="test-card test-card--catalog" data-category="all diabetes">
               <div class="test-image photo-thumb photo-thumb--blood">
+                <img src="assets/images/test-cbc.jpg" alt="" loading="lazy" decoding="async">
                 <span class="test-badge test-badge--popular">Popular</span>
                 <span class="test-badge test-badge--category">General</span>
               </div>
@@ -137,6 +125,7 @@
 
             <article class="test-card test-card--catalog" data-category="all heart">
               <div class="test-image photo-thumb photo-thumb--heart">
+                <img src="assets/images/test-heart.jpg" alt="" loading="lazy" decoding="async">
                 <span class="test-badge test-badge--category">Heart</span>
               </div>
               <div class="test-body">
@@ -156,6 +145,7 @@
 
             <article class="test-card test-card--catalog" data-category="all thyroid">
               <div class="test-image photo-thumb photo-thumb--thyroid">
+                <img src="assets/images/test-thyroid.jpg" alt="" loading="lazy" decoding="async">
                 <span class="test-badge test-badge--category">Thyroid</span>
               </div>
               <div class="test-body">
@@ -175,6 +165,7 @@
 
             <article class="test-card test-card--catalog" data-category="all">
               <div class="test-image photo-thumb photo-thumb--vitamin">
+                <img src="assets/images/test-vitamin-d.jpg" alt="" loading="lazy" decoding="async">
                 <span class="test-badge test-badge--category">Wellness</span>
               </div>
               <div class="test-body">
@@ -194,6 +185,7 @@
 
             <article class="test-card test-card--catalog" data-category="all full-body">
               <div class="test-image photo-thumb photo-thumb--body">
+                <img src="assets/images/test-full-body.jpg" alt="" loading="lazy" decoding="async">
                 <span class="test-badge test-badge--category">Full body</span>
               </div>
               <div class="test-body">
@@ -213,6 +205,7 @@
 
             <article class="test-card test-card--catalog" data-category="all diabetes">
               <div class="test-image photo-thumb photo-thumb--blood">
+                <img src="assets/images/test-cbc.jpg" alt="" loading="lazy" decoding="async">
                 <span class="test-badge test-badge--category">Diabetes</span>
               </div>
               <div class="test-body">
@@ -232,6 +225,7 @@
 
             <article class="test-card test-card--catalog" data-category="all women">
               <div class="test-image photo-thumb photo-thumb--her">
+                <img src="assets/images/test-womens-health.jpg" alt="" loading="lazy" decoding="async">
                 <span class="test-badge test-badge--category">Women's</span>
               </div>
               <div class="test-body">
@@ -251,6 +245,7 @@
 
             <article class="test-card test-card--catalog" data-category="all">
               <div class="test-image photo-thumb photo-thumb--thyroid">
+                <img src="assets/images/test-kidney.jpg" alt="" loading="lazy" decoding="async">
                 <span class="test-badge test-badge--category">Kidney</span>
               </div>
               <div class="test-body">
@@ -293,11 +288,11 @@
             <span>Dr.Swift Diagnostics</span>
           </a>
           <p class="footer-tagline">At-home lab tests, clear reports, and health insights for your whole family.</p>
-          <div class="footer-social" aria-label="Social links">
-            <a href="#" aria-label="LinkedIn">in</a>
-            <a href="#" aria-label="X">X</a>
-            <a href="#" aria-label="YouTube">YT</a>
-            <a href="#" aria-label="Instagram">IG</a>
+                              <div class="footer-social" aria-label="Contact shortcuts">
+            <a href="mailto:care@drswift.health" aria-label="Email Dr.Swift" title="Email"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-email"/></svg></a>
+            <a href="whatsapp.html" aria-label="Book on WhatsApp" title="WhatsApp"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-whatsapp"/></svg></a>
+            <a href="app.html" aria-label="Open customer app page" title="App"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-app"/></svg></a>
+            <a href="doctors.html" aria-label="Doctors portal" title="Doctors Portal"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-doctors"/></svg></a>
           </div>
         </div>
         <div>

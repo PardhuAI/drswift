@@ -9,6 +9,7 @@
       content="Dr.Swift Diagnostics offers clean, simple health testing, report access, and care-friendly lab services."
     >
     <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
   <body>
     <header class="site-header" id="site-header">
@@ -61,47 +62,19 @@
               </h1>
               <ul class="hero-points hero-points--reveal">
                 <li class="item-1">
-                  <svg class="hp-icon" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
-                    <g fill="#ffffff" stroke="#111111" stroke-width="2.2">
-                      <rect class="sq sq-top" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(24 11) rotate(45)"></rect>
-                      <rect class="sq sq-right" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(37 24) rotate(45)"></rect>
-                      <rect class="sq sq-bottom" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(24 37) rotate(45)"></rect>
-                      <rect class="sq sq-left" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(11 24) rotate(45)"></rect>
-                    </g>
-                  </svg>
+                  <span class="hp-icon-wrap"><svg class="hp-icon" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-home-collection"/></svg></span>
                   <span>At-Home collection. You can book Online, iOS, Android app or WhatsApp</span>
                 </li>
                 <li class="item-2">
-                  <svg class="hp-icon" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
-                    <g fill="#ffffff" stroke="#111111" stroke-width="2.2">
-                      <rect class="sq sq-top" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(24 11) rotate(45)"></rect>
-                      <rect class="sq sq-right" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(37 24) rotate(45)"></rect>
-                      <rect class="sq sq-bottom" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(24 37) rotate(45)"></rect>
-                      <rect class="sq sq-left" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(11 24) rotate(45)"></rect>
-                    </g>
-                  </svg>
+                  <span class="hp-icon-wrap"><svg class="hp-icon" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-results"/></svg></span>
                   <span>Results online, WhatsApp, iOS and Android app</span>
                 </li>
                 <li class="item-3">
-                  <svg class="hp-icon" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
-                    <g fill="#ffffff" stroke="#111111" stroke-width="2.2">
-                      <rect class="sq sq-top" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(24 11) rotate(45)"></rect>
-                      <rect class="sq sq-right" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(37 24) rotate(45)"></rect>
-                      <rect class="sq sq-bottom" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(24 37) rotate(45)"></rect>
-                      <rect class="sq sq-left" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(11 24) rotate(45)"></rect>
-                    </g>
-                  </svg>
+                  <span class="hp-icon-wrap"><svg class="hp-icon" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-insights"/></svg></span>
                   <span>Health Metrics, graphs and Insights</span>
                 </li>
                 <li class="item-4">
-                  <svg class="hp-icon" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
-                    <g fill="#ffffff" stroke="#111111" stroke-width="2.2">
-                      <rect class="sq sq-top" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(24 11) rotate(45)"></rect>
-                      <rect class="sq sq-right" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(37 24) rotate(45)"></rect>
-                      <rect class="sq sq-bottom" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(24 37) rotate(45)"></rect>
-                      <rect class="sq sq-left" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(11 24) rotate(45)"></rect>
-                    </g>
-                  </svg>
+                  <span class="hp-icon-wrap"><svg class="hp-icon" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-family"/></svg></span>
                   <span>One account, whole-family</span>
                 </li>
               </ul>
@@ -156,10 +129,14 @@
 
       <section class="quick-links section-pad-sm section-bg-white">
         <div class="container quick-link-list" aria-label="Quick links">
-          <a href="promotions.html">see promotions</a>
-          <a href="tests.html">see all tests</a>
-          <a href="tests.html">see all categories</a>
-          <a href="help.html">help</a>
+          <a href="promotions.html">
+            <span>Promotions</span>
+            <small>Seasonal packages and offers</small>
+          </a>
+          <a href="help.html">
+            <span>Need help choosing?</span>
+            <small>Get guidance before you book</small>
+          </a>
         </div>
       </section>
 
@@ -301,12 +278,12 @@
                     }
 
                     .report-table-svg .bg { fill: var(--white); }
-                    .report-table-svg .title { font: 200 28px Inter, Arial, sans-serif; fill: var(--ink); letter-spacing: -0.3px; }
+                    .report-table-svg .title { font: 200 28px Inter, Arial, sans-serif; fill: var(--ink); letter-spacing: 0; }
                     .report-table-svg .meta { font: 200 20px Inter, Arial, sans-serif; fill: var(--muted); }
                     .report-table-svg .meta-value { fill: var(--ink); }
                     .report-table-svg .rule { stroke: var(--line); stroke-width: 1; }
                     .report-table-svg .rule-strong { stroke: var(--line-strong); stroke-width: 1.25; }
-                    .report-table-svg .th { font: 200 26px Inter, Arial, sans-serif; fill: var(--ink); letter-spacing: -0.1px; }
+                    .report-table-svg .th { font: 200 26px Inter, Arial, sans-serif; fill: var(--ink); letter-spacing: 0; }
                     .report-table-svg .th-sub { font: 200 18px Inter, Arial, sans-serif; fill: var(--muted); }
                     .report-table-svg .test-name { font: 200 24px Inter, Arial, sans-serif; fill: var(--ink); }
                     .report-table-svg .patient-info { font: 200 24px Inter, Arial, sans-serif; fill: var(--ink); }
@@ -438,6 +415,7 @@
           <div class="test-cards horizontal-scroll" id="test-cards" data-scroll-container>
             <article class="test-card test-card--catalog">
               <div class="test-image photo-thumb photo-thumb--blood">
+                <img src="assets/images/test-cbc.jpg" alt="" loading="lazy" decoding="async">
                 <span class="test-badge test-badge--popular">Popular</span>
                 <span class="test-badge test-badge--category">General</span>
               </div>
@@ -458,6 +436,7 @@
 
             <article class="test-card test-card--catalog">
               <div class="test-image photo-thumb photo-thumb--heart">
+                <img src="assets/images/test-heart.jpg" alt="" loading="lazy" decoding="async">
                 <span class="test-badge test-badge--category">Heart</span>
               </div>
               <div class="test-body">
@@ -477,6 +456,7 @@
 
             <article class="test-card test-card--catalog">
               <div class="test-image photo-thumb photo-thumb--thyroid">
+                <img src="assets/images/test-thyroid.jpg" alt="" loading="lazy" decoding="async">
                 <span class="test-badge test-badge--category">Thyroid</span>
               </div>
               <div class="test-body">
@@ -496,6 +476,7 @@
 
             <article class="test-card test-card--catalog">
               <div class="test-image photo-thumb photo-thumb--vitamin">
+                <img src="assets/images/test-vitamin-d.jpg" alt="" loading="lazy" decoding="async">
                 <span class="test-badge test-badge--category">Wellness</span>
               </div>
               <div class="test-body">
@@ -515,6 +496,7 @@
 
             <article class="test-card test-card--catalog">
               <div class="test-image photo-thumb photo-thumb--body">
+                <img src="assets/images/test-full-body.jpg" alt="" loading="lazy" decoding="async">
                 <span class="test-badge test-badge--category">Full body</span>
               </div>
               <div class="test-body">
@@ -537,9 +519,16 @@
 
       <section class="wellness-program section-pad section-bg-white" aria-labelledby="wellness-heading">
         <div class="container wellness-split">
-          <div class="media-slot media-slot--hero-ratio" data-image-id="wellness-family">
-            <!-- Replace with: assets/images/wellness-family.jpg -->
-            <span class="media-slot__label">Image slot: wellness-family<br>See docs/IMAGE_PROMPTS.md</span>
+          <div class="media-slot media-slot--hero-ratio has-image" data-image-id="wellness-family">
+            <picture>
+              <source srcset="assets/images/wellness-family.webp" type="image/webp">
+              <img
+                src="assets/images/wellness-family.jpg"
+                alt="Family reviewing health profiles together at home"
+                loading="lazy"
+                decoding="async"
+              >
+            </picture>
           </div>
           <article class="wellness-copy">
             <p class="overline">Whole-family health</p>
@@ -562,28 +551,28 @@
           <div class="reasons-grid">
             <article class="reason-card">
               <div class="reason-card__icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9H8L6 6z"/><path d="M6 6 5 3H2"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
               </div>
               <h3>Book your way</h3>
               <p>Web, iOS, Android, or WhatsApp — whichever channel fits your routine.</p>
             </article>
             <article class="reason-card">
               <div class="reason-card__icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
               </div>
               <h3>Clear, fair pricing</h3>
               <p>Transparent panel pricing with no surprise add-ons at collection time.</p>
             </article>
             <article class="reason-card">
               <div class="reason-card__icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               </div>
               <h3>Fast turnaround</h3>
               <p>Most results land in your app within 24–48 hours with notifications when ready.</p>
             </article>
             <article class="reason-card">
               <div class="reason-card__icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M12 3l7 4v6c0 5-3.5 8-7 8s-7-3-7-8V7l7-4z"/><path d="M9 12l2 2 4-4"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
               </div>
               <h3>Trusted collection</h3>
               <p>Verified phlebotomists, proper handling, and lab-grade processing you can rely on.</p>
@@ -613,7 +602,7 @@
             <article class="faq-item">
               <button class="faq-question" type="button" aria-expanded="false">
                 <span>How do I book an at-home blood test?</span>
-                <svg class="faq-chevron" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" d="M6 9l6 6 6-6"/></svg>
+                <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
               </button>
               <div class="faq-answer" hidden>
                 <div class="faq-answer-inner">
@@ -624,7 +613,7 @@
             <article class="faq-item">
               <button class="faq-question" type="button" aria-expanded="false">
                 <span>When and how will I receive my results?</span>
-                <svg class="faq-chevron" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" d="M6 9l6 6 6-6"/></svg>
+                <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
               </button>
               <div class="faq-answer" hidden>
                 <div class="faq-answer-inner">
@@ -635,7 +624,7 @@
             <article class="faq-item">
               <button class="faq-question" type="button" aria-expanded="false">
                 <span>Can I manage tests for my whole family?</span>
-                <svg class="faq-chevron" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" d="M6 9l6 6 6-6"/></svg>
+                <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
               </button>
               <div class="faq-answer" hidden>
                 <div class="faq-answer-inner">
@@ -646,7 +635,7 @@
             <article class="faq-item">
               <button class="faq-question" type="button" aria-expanded="false">
                 <span>Do I need to fast before my test?</span>
-                <svg class="faq-chevron" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" d="M6 9l6 6 6-6"/></svg>
+                <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
               </button>
               <div class="faq-answer" hidden>
                 <div class="faq-answer-inner">
@@ -705,11 +694,11 @@
             <span>Dr.Swift Diagnostics</span>
           </a>
           <p class="footer-tagline">At-home lab tests, clear reports, and health insights for your whole family.</p>
-          <div class="footer-social" aria-label="Social links">
-            <a href="#" aria-label="LinkedIn">in</a>
-            <a href="#" aria-label="X">X</a>
-            <a href="#" aria-label="YouTube">YT</a>
-            <a href="#" aria-label="Instagram">IG</a>
+                              <div class="footer-social" aria-label="Contact shortcuts">
+            <a href="mailto:care@drswift.health" aria-label="Email Dr.Swift" title="Email"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-email"/></svg></a>
+            <a href="whatsapp.html" aria-label="Book on WhatsApp" title="WhatsApp"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-whatsapp"/></svg></a>
+            <a href="app.html" aria-label="Open customer app page" title="App"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-app"/></svg></a>
+            <a href="doctors.html" aria-label="Doctors portal" title="Doctors Portal"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-doctors"/></svg></a>
           </div>
         </div>
         <div>
