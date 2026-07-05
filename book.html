@@ -27,6 +27,7 @@
             <p>Fill in details below — payment and scheduling backend coming soon.</p>
           </div>
           <form class="auth-form" data-auth-form id="book-form" novalidate>
+            <p class="secure-note">Booking details are used to schedule collection and send report updates securely.</p>
             <div class="form-field">
               <label for="book-test">Select test</label>
               <select id="book-test" name="test" required>
@@ -58,7 +59,7 @@
               <input id="book-date" type="date" name="date" required>
             </div>
             <button class="button primary full" type="submit">Request booking</button>
-            <p class="auth-success" data-auth-success hidden>Booking request received. We will connect payment &amp; scheduling soon.</p>
+            <p class="auth-success" data-auth-success aria-live="polite" hidden>Booking request received. We will connect payment &amp; scheduling soon.</p>
           </form>
           <p class="auth-alt">Or <a href="whatsapp.html">book via WhatsApp</a> · <a href="login.html">Sign in</a> for faster checkout</p>
         </div>

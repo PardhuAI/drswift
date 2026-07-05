@@ -53,6 +53,7 @@
                 <p>Start with one profile — add family members anytime.</p>
               </div>
               <form class="auth-form" data-auth-form novalidate>
+                <p class="secure-note">Your contact details are used only for account access, test updates, and report notifications.</p>
                 <div class="form-field">
                   <label for="signup-name">Full name</label>
                   <input id="signup-name" type="text" name="name" autocomplete="name" required>
@@ -74,7 +75,7 @@
                   <span>I agree to the <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a></span>
                 </label>
                 <button class="button primary full" type="submit">Create account</button>
-                <p class="auth-success" data-auth-success hidden>Account created. Verification and backend connection coming soon.</p>
+                <p class="auth-success" data-auth-success aria-live="polite" hidden>Account created. Verification and backend connection coming soon.</p>
               </form>
               <p class="auth-alt">Already have an account? <a href="login.html">Sign in</a></p>
             </div>

@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <symbol id="icon-home" viewBox="0 0 24 24">
+    <path d="M4 10.8 12 4l8 6.8v8.1a1.6 1.6 0 0 1-1.6 1.6h-3.2v-5.8H8.8v5.8H5.6A1.6 1.6 0 0 1 4 18.9v-8.1Z"/>
+    <path d="M9.4 20.5v-4.3h5.2v4.3"/>
+  </symbol>
+  <symbol id="icon-clock" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="8.5"/>
+    <path d="M12 7.4V12l3.4 2"/>
+  </symbol>
+  <symbol id="icon-family" viewBox="0 0 24 24">
+    <circle cx="8" cy="8.2" r="2.7"/>
+    <circle cx="16" cy="8.2" r="2.7"/>
+    <path d="M3.8 20v-1.4c0-2.8 1.8-4.7 4.2-4.7s4.2 1.9 4.2 4.7V20"/>
+    <path d="M11.8 20v-1.4c0-2.8 1.8-4.7 4.2-4.7s4.2 1.9 4.2 4.7V20"/>
+  </symbol>
+  <symbol id="icon-shield-check" viewBox="0 0 24 24">
+    <path d="M12 3.6 19 6.7v5.4c0 4.4-2.7 7.3-7 8.5-4.3-1.2-7-4.1-7-8.5V6.7l7-3.1Z"/>
+    <path d="m8.8 12.2 2.1 2.1 4.5-4.8"/>
+  </symbol>
+  <symbol id="icon-chart" viewBox="0 0 24 24">
+    <path d="M4 18.8h16"/>
+    <path d="m6.2 15 3.1-4 3.5 3 4.6-6"/>
+    <path d="M17.4 8h2.2v2.2"/>
+    <circle cx="9.3" cy="11" r=".9"/>
+    <circle cx="12.8" cy="14" r=".9"/>
+  </symbol>
+  <symbol id="icon-document" viewBox="0 0 24 24">
+    <path d="M7 3.5h7l4 4v13H7a1.7 1.7 0 0 1-1.7-1.7V5.2A1.7 1.7 0 0 1 7 3.5Z"/>
+    <path d="M14 3.5v4.6h4"/>
+    <path d="M8.8 12.2h6.4M8.8 15.7h5.1"/>
+  </symbol>
+  <symbol id="icon-lock" viewBox="0 0 24 24">
+    <rect x="5" y="10" width="14" height="10" rx="2"/>
+    <path d="M8.5 10V7.8a3.5 3.5 0 0 1 7 0V10"/>
+    <path d="M12 14.3v2.2"/>
+  </symbol>
+  <symbol id="icon-phone" viewBox="0 0 24 24">
+    <rect x="7" y="2.8" width="10" height="18.4" rx="2.2"/>
+    <path d="M10.3 5h3.4M11.2 18.3h1.6"/>
+  </symbol>
+  <symbol id="icon-chat" viewBox="0 0 24 24">
+    <path d="M5.4 18.1 3.8 21l3.6-1.1c1.2.6 2.6.9 4.2.9 5 0 8.8-3.4 8.8-7.8s-3.8-7.8-8.8-7.8S2.8 8.6 2.8 13c0 1.9 1 3.8 2.6 5.1Z"/>
+    <path d="M8.4 11.5h7.2M8.4 15h4.8"/>
+  </symbol>
+  <symbol id="icon-globe" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="8.8"/>
+    <path d="M3.5 12h17M12 3.2c2.1 2.3 3.1 5.2 3.1 8.8S14.1 18.5 12 20.8M12 3.2C9.9 5.5 8.9 8.4 8.9 12s1 6.5 3.1 8.8"/>
+  </symbol>
+  <symbol id="icon-cards" viewBox="0 0 24 24">
+    <rect x="4" y="4" width="6.5" height="6.5" rx="1.4"/>
+    <rect x="13.5" y="4" width="6.5" height="6.5" rx="1.4"/>
+    <rect x="4" y="13.5" width="6.5" height="6.5" rx="1.4"/>
+    <rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.4"/>
+  </symbol>
+  <symbol id="icon-compare" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="8.6"/>
+    <path d="M12 7v10M7 12h10"/>
+  </symbol>
+  <symbol id="icon-calendar" viewBox="0 0 24 24">
+    <rect x="4" y="5.5" width="16" height="15" rx="2"/>
+    <path d="M8 3.5v4M16 3.5v4M4 10h16"/>
+  </symbol>
+  <symbol id="icon-bell" viewBox="0 0 24 24">
+    <path d="M18 9.7c0-3.4-2.3-5.7-6-5.7s-6 2.3-6 5.7c0 5.8-2.4 5.9-2.4 7.8h16.8c0-1.9-2.4-2-2.4-7.8Z"/>
+    <path d="M9.8 20.3h4.4"/>
+  </symbol>
+  <symbol id="icon-cart" viewBox="0 0 24 24">
+    <path d="M6.1 6.2h14l-1.6 8.4H8L6.1 6.2Z"/>
+    <path d="M6.1 6.2 5.3 3.7H2.8"/>
+    <circle cx="9" cy="19.1" r="1.2"/>
+    <circle cx="17.4" cy="19.1" r="1.2"/>
+  </symbol>
+  <symbol id="icon-price" viewBox="0 0 24 24">
+    <path d="M12 3v18"/>
+    <path d="M16.5 6.7H9.9a3.2 3.2 0 0 0 0 6.4h4.2a3.2 3.2 0 1 1 0 6.4H7.2"/>
+  </symbol>
+</svg>

@@ -721,15 +721,46 @@ const newsletterForm = document.getElementById("newsletter-form");
 const newsletterSuccess = document.getElementById("newsletter-success");
 
 if (newsletterForm && newsletterSuccess) {
+  const emailInput = newsletterForm.querySelector('input[type="email"]');
+  const setNewsletterError = (message) => {
+    if (!emailInput) return;
+    let error = document.getElementById("newsletter-email-error");
+    if (!error) {
+      error = document.createElement("p");
+      error.className = "form-error";
+      error.id = "newsletter-email-error";
+      emailInput.closest(".newsletter-form-row")?.after(error);
+    }
+    error.textContent = message;
+    emailInput.setAttribute("aria-invalid", "true");
+    emailInput.setAttribute("aria-describedby", "newsletter-email-error");
+  };
+
+  const clearNewsletterError = () => {
+    if (!emailInput) return;
+    emailInput.removeAttribute("aria-invalid");
+    emailInput.removeAttribute("aria-describedby");
+    document.getElementById("newsletter-email-error")?.remove();
+  };
+
+  emailInput?.addEventListener("input", clearNewsletterError);
+
   newsletterForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    const emailInput = newsletterForm.querySelector('input[type="email"]');
 
     if (!emailInput?.value.trim()) {
+      setNewsletterError("Enter your email address.");
       emailInput?.focus();
       return;
     }
 
+    if (!emailInput.checkValidity()) {
+      setNewsletterError("Enter a valid email address.");
+      emailInput?.focus();
+      return;
+    }
+
+    clearNewsletterError();
     newsletterSuccess.hidden = false;
     newsletterForm.reset();
   });

@@ -394,7 +394,13 @@
 
             <div class="feature-pair">
               <figure class="graph-card" aria-label="Health trend graph">
-                <object class="graph-card__img" type="image/svg+xml" data="assets/images/hba1c_artistic_vector_clean.svg" aria-label="Line graph showing HbA1c improving over time: 6.0 (borderline high) on 04-09-24, 5.6 (good) on 28-09-24, 5.2 (healthy) on 17-11-24, and 5.1 (healthy) on 05-01-25."></object>
+                <img
+                  class="graph-card__img"
+                  src="assets/images/hba1c_artistic_vector_clean.svg"
+                  alt="Line graph showing HbA1c improving over time: 6.0 borderline high on 04-09-24, 5.6 good on 28-09-24, 5.2 healthy on 17-11-24, and 5.1 healthy on 05-01-25."
+                  loading="lazy"
+                  decoding="async"
+                >
               </figure>
               <article class="feature-copy">
                 <h3 class="accent-green">Graphs that explain what changed</h3>
@@ -579,28 +585,28 @@
           <div class="reasons-grid">
             <article class="reason-card">
               <div class="reason-card__icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9H8L6 6z"/><path d="M6 6 5 3H2"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-cart"></use></svg>
               </div>
               <h3>Book your way</h3>
               <p>Web, iOS, Android, or WhatsApp — whichever channel fits your routine.</p>
             </article>
             <article class="reason-card">
               <div class="reason-card__icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6"/></svg>
+                <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-price"></use></svg>
               </div>
               <h3>Clear, fair pricing</h3>
               <p>Transparent panel pricing with no surprise add-ons at collection time.</p>
             </article>
             <article class="reason-card">
               <div class="reason-card__icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-clock"></use></svg>
               </div>
               <h3>Fast turnaround</h3>
               <p>Most results land in your app within 24–48 hours with notifications when ready.</p>
             </article>
             <article class="reason-card">
               <div class="reason-card__icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M12 3l7 4v6c0 5-3.5 8-7 8s-7-3-7-8V7l7-4z"/><path d="M9 12l2 2 4-4"/></svg>
+                <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-shield-check"></use></svg>
               </div>
               <h3>Trusted collection</h3>
               <p>Verified phlebotomists, proper handling, and lab-grade processing you can rely on.</p>
@@ -685,13 +691,13 @@
             <p>Occasional emails about new tests, seasonal checkups, and family wellness tips. No spam.</p>
           </div>
           <form class="newsletter-form" id="newsletter-form" novalidate>
+            <label for="newsletter-email">Email address</label>
             <div class="newsletter-form-row">
-              <label class="sr-only" for="newsletter-email">Email address</label>
-              <input id="newsletter-email" type="email" name="email" placeholder="Your email address" autocomplete="email" required>
+              <input id="newsletter-email" type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
               <button class="button primary" type="submit">Subscribe</button>
             </div>
             <p class="newsletter-fineprint">By subscribing you agree to receive emails from Dr.Swift. Unsubscribe anytime.</p>
-            <p class="newsletter-success" id="newsletter-success" hidden>Thanks — you are on the list.</p>
+            <p class="newsletter-success" id="newsletter-success" aria-live="polite" hidden>Thanks — you are on the list.</p>
           </form>
         </div>
       </section>
