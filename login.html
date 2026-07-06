@@ -42,6 +42,7 @@
             <p>View reports, family profiles, and health insights.</p>
           </div>
           <form class="auth-form" data-auth-form novalidate>
+            <p class="secure-note">Secure and confidential access to reports, family profiles, and health insights.</p>
             <div class="form-field">
               <label for="login-email">Email or phone</label>
               <input id="login-email" type="text" name="email" autocomplete="username" placeholder="you@email.com" required>
@@ -58,7 +59,7 @@
               <a href="forgot-password.html">Forgot password?</a>
             </div>
             <button class="button primary full" type="submit">Sign in</button>
-            <p class="auth-success" data-auth-success hidden>Signed in successfully. Backend connection coming soon.</p>
+            <p class="auth-success" data-auth-success aria-live="polite" hidden>Signed in successfully. Backend connection coming soon.</p>
           </form>
           <div class="auth-divider">or</div>
           <a class="button secondary full" href="whatsapp.html">Continue with WhatsApp</a>

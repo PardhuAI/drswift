@@ -111,16 +111,6 @@
               <a class="quick-card" href="tests.html">Full Body Checkup</a>
             </div>
           </div>
-          <div class="quick-select__hint swipe-hint" aria-hidden="true">
-            <span class="sr-only">Swipe sideways to see more tests</span>
-            <img
-              class="swipe-hint__svg"
-              src="assets/images/scroll_left_right_hint_animated.svg"
-              alt=""
-              height="32"
-              decoding="async"
-            >
-          </div>
           <div class="section-cta">
             <a class="button primary" href="tests.html">Shop all tests</a>
           </div>
@@ -366,7 +356,13 @@
 
             <div class="feature-pair">
               <figure class="graph-card" aria-label="Health trend graph">
-                <object class="graph-card__img" type="image/svg+xml" data="assets/images/hba1c_artistic_vector_clean.svg" aria-label="Line graph showing HbA1c improving over time: 6.0 (borderline high) on 04-09-24, 5.6 (good) on 28-09-24, 5.2 (healthy) on 17-11-24, and 5.1 (healthy) on 05-01-25."></object>
+                <img
+                  class="graph-card__img"
+                  src="assets/images/hba1c_artistic_vector_clean.svg"
+                  alt="Line graph showing HbA1c improving over time: 6.0 borderline high on 04-09-24, 5.6 good on 28-09-24, 5.2 healthy on 17-11-24, and 5.1 healthy on 05-01-25."
+                  loading="lazy"
+                  decoding="async"
+                >
               </figure>
               <article class="feature-copy">
                 <h3 class="accent-green">Graphs that explain what changed</h3>
@@ -657,13 +653,13 @@
             <p>Occasional emails about new tests, seasonal checkups, and family wellness tips. No spam.</p>
           </div>
           <form class="newsletter-form" id="newsletter-form" novalidate>
+            <label for="newsletter-email">Email address</label>
             <div class="newsletter-form-row">
-              <label class="sr-only" for="newsletter-email">Email address</label>
-              <input id="newsletter-email" type="email" name="email" placeholder="Your email address" autocomplete="email" required>
+              <input id="newsletter-email" type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
               <button class="button primary" type="submit">Subscribe</button>
             </div>
             <p class="newsletter-fineprint">By subscribing you agree to receive emails from Dr.Swift. Unsubscribe anytime.</p>
-            <p class="newsletter-success" id="newsletter-success" hidden>Thanks — you are on the list.</p>
+            <p class="newsletter-success" id="newsletter-success" aria-live="polite" hidden>Thanks — you are on the list.</p>
           </form>
         </div>
       </section>
