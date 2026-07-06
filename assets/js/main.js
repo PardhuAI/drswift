@@ -678,6 +678,8 @@ if (newsletterForm && newsletterSuccess) {
 const catalogGrid = document.getElementById("catalog-grid");
 const catalogEmpty = document.getElementById("catalog-empty");
 const filterButtons = document.querySelectorAll(".catalog-toolbar .filter-pill");
+const catalogSearch = document.querySelector("[data-catalog-search]");
+let activeCatalogFilter = "all";
 
 function applyCatalogFilter(filter) {
   if (!catalogGrid) {
@@ -685,11 +687,15 @@ function applyCatalogFilter(filter) {
   }
 
   const cards = catalogGrid.querySelectorAll(".test-card--catalog");
+  const query = catalogSearch?.value.trim().toLowerCase() || "";
   let visibleCount = 0;
 
   cards.forEach((card) => {
     const categories = card.getAttribute("data-category") || "";
-    const matches = filter === "all" || categories.split(/\s+/).includes(filter);
+    const haystack = card.getAttribute("data-search") || card.textContent || "";
+    const matchesFilter = filter === "all" || categories.split(/\s+/).includes(filter);
+    const matchesSearch = !query || haystack.toLowerCase().includes(query);
+    const matches = matchesFilter && matchesSearch;
     card.classList.toggle("is-hidden", !matches);
     if (matches) {
       visibleCount += 1;
@@ -700,6 +706,8 @@ function applyCatalogFilter(filter) {
     catalogEmpty.hidden = visibleCount > 0;
   }
 
+  catalogGrid.classList.toggle("is-single-result", visibleCount === 1);
+
   filterButtons.forEach((button) => {
     button.classList.toggle("is-active", button.getAttribute("data-filter") === filter);
   });
@@ -707,6 +715,7 @@ function applyCatalogFilter(filter) {
 }
 
 function setCatalogFilter(filter) {
+  activeCatalogFilter = filter;
   applyCatalogFilter(filter);
 }
 
@@ -715,3 +724,518 @@ filterButtons.forEach((button) => {
     setCatalogFilter(button.getAttribute("data-filter") || "all");
   });
 });
+
+catalogSearch?.addEventListener("input", () => {
+  applyCatalogFilter(activeCatalogFilter);
+});
+
+// Test storefront, detail page, and cart
+const TESTS = Array.isArray(window.DRSWIFT_TESTS) ? window.DRSWIFT_TESTS : [];
+const CART_STORAGE_KEY = "drswift.cart.v1";
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function formatPrice(value) {
+  return `$${Number(value || 0).toFixed(0)}`;
+}
+
+function detailUrl(slug) {
+  return `test-details.html?test=${encodeURIComponent(slug)}`;
+}
+
+function getTestBySlug(slug) {
+  return TESTS.find((test) => test.slug === slug);
+}
+
+function readCart() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || "[]");
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+    return parsed
+      .filter((item) => item && item.slug && (!TESTS.length || getTestBySlug(item.slug)))
+      .map((item) => ({
+        slug: item.slug,
+        quantity: Math.max(1, Number(item.quantity) || 1),
+      }));
+  } catch {
+    return [];
+  }
+}
+
+function writeCart(cart) {
+  localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+  updateCartBadges();
+}
+
+function cartQuantity() {
+  return readCart().reduce((sum, item) => sum + item.quantity, 0);
+}
+
+function updateCartBadges() {
+  const count = cartQuantity();
+  document.querySelectorAll("[data-cart-count]").forEach((badge) => {
+    badge.textContent = String(count);
+    badge.hidden = count === 0;
+  });
+}
+
+function addToCart(slug) {
+  if (!getTestBySlug(slug)) {
+    return;
+  }
+  const cart = readCart();
+  const existing = cart.find((item) => item.slug === slug);
+  if (existing) {
+    existing.quantity += 1;
+  } else {
+    cart.push({ slug, quantity: 1 });
+  }
+  writeCart(cart);
+}
+
+function updateCartItem(slug, action) {
+  let cart = readCart();
+  const item = cart.find((entry) => entry.slug === slug);
+
+  if (action === "clear") {
+    writeCart([]);
+    renderCartPage();
+    return;
+  }
+
+  if (!item) {
+    return;
+  }
+
+  if (action === "increase") {
+    item.quantity += 1;
+  }
+
+  if (action === "decrease") {
+    item.quantity -= 1;
+  }
+
+  if (action === "remove" || item.quantity <= 0) {
+    cart = cart.filter((entry) => entry.slug !== slug);
+  }
+
+  writeCart(cart);
+  renderCartPage();
+}
+
+function showCartToast(message) {
+  let toast = document.querySelector(".cart-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.className = "cart-toast";
+    toast.setAttribute("role", "status");
+    toast.setAttribute("aria-live", "polite");
+    document.body.append(toast);
+  }
+
+  toast.textContent = message;
+  toast.classList.add("is-visible");
+  window.clearTimeout(showCartToast.timer);
+  showCartToast.timer = window.setTimeout(() => {
+    toast.classList.remove("is-visible");
+  }, 2200);
+}
+
+function buildCatalogCard(test) {
+  const filters = (test.filters || ["all"]).join(" ");
+  const searchText = [
+    test.name,
+    test.category,
+    test.summary,
+    test.headline,
+    ...(test.markers || []),
+    ...(test.reasons || []).flat(),
+  ].join(" ");
+  const badge = test.badge
+    ? `<span class="test-badge test-badge--popular">${escapeHtml(test.badge)}</span>`
+    : "";
+  return `
+    <article class="test-card test-card--catalog" data-category="${escapeHtml(filters)}" data-search="${escapeHtml(searchText)}">
+      <a class="test-image photo-thumb photo-thumb--${escapeHtml(test.imageTone || "blood")}" href="${detailUrl(test.slug)}" aria-label="View ${escapeHtml(test.name)} details">
+        <img src="${escapeHtml(test.image)}" alt="" loading="lazy" decoding="async">
+        ${badge}
+        <span class="test-badge test-badge--category">${escapeHtml(test.category)}</span>
+      </a>
+      <div class="test-body">
+        <h3><a href="${detailUrl(test.slug)}">${escapeHtml(test.name)}</a></h3>
+        <p>${escapeHtml(test.summary)}</p>
+        <ul class="test-meta">
+          <li>${escapeHtml(test.collection)}</li>
+          <li>${escapeHtml(test.results.replace(" after sample reaches the lab", ""))}</li>
+        </ul>
+        <div class="price-row">
+          <span class="price">${formatPrice(test.price)}</span>
+          <span class="old-price">${formatPrice(test.oldPrice)}</span>
+        </div>
+        <div class="test-card-actions">
+          <button class="button primary full" type="button" data-add-to-cart="${escapeHtml(test.slug)}">Add to cart</button>
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function renderTestsCatalog() {
+  const grid = document.querySelector("[data-catalog-grid]");
+  if (!grid || !TESTS.length) {
+    return;
+  }
+
+  grid.innerHTML = TESTS.map(buildCatalogCard).join("");
+  applyCatalogFilter("all");
+}
+
+function buildFact(icon, label, value) {
+  return `
+    <li>
+      <span class="detail-fact__icon" aria-hidden="true">
+        <svg class="ui-icon"><use href="assets/images/ui-icons.svg#${icon}"></use></svg>
+      </span>
+      <span>
+        <small>${escapeHtml(label)}</small>
+        <strong>${escapeHtml(value)}</strong>
+      </span>
+    </li>
+  `;
+}
+
+function buildRelatedCard(slug) {
+  const test = getTestBySlug(slug);
+  if (!test) {
+    return "";
+  }
+  return `
+    <article class="related-test">
+      <a class="related-test__image photo-thumb photo-thumb--${escapeHtml(test.imageTone || "blood")}" href="${detailUrl(test.slug)}">
+        <img src="${escapeHtml(test.image)}" alt="" loading="lazy" decoding="async">
+      </a>
+      <div>
+        <p class="overline">${escapeHtml(test.category)}</p>
+        <h3><a href="${detailUrl(test.slug)}">${escapeHtml(test.name)}</a></h3>
+        <p>${escapeHtml(test.summary)}</p>
+        <div class="price-row">
+          <span class="price">${formatPrice(test.price)}</span>
+          <span class="old-price">${formatPrice(test.oldPrice)}</span>
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function renderTestDetailPage() {
+  const main = document.querySelector("[data-test-detail]");
+  if (!main || !TESTS.length) {
+    return;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const slug = params.get("test") || TESTS[0].slug;
+  const test = getTestBySlug(slug);
+
+  if (!test) {
+    main.innerHTML = `
+      <section class="section-pad">
+        <div class="container not-found-panel">
+          <p class="eyebrow">Test not found</p>
+          <h1>We could not find that test.</h1>
+          <p>Browse the full catalog or message the care team for help choosing a panel.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="tests.html">Shop tests</a>
+            <a class="button secondary" href="whatsapp.html">WhatsApp us</a>
+          </div>
+        </div>
+      </section>
+    `;
+    return;
+  }
+
+  document.title = `${test.name} | Dr.Swift Diagnostics`;
+  const savings = Math.max(0, Number(test.oldPrice || 0) - Number(test.price || 0));
+
+  main.innerHTML = `
+    <section class="product-hero section-pad">
+      <div class="container product-hero__grid">
+        <div class="product-intro">
+          <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <span>/</span>
+            <a href="tests.html">Tests</a>
+            <span>/</span>
+            <span>${escapeHtml(test.name)}</span>
+          </nav>
+          <p class="eyebrow">${escapeHtml(test.category)} test</p>
+          <h1>${escapeHtml(test.name)}</h1>
+          <p class="product-headline">${escapeHtml(test.headline)}</p>
+        </div>
+        <aside class="product-buy-card" aria-label="Book ${escapeHtml(test.name)}">
+          <div class="product-price">
+            <span>${formatPrice(test.price)}</span>
+            <del>${formatPrice(test.oldPrice)}</del>
+          </div>
+          <p>${savings > 0 ? `Save ${formatPrice(savings)} today.` : "Transparent pricing before booking."}</p>
+          <button class="button primary full" type="button" data-add-to-cart="${escapeHtml(test.slug)}">Add to cart</button>
+          <a class="button secondary full" href="book.html?test=${encodeURIComponent(test.name)}">Book now</a>
+          <a class="cart-inline-link" href="cart.html">View cart</a>
+        </aside>
+        <div class="product-media photo-thumb photo-thumb--${escapeHtml(test.imageTone || "blood")}">
+          <img src="${escapeHtml(test.image)}" alt="" decoding="async">
+          <span class="test-badge test-badge--category">${escapeHtml(test.category)}</span>
+        </div>
+        <p class="product-description">${escapeHtml(test.description)}</p>
+      </div>
+    </section>
+
+    <section class="section-pad-sm">
+      <div class="container">
+        <ul class="detail-facts" aria-label="Test facts">
+          ${buildFact("icon-price", "Sample type", test.sampleType)}
+          ${buildFact("icon-home", "Collection", test.collection)}
+          ${buildFact("icon-family", "Age", test.age)}
+          ${buildFact("icon-clock", "Results", test.results)}
+          ${buildFact("icon-shield-check", "HSA/FSA", test.hsa)}
+          ${buildFact("icon-document", "Booking", test.purchaser)}
+        </ul>
+      </div>
+    </section>
+
+    <section class="detail-section section-pad section-bg-white">
+      <div class="container detail-layout">
+        <div class="detail-copy">
+          <p class="overline">Test details</p>
+          <h2>What's tested</h2>
+          <p>${escapeHtml(test.description)}</p>
+          <ul class="marker-list">
+            ${test.markers.map((marker) => `<li>${escapeHtml(marker)}</li>`).join("")}
+          </ul>
+        </div>
+        <aside class="preparation-panel">
+          <h2>Preparation</h2>
+          <p>${escapeHtml(test.preparation)}</p>
+          <p class="detail-note">If you have urgent symptoms, active medical concerns, or abnormal prior results, speak with a qualified clinician before booking self-directed testing.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="detail-section section-pad section-bg-soft">
+      <div class="container">
+        <div class="section-heading split">
+          <div>
+            <p class="overline">Why consider this test</p>
+            <h2>Helpful for these situations</h2>
+          </div>
+        </div>
+        <div class="reason-grid">
+          ${test.reasons
+            .map(
+              ([title, copy]) => `
+                <article class="reason-card">
+                  <h3>${escapeHtml(title)}</h3>
+                  <p>${escapeHtml(copy)}</p>
+                </article>
+              `
+            )
+            .join("")}
+        </div>
+      </div>
+    </section>
+
+    <section class="detail-section section-pad section-bg-white">
+      <div class="container">
+        <div class="section-heading text-center">
+          <p class="overline">How it works</p>
+          <h2>From cart to clear results</h2>
+        </div>
+        <div class="steps-grid">
+          <article class="step-card">
+            <span>1</span>
+            <h3>Add tests</h3>
+            <p>Build your cart online and choose the panels you need.</p>
+          </article>
+          <article class="step-card">
+            <span>2</span>
+            <h3>Schedule collection</h3>
+            <p>Share patient and address details during booking for at-home collection.</p>
+          </article>
+          <article class="step-card">
+            <span>3</span>
+            <h3>View results</h3>
+            <p>Get app-ready reports with trends, plain-language notes, and family profiles.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="detail-section section-pad section-bg-soft">
+      <div class="container">
+        <div class="section-heading split">
+          <div>
+            <p class="overline">Frequently bought together</p>
+            <h2>Related tests</h2>
+          </div>
+          <a class="button secondary" href="tests.html">Shop tests</a>
+        </div>
+        <div class="related-grid">
+          ${test.related.map(buildRelatedCard).join("")}
+        </div>
+      </div>
+    </section>
+
+    <section class="detail-section section-pad section-bg-white">
+      <div class="container faq-container">
+        <p class="overline">FAQ</p>
+        <h2>Common questions</h2>
+        <div class="detail-faq-list">
+          ${test.faqs
+            .map(
+              ([question, answer]) => `
+                <details>
+                  <summary>${escapeHtml(question)}</summary>
+                  <p>${escapeHtml(answer)}</p>
+                </details>
+              `
+            )
+            .join("")}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function cartLineItems() {
+  return readCart()
+    .map((item) => ({ ...item, test: getTestBySlug(item.slug) }))
+    .filter((item) => item.test);
+}
+
+function cartTotals(items) {
+  return items.reduce(
+    (totals, item) => {
+      totals.subtotal += item.test.price * item.quantity;
+      totals.original += item.test.oldPrice * item.quantity;
+      return totals;
+    },
+    { subtotal: 0, original: 0 }
+  );
+}
+
+function renderCartPage() {
+  const container = document.querySelector("[data-cart-page]");
+  if (!container || !TESTS.length) {
+    return;
+  }
+
+  const items = cartLineItems();
+  if (!items.length) {
+    container.innerHTML = `
+      <div class="empty-cart">
+        <p class="eyebrow">Empty cart</p>
+        <h2>Your cart is ready for tests.</h2>
+        <p>Add one or more panels, then continue to booking for patient and collection details.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="tests.html">Shop tests</a>
+          <a class="button secondary" href="whatsapp.html">Book via WhatsApp</a>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  const totals = cartTotals(items);
+  const savings = Math.max(0, totals.original - totals.subtotal);
+  const cartNames = items.map((item) => `${item.test.name} x ${item.quantity}`).join(", ");
+
+  container.innerHTML = `
+    <div class="cart-items" aria-label="Selected tests">
+      ${items
+        .map(
+          ({ test, quantity }) => `
+            <article class="cart-item">
+              <a class="cart-item__image photo-thumb photo-thumb--${escapeHtml(test.imageTone || "blood")}" href="${detailUrl(test.slug)}">
+                <img src="${escapeHtml(test.image)}" alt="" loading="lazy" decoding="async">
+              </a>
+              <div class="cart-item__body">
+                <p class="overline">${escapeHtml(test.category)}</p>
+                <h2><a href="${detailUrl(test.slug)}">${escapeHtml(test.name)}</a></h2>
+                <p>${escapeHtml(test.summary)}</p>
+                <ul class="test-meta">
+                  <li>${escapeHtml(test.collection)}</li>
+                  <li>${escapeHtml(test.results.replace(" after sample reaches the lab", ""))}</li>
+                </ul>
+              </div>
+              <div class="cart-item__controls">
+                <div class="price-row">
+                  <span class="price">${formatPrice(test.price * quantity)}</span>
+                  <span class="old-price">${formatPrice(test.oldPrice * quantity)}</span>
+                </div>
+                <div class="quantity-control" aria-label="Quantity for ${escapeHtml(test.name)}">
+                  <button type="button" data-cart-action="decrease" data-cart-slug="${escapeHtml(test.slug)}" aria-label="Decrease ${escapeHtml(test.name)} quantity">-</button>
+                  <span>${quantity}</span>
+                  <button type="button" data-cart-action="increase" data-cart-slug="${escapeHtml(test.slug)}" aria-label="Increase ${escapeHtml(test.name)} quantity">+</button>
+                </div>
+                <button class="cart-remove" type="button" data-cart-action="remove" data-cart-slug="${escapeHtml(test.slug)}">Remove</button>
+              </div>
+            </article>
+          `
+        )
+        .join("")}
+    </div>
+    <aside class="cart-summary" aria-label="Cart summary">
+      <h2>Order summary</h2>
+      <dl>
+        <div><dt>Tests</dt><dd>${items.reduce((sum, item) => sum + item.quantity, 0)}</dd></div>
+        <div><dt>Subtotal</dt><dd>${formatPrice(totals.original)}</dd></div>
+        <div><dt>Savings</dt><dd>-${formatPrice(savings)}</dd></div>
+        <div class="cart-summary__total"><dt>Total</dt><dd>${formatPrice(totals.subtotal)}</dd></div>
+      </dl>
+      <a class="button primary full" href="book.html?cart=checkout">Continue to booking</a>
+      <a class="button secondary full" href="whatsapp.html?message=${encodeURIComponent(`I want to book: ${cartNames}`)}">Book via WhatsApp</a>
+      <button class="cart-clear-link" type="button" data-cart-action="clear">Clear cart</button>
+      <ul class="cart-assurance">
+        <li>No payment is taken until your slot is confirmed.</li>
+        <li>Care team reviews address, timing, and preparation.</li>
+        <li>You can switch to WhatsApp support anytime.</li>
+      </ul>
+    </aside>
+  `;
+}
+
+document.addEventListener("click", (event) => {
+  const addButton = event.target.closest("[data-add-to-cart]");
+  if (addButton) {
+    const slug = addButton.getAttribute("data-add-to-cart");
+    const test = getTestBySlug(slug);
+    if (test) {
+      addToCart(slug);
+      renderCartPage();
+      showCartToast(`${test.name} added to cart.`);
+    }
+    return;
+  }
+
+  const cartButton = event.target.closest("[data-cart-action]");
+  if (cartButton) {
+    updateCartItem(
+      cartButton.getAttribute("data-cart-slug"),
+      cartButton.getAttribute("data-cart-action")
+    );
+  }
+});
+
+renderTestsCatalog();
+renderTestDetailPage();
+renderCartPage();
+updateCartBadges();

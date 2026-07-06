@@ -39,9 +39,12 @@
             <a href="about.html">About</a>
           </div>
           <div class="nav-actions" aria-label="Account links">
-            <a href="login.html">Sign in</a>
-            <a href="doctors.html">Doctors</a>
-            <a class="button primary nav-cta" href="tests.html">Book a test</a>
+            <a class="cart-link" href="cart.html" aria-label="View cart">
+              <svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-cart"></use></svg>
+              <span>Cart</span>
+              <span class="cart-count" data-cart-count hidden>0</span>
+            </a>
+            <a class="button primary nav-cta" href="tests.html">Shop tests</a>
           </div>
         </div>
       </nav>
@@ -52,7 +55,7 @@
         <div class="container">
           <div class="hero-frame">
             <article class="hero-copy">
-              <h1 class="hero-statement hero-statement--spring">
+              <h1 class="hero-statement">
                 <span class="hero-line-one">See More Than Numbers,</span>
                 <span class="hero-line-two">
                   <span class="c-red">See</span>
@@ -60,59 +63,53 @@
                   <span class="c-health">Health.</span>
                 </span>
               </h1>
-              <ul class="hero-points hero-points--reveal">
+              <p class="hero-subcopy">
+                Book at-home lab tests, track clear digital reports, and compare health trends for your family.
+              </p>
+              <ul class="hero-points">
                 <li class="item-1">
-                  <svg class="hp-icon" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
-                    <g fill="#ffffff" stroke="#111111" stroke-width="2.2">
-                      <rect class="sq sq-top" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(24 11) rotate(45)"></rect>
-                      <rect class="sq sq-right" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(37 24) rotate(45)"></rect>
-                      <rect class="sq sq-bottom" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(24 37) rotate(45)"></rect>
-                      <rect class="sq sq-left" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(11 24) rotate(45)"></rect>
-                    </g>
+                  <svg class="hp-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M4 11 12 4l8 7v8.5a1.5 1.5 0 0 1-1.5 1.5H15v-6H9v6H5.5A1.5 1.5 0 0 1 4 19.5V11Z"></path>
+                    <path d="M9 21v-6h6v6"></path>
                   </svg>
-                  <span>At-Home collection. You can book Online, iOS, Android app or WhatsApp</span>
+                  <span>At-home sample collection at your door</span>
                 </li>
                 <li class="item-2">
-                  <svg class="hp-icon" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
-                    <g fill="#ffffff" stroke="#111111" stroke-width="2.2">
-                      <rect class="sq sq-top" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(24 11) rotate(45)"></rect>
-                      <rect class="sq sq-right" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(37 24) rotate(45)"></rect>
-                      <rect class="sq sq-bottom" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(24 37) rotate(45)"></rect>
-                      <rect class="sq sq-left" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(11 24) rotate(45)"></rect>
-                    </g>
+                  <svg class="hp-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M7 4h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"></path>
+                    <path d="M8.5 8h7M8.5 12h7M8.5 16h4.5"></path>
                   </svg>
-                  <span>Results online, WhatsApp, iOS and Android app</span>
+                  <span>Reports in web, app, and WhatsApp</span>
                 </li>
                 <li class="item-3">
-                  <svg class="hp-icon" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
-                    <g fill="#ffffff" stroke="#111111" stroke-width="2.2">
-                      <rect class="sq sq-top" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(24 11) rotate(45)"></rect>
-                      <rect class="sq sq-right" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(37 24) rotate(45)"></rect>
-                      <rect class="sq sq-bottom" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(24 37) rotate(45)"></rect>
-                      <rect class="sq sq-left" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(11 24) rotate(45)"></rect>
-                    </g>
+                  <svg class="hp-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M4 18.5h16"></path>
+                    <path d="m6.5 15 3.5-4 3.5 3 4-6"></path>
+                    <path d="M17.5 8H20v2.5"></path>
                   </svg>
-                  <span>Health Metrics, graphs and Insights</span>
+                  <span>Trends, graphs, and doctor-ready PDFs</span>
                 </li>
                 <li class="item-4">
-                  <svg class="hp-icon" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
-                    <g fill="#ffffff" stroke="#111111" stroke-width="2.2">
-                      <rect class="sq sq-top" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(24 11) rotate(45)"></rect>
-                      <rect class="sq sq-right" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(37 24) rotate(45)"></rect>
-                      <rect class="sq sq-bottom" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(24 37) rotate(45)"></rect>
-                      <rect class="sq sq-left" x="-6.5" y="-6.5" width="13" height="13" rx="4" transform="translate(11 24) rotate(45)"></rect>
-                    </g>
+                  <svg class="hp-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <circle cx="8" cy="8" r="2.5"></circle>
+                    <circle cx="16" cy="8" r="2.5"></circle>
+                    <path d="M4 20v-1.3C4 16 5.7 14.2 8 14.2s4 1.8 4 4.5V20"></path>
+                    <path d="M12 20v-1.3c0-2.7 1.7-4.5 4-4.5s4 1.8 4 4.5V20"></path>
                   </svg>
-                  <span>One account, whole-family</span>
+                  <span>One account for the whole family</span>
                 </li>
               </ul>
+              <div class="hero-actions hero-actions--primary">
+                <a class="button primary" href="tests.html">Shop tests</a>
+                <a class="button secondary" href="sample-report.html">View sample report</a>
+              </div>
             </article>
 
             <article class="hero-image hero-image--photo" aria-label="Couple reviewing their health results at home">
               <img class="hero-photo" src="assets/images/hero-couple.png" alt="A couple looking at their health results together on a desktop computer at home">
-              <div class="image-cta-group">
-                <a class="button image-cta" href="tests.html">see all tests</a>
-                <a class="button image-cta" href="promotions.html">see all promotions</a>
+              <div class="hero-image-note">
+                <span>At-home collection</span>
+                <span>Reports with trends</span>
               </div>
             </article>
           </div>
@@ -145,59 +142,140 @@
         </div>
       </section>
 
-      <section class="quick-links section-pad-sm section-bg-white">
-        <div class="container quick-link-list" aria-label="Quick links">
-          <a href="promotions.html">
-            <span>Promotions</span>
-            <small>Seasonal packages and offers</small>
-          </a>
-          <a href="help.html">
-            <span>Need help choosing?</span>
-            <small>Get guidance before you book</small>
-          </a>
-        </div>
-      </section>
-
-      <section class="audience-tests section-pad" aria-labelledby="audience-tests-heading">
+      <section class="ordered-tests section-pad section-bg-white" id="popular-tests">
         <div class="container">
-          <div class="section-heading centered">
-            <p class="overline">For everyone you care about</p>
-            <h2 id="audience-tests-heading">Quick tests, picked for who you care about</h2>
+          <div class="section-heading split">
+            <div>
+              <p class="overline">Popular panels</p>
+              <h2>Frequently ordered tests</h2>
+              <p class="catalog-meta">At-home collection · clear reports · cart checkout</p>
+            </div>
+            <div class="carousel-actions">
+              <button class="scroll-btn inline" type="button" data-scroll-target="test-cards" data-scroll-dir="-1" aria-label="Scroll test cards left">
+                <span aria-hidden="true">&lsaquo;</span>
+              </button>
+              <button class="scroll-btn inline" type="button" data-scroll-target="test-cards" data-scroll-dir="1" aria-label="Scroll test cards right">
+                <span aria-hidden="true">&rsaquo;</span>
+              </button>
+            </div>
           </div>
 
-          <div class="audience-tests-grid">
-            <div class="audience-column audience-column--him">
-              <h3 class="audience-column__title">For Him</h3>
-              <div class="audience-tiles">
-                <a class="audience-tile" href="tests.html">Men's Health</a>
-                <a class="audience-tile" href="tests.html">Athletic Performance</a>
-                <a class="audience-tile" href="tests.html">Heart Health</a>
-                <a class="audience-tile" href="tests.html">Hormones</a>
+          <div class="test-cards horizontal-scroll" id="test-cards" data-scroll-container>
+            <article class="test-card test-card--catalog">
+              <a class="test-image photo-thumb photo-thumb--blood" href="test-details.html?test=cbc">
+                <img src="assets/images/test-cbc.jpg" alt="" loading="lazy" decoding="async">
+                <span class="test-badge test-badge--popular">Popular</span>
+                <span class="test-badge test-badge--category">General</span>
+              </a>
+              <div class="test-body">
+                <h3><a href="test-details.html?test=cbc">Complete Blood Count</a></h3>
+                <p>Checks blood cells, anemia indicators, and infection clues.</p>
+                <ul class="test-meta">
+                  <li>At-home collection</li>
+                  <li>24–48 hr results</li>
+                </ul>
+                <div class="price-row">
+                  <span class="price">$29</span>
+                  <span class="old-price">$45</span>
+                </div>
+                <div class="test-card-actions">
+                  <button class="button primary full" type="button" data-add-to-cart="cbc">Add to cart</button>
+                  <a class="button secondary full" href="test-details.html?test=cbc">View details</a>
+                </div>
               </div>
-              <a class="button audience-more" href="tests.html">See more tests</a>
-            </div>
+            </article>
 
-            <div class="audience-column audience-column--her">
-              <h3 class="audience-column__title">For Her</h3>
-              <div class="audience-tiles">
-                <a class="audience-tile" href="tests.html">Women's Health</a>
-                <a class="audience-tile" href="tests.html">Maternal Tests</a>
-                <a class="audience-tile" href="tests.html">Hormonal Balance</a>
-                <a class="audience-tile" href="tests.html">Thyroid Profile</a>
+            <article class="test-card test-card--catalog">
+              <a class="test-image photo-thumb photo-thumb--heart" href="test-details.html?test=lipid-profile">
+                <img src="assets/images/test-heart.jpg" alt="" loading="lazy" decoding="async">
+                <span class="test-badge test-badge--category">Heart</span>
+              </a>
+              <div class="test-body">
+                <h3><a href="test-details.html?test=lipid-profile">Lipid Profile</a></h3>
+                <p>Measures cholesterol, triglycerides, HDL, and LDL.</p>
+                <ul class="test-meta">
+                  <li>At-home collection</li>
+                  <li>24–48 hr results</li>
+                </ul>
+                <div class="price-row">
+                  <span class="price">$39</span>
+                  <span class="old-price">$58</span>
+                </div>
+                <div class="test-card-actions">
+                  <button class="button primary full" type="button" data-add-to-cart="lipid-profile">Add to cart</button>
+                  <a class="button secondary full" href="test-details.html?test=lipid-profile">View details</a>
+                </div>
               </div>
-              <a class="button audience-more" href="tests.html">See more tests</a>
-            </div>
+            </article>
 
-            <div class="audience-column audience-column--loved">
-              <h3 class="audience-column__title">For Loved Ones</h3>
-              <div class="audience-tiles">
-                <a class="audience-tile" href="tests.html">General Health</a>
-                <a class="audience-tile" href="tests.html">Diabetic Risk</a>
-                <a class="audience-tile" href="tests.html">Senior Wellness</a>
-                <a class="audience-tile" href="tests.html">Heart Health</a>
+            <article class="test-card test-card--catalog">
+              <a class="test-image photo-thumb photo-thumb--thyroid" href="test-details.html?test=thyroid-profile">
+                <img src="assets/images/test-thyroid.jpg" alt="" loading="lazy" decoding="async">
+                <span class="test-badge test-badge--category">Thyroid</span>
+              </a>
+              <div class="test-body">
+                <h3><a href="test-details.html?test=thyroid-profile">Thyroid Profile</a></h3>
+                <p>Includes T3, T4, and TSH for thyroid screening.</p>
+                <ul class="test-meta">
+                  <li>At-home collection</li>
+                  <li>24–48 hr results</li>
+                </ul>
+                <div class="price-row">
+                  <span class="price">$35</span>
+                  <span class="old-price">$52</span>
+                </div>
+                <div class="test-card-actions">
+                  <button class="button primary full" type="button" data-add-to-cart="thyroid-profile">Add to cart</button>
+                  <a class="button secondary full" href="test-details.html?test=thyroid-profile">View details</a>
+                </div>
               </div>
-              <a class="button audience-more" href="tests.html">See more tests</a>
-            </div>
+            </article>
+
+            <article class="test-card test-card--catalog">
+              <a class="test-image photo-thumb photo-thumb--vitamin" href="test-details.html?test=vitamin-d">
+                <img src="assets/images/test-vitamin-d.jpg" alt="" loading="lazy" decoding="async">
+                <span class="test-badge test-badge--category">Wellness</span>
+              </a>
+              <div class="test-body">
+                <h3><a href="test-details.html?test=vitamin-d">Vitamin D Test</a></h3>
+                <p>Useful for fatigue, bone health, and wellness checks.</p>
+                <ul class="test-meta">
+                  <li>At-home collection</li>
+                  <li>24–48 hr results</li>
+                </ul>
+                <div class="price-row">
+                  <span class="price">$31</span>
+                  <span class="old-price">$49</span>
+                </div>
+                <div class="test-card-actions">
+                  <button class="button primary full" type="button" data-add-to-cart="vitamin-d">Add to cart</button>
+                  <a class="button secondary full" href="test-details.html?test=vitamin-d">View details</a>
+                </div>
+              </div>
+            </article>
+
+            <article class="test-card test-card--catalog">
+              <a class="test-image photo-thumb photo-thumb--body" href="test-details.html?test=full-body-checkup">
+                <img src="assets/images/test-full-body.jpg" alt="" loading="lazy" decoding="async">
+                <span class="test-badge test-badge--category">Full body</span>
+              </a>
+              <div class="test-body">
+                <h3><a href="test-details.html?test=full-body-checkup">Full Body Checkup</a></h3>
+                <p>A broad wellness panel for annual preventive testing.</p>
+                <ul class="test-meta">
+                  <li>At-home collection</li>
+                  <li>48 hr results</li>
+                </ul>
+                <div class="price-row">
+                  <span class="price">$99</span>
+                  <span class="old-price">$149</span>
+                </div>
+                <div class="test-card-actions">
+                  <button class="button primary full" type="button" data-add-to-cart="full-body-checkup">Add to cart</button>
+                  <a class="button secondary full" href="test-details.html?test=full-body-checkup">View details</a>
+                </div>
+              </div>
+            </article>
           </div>
         </div>
       </section>
@@ -409,134 +487,11 @@
           <div class="report-cta-copy">
             <p class="overline">Sample report</p>
             <h2>See how Dr.Swift explains your results</h2>
-            <p>Download a sample report or explore the insights dashboard on our homepage.</p>
+            <p>Preview the kind of report patients receive after booking a test.</p>
           </div>
           <div class="tests-hero__actions">
-            <a class="button secondary" href="tests.html">See all tests</a>
-            <a class="button primary" href="reports.html">View sample report</a>
-          </div>
-        </div>
-      </section>
-
-      <section class="ordered-tests section-pad section-bg-soft">
-        <div class="container">
-          <div class="section-heading split">
-            <div>
-              <p class="overline">Popular panels</p>
-              <h2>Frequently ordered tests</h2>
-              <p class="catalog-meta">At-home collection · insights included</p>
-            </div>
-            <div class="carousel-actions">
-              <button class="scroll-btn inline" type="button" data-scroll-target="test-cards" data-scroll-dir="-1" aria-label="Scroll test cards left">
-                <span aria-hidden="true">&lsaquo;</span>
-              </button>
-              <button class="scroll-btn inline" type="button" data-scroll-target="test-cards" data-scroll-dir="1" aria-label="Scroll test cards right">
-                <span aria-hidden="true">&rsaquo;</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="test-cards horizontal-scroll" id="test-cards" data-scroll-container>
-            <article class="test-card test-card--catalog">
-              <div class="test-image photo-thumb photo-thumb--blood">
-                <img src="assets/images/test-cbc.jpg" alt="" loading="lazy" decoding="async">
-                <span class="test-badge test-badge--popular">Popular</span>
-                <span class="test-badge test-badge--category">General</span>
-              </div>
-              <div class="test-body">
-                <h3>Complete Blood Count</h3>
-                <p>Checks blood cells, anemia indicators, and infection clues.</p>
-                <ul class="test-meta">
-                  <li>At-home collection</li>
-                  <li>24–48 hr results</li>
-                </ul>
-                <div class="price-row">
-                  <span class="price">$29</span>
-                  <span class="old-price">$45</span>
-                </div>
-                <a class="button primary full" href="book.html?test=CBC">Book test</a>
-              </div>
-            </article>
-
-            <article class="test-card test-card--catalog">
-              <div class="test-image photo-thumb photo-thumb--heart">
-                <img src="assets/images/test-heart.jpg" alt="" loading="lazy" decoding="async">
-                <span class="test-badge test-badge--category">Heart</span>
-              </div>
-              <div class="test-body">
-                <h3>Lipid Profile</h3>
-                <p>Measures cholesterol, triglycerides, HDL, and LDL.</p>
-                <ul class="test-meta">
-                  <li>At-home collection</li>
-                  <li>24–48 hr results</li>
-                </ul>
-                <div class="price-row">
-                  <span class="price">$39</span>
-                  <span class="old-price">$58</span>
-                </div>
-                <a class="button primary full" href="book.html?test=Lipid">Book test</a>
-              </div>
-            </article>
-
-            <article class="test-card test-card--catalog">
-              <div class="test-image photo-thumb photo-thumb--thyroid">
-                <img src="assets/images/test-thyroid.jpg" alt="" loading="lazy" decoding="async">
-                <span class="test-badge test-badge--category">Thyroid</span>
-              </div>
-              <div class="test-body">
-                <h3>Thyroid Profile</h3>
-                <p>Includes T3, T4, and TSH for thyroid screening.</p>
-                <ul class="test-meta">
-                  <li>At-home collection</li>
-                  <li>24–48 hr results</li>
-                </ul>
-                <div class="price-row">
-                  <span class="price">$35</span>
-                  <span class="old-price">$52</span>
-                </div>
-                <a class="button primary full" href="book.html?test=Thyroid">Book test</a>
-              </div>
-            </article>
-
-            <article class="test-card test-card--catalog">
-              <div class="test-image photo-thumb photo-thumb--vitamin">
-                <img src="assets/images/test-vitamin-d.jpg" alt="" loading="lazy" decoding="async">
-                <span class="test-badge test-badge--category">Wellness</span>
-              </div>
-              <div class="test-body">
-                <h3>Vitamin D Test</h3>
-                <p>Useful for fatigue, bone health, and wellness checks.</p>
-                <ul class="test-meta">
-                  <li>At-home collection</li>
-                  <li>24–48 hr results</li>
-                </ul>
-                <div class="price-row">
-                  <span class="price">$31</span>
-                  <span class="old-price">$49</span>
-                </div>
-                <a class="button primary full" href="book.html?test=Vitamin%20D">Book test</a>
-              </div>
-            </article>
-
-            <article class="test-card test-card--catalog">
-              <div class="test-image photo-thumb photo-thumb--body">
-                <img src="assets/images/test-full-body.jpg" alt="" loading="lazy" decoding="async">
-                <span class="test-badge test-badge--category">Full body</span>
-              </div>
-              <div class="test-body">
-                <h3>Full Body Checkup</h3>
-                <p>A broad wellness panel for annual preventive testing.</p>
-                <ul class="test-meta">
-                  <li>At-home collection</li>
-                  <li>48 hr results</li>
-                </ul>
-                <div class="price-row">
-                  <span class="price">$99</span>
-                  <span class="old-price">$149</span>
-                </div>
-                <a class="button primary full" href="book.html?test=Full%20Body">Book test</a>
-              </div>
-            </article>
+            <a class="button secondary" href="tests.html">Shop tests</a>
+            <a class="button primary" href="sample-report.html">View sample report</a>
           </div>
         </div>
       </section>
@@ -612,7 +567,7 @@
             “We stopped juggling PDFs from different labs. Dr.Swift shows trends for my parents and my kids in one place — it finally feels manageable.”
           </blockquote>
           <p class="testimonial-attribution">— Priya M., Dr.Swift family account member</p>
-          <a class="button outline-light" href="tests.html">Browse all tests</a>
+          <a class="button outline-light" href="tests.html">Shop tests</a>
         </div>
       </section>
 
@@ -674,30 +629,12 @@
         </div>
       </section>
 
-      <section class="newsletter section-pad section-bg-soft" aria-labelledby="newsletter-heading">
-        <div class="container newsletter-split">
-          <div class="newsletter-copy">
-            <h2 id="newsletter-heading">Stay updated on health panels and offers</h2>
-            <p>Occasional emails about new tests, seasonal checkups, and family wellness tips. No spam.</p>
-          </div>
-          <form class="newsletter-form" id="newsletter-form" novalidate>
-            <label for="newsletter-email">Email address</label>
-            <div class="newsletter-form-row">
-              <input id="newsletter-email" type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
-              <button class="button primary" type="submit">Subscribe</button>
-            </div>
-            <p class="newsletter-fineprint">By subscribing you agree to receive emails from Dr.Swift. Unsubscribe anytime.</p>
-            <p class="newsletter-success" id="newsletter-success" aria-live="polite" hidden>Thanks — you are on the list.</p>
-          </form>
-        </div>
-      </section>
-
       <section class="community-band section-pad section-bg-navy" aria-labelledby="community-heading">
         <div class="container">
           <h2 id="community-heading">Ready to see more than numbers?</h2>
           <p>Book your first at-home test or download the app to explore health insights built for real families.</p>
           <div class="cta-band__actions">
-            <a class="button outline-light" href="tests.html">Browse tests</a>
+            <a class="button outline-light" href="tests.html">Shop tests</a>
             <a class="button primary" href="app.html">Get the app</a>
           </div>
         </div>
@@ -727,9 +664,9 @@
         </div>
         <div>
           <h2 class="footer-col-title">Our Tests</h2>
-          <a href="tests.html">Browse all tests</a>
+          <a href="tests.html">Shop tests</a>
           <a href="tests.html#catalog">By category</a>
-          <a href="#audience-tests-heading">For Him / Her / Family</a>
+          <a href="#popular-tests">Popular panels</a>
           <a href="promotions.html">Promotions</a>
         </div>
         <div>
@@ -760,6 +697,7 @@
       </div>
     </footer>
 
+    <script src="assets/js/test-data.js"></script>
     <script src="assets/js/main.js"></script>
   </body>
 </html>

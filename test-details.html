@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Tests | Dr.Swift Diagnostics</title>
-    <meta name="description" content="Browse at-home lab tests from Dr.Swift Diagnostics — book online, app, or WhatsApp.">
+    <title>Test details | Dr.Swift Diagnostics</title>
+    <meta name="description" content="Review Dr.Swift test details, sample type, preparation, results timeline, pricing, and cart options.">
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
-  <body class="tests-page">
+  <body class="test-detail-page">
     <header class="site-header" id="site-header">
       <nav class="navbar container" aria-label="Primary navigation">
         <a class="brand" href="index.html" aria-label="Dr.Swift Diagnostics home">
@@ -30,62 +30,18 @@
               <span>Cart</span>
               <span class="cart-count" data-cart-count hidden>0</span>
             </a>
-            <a class="button primary nav-cta" href="whatsapp.html">Need help?</a>
+            <a class="button primary nav-cta" href="tests.html">Shop tests</a>
           </div>
         </div>
       </nav>
     </header>
 
-    <main>
-      <section class="catalog-section catalog-section--first section-pad section-bg-white" id="catalog">
+    <main data-test-detail>
+      <section class="section-pad">
         <div class="container">
-          <div class="catalog-header">
-            <div class="catalog-header__copy">
-              <p class="overline">Tests catalog</p>
-              <h2>All health tests</h2>
-              <p class="catalog-meta">Search 9 panels by test name, marker, or health goal.</p>
-            </div>
-            <a class="catalog-help-link" href="whatsapp.html">Need help choosing?</a>
-          </div>
-
-          <ul class="catalog-trust-strip" aria-label="Why book with Dr.Swift">
-            <li><svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-home"></use></svg>At-home collection</li>
-            <li><svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-clock"></use></svg>24-48h results</li>
-            <li><svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-family"></use></svg>Family profiles</li>
-            <li><svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-shield-check"></use></svg>Accredited labs</li>
-          </ul>
-
-          <div class="catalog-search">
-            <label class="sr-only" for="catalog-search">Search tests</label>
-            <input id="catalog-search" type="search" placeholder="Search tests, markers, or health goals" data-catalog-search>
-          </div>
-
-          <div class="catalog-toolbar-wrap">
-            <p class="catalog-toolbar__label">Filter</p>
-            <div class="catalog-toolbar horizontal-scroll" role="tablist" aria-label="Filter tests by category">
-              <button class="filter-pill is-active" type="button" data-filter="all">All tests</button>
-              <button class="filter-pill" type="button" data-filter="heart">Heart health</button>
-              <button class="filter-pill" type="button" data-filter="diabetes">Diabetes</button>
-              <button class="filter-pill" type="button" data-filter="women">Women's health</button>
-              <button class="filter-pill" type="button" data-filter="thyroid">Thyroid</button>
-              <button class="filter-pill" type="button" data-filter="immunity">Immunity</button>
-              <button class="filter-pill" type="button" data-filter="full-body">Full body</button>
-            </div>
-          </div>
-
-          <div class="catalog-grid" id="catalog-grid" data-catalog-grid></div>
-
-          <p class="catalog-empty" id="catalog-empty" hidden>No tests in this category yet. Try another filter or browse all tests.</p>
-
-          <div class="tests-cta-band band-cta">
-            <div class="tests-cta-band__copy">
-              <h2>Not sure which test to choose?</h2>
-              <p>Message us on WhatsApp or call our care team — we will help you pick the right panel.</p>
-            </div>
-            <div class="tests-cta-band__actions">
-              <a class="button outline-light" href="whatsapp.html">WhatsApp us</a>
-              <a class="button primary" href="about.html#contact">Contact support</a>
-            </div>
+          <div class="detail-loading">
+            <p class="eyebrow">Loading test</p>
+            <h1>Preparing test details...</h1>
           </div>
         </div>
       </section>
@@ -99,7 +55,7 @@
             <span>Dr.Swift Diagnostics</span>
           </a>
           <p class="footer-tagline">At-home lab tests, clear reports, and health insights for your whole family.</p>
-                              <div class="footer-social" aria-label="Contact shortcuts">
+          <div class="footer-social" aria-label="Contact shortcuts">
             <a href="mailto:care@drswift.health" aria-label="Email Dr.Swift" title="Email"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-email"/></svg></a>
             <a href="whatsapp.html" aria-label="Book on WhatsApp" title="WhatsApp"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-whatsapp"/></svg></a>
             <a href="app.html" aria-label="Open customer app page" title="App"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-app"/></svg></a>

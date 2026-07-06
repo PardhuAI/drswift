@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Reports | Dr.Swift Diagnostics</title>
-    <meta name="description" content="Access Dr.Swift lab reports online, in the app, or via WhatsApp — with insights and trend graphs.">
+    <meta name="description" content="View Dr.Swift patient reports, compare current and previous values, and download doctor-ready PDFs.">
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
@@ -25,92 +25,94 @@
             <a href="about.html">About</a>
           </div>
           <div class="nav-actions" aria-label="Account links">
-            <a href="login.html">Sign in</a>
-            <a href="doctors.html">Doctors</a>
-            <a class="button primary nav-cta" href="tests.html">Book a test</a>
+            <a class="cart-link" href="cart.html" aria-label="View cart">
+              <svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-cart"></use></svg>
+              <span>Cart</span>
+              <span class="cart-count" data-cart-count hidden>0</span>
+            </a>
+            <a class="button primary nav-cta" href="tests.html">Shop tests</a>
           </div>
         </div>
       </nav>
     </header>
 
     <main>
-      <section class="inner-hero section-pad">
-        <div class="container">
-          <div class="inner-hero__frame">
-            <div class="inner-hero__copy">
-              <p class="eyebrow">Reports &amp; insights</p>
-              <h1>Your results, explained — not just filed away</h1>
-              <p>
-                View current and past values, trend graphs, and downloadable PDFs from one calm
-                family account — on web, app, or WhatsApp.
-              </p>
-              <div class="inner-hero__actions">
-                <a class="button primary" href="login.html">Login to view reports</a>
-                <a class="button secondary" href="#sample">See sample report</a>
-              </div>
+      <section class="report-center section-pad">
+        <div class="container report-center__grid">
+          <div class="report-center__copy">
+            <p class="overline">Report center</p>
+            <h1>Lab results you can read, compare, and share</h1>
+            <p>
+              See current values beside previous results, reference ranges, doctor details,
+              collection dates, and a clean PDF built for clinical visits.
+            </p>
+            <div class="report-center__actions">
+              <a class="button primary" href="login.html">View my reports</a>
+              <a class="button secondary" href="assets/reports/patient-report-drswift-sample.pdf">Download sample PDF</a>
             </div>
-            <ul class="trust-list" aria-label="Report features">
-              <li>
-                <span class="trust-list__icon" aria-hidden="true">
-                  <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-chart"></use></svg>
-                </span>
-                <span>Trend graphs for recurring markers</span>
-              </li>
-              <li>
-                <span class="trust-list__icon" aria-hidden="true">
-                  <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-document"></use></svg>
-                </span>
-                <span>Downloadable PDF for your doctor</span>
-              </li>
-              <li>
-                <span class="trust-list__icon" aria-hidden="true">
-                  <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-family"></use></svg>
-                </span>
-                <span>Separate profiles for each family member</span>
-              </li>
-              <li>
-                <span class="trust-list__icon" aria-hidden="true">
-                  <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-lock"></use></svg>
-                </span>
-                <span>Secure access on every device</span>
-              </li>
-            </ul>
           </div>
+
+          <aside class="report-access-panel" aria-label="Report access options">
+            <h2>Access options</h2>
+            <div class="report-access-list">
+              <a href="login.html">
+                <svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-globe"></use></svg>
+                <span><strong>Web portal</strong><small>PDFs, trends, and family profiles</small></span>
+              </a>
+              <a href="app.html">
+                <svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-phone"></use></svg>
+                <span><strong>Mobile app</strong><small>Notifications when reports are ready</small></span>
+              </a>
+              <a href="whatsapp.html">
+                <svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-chat"></use></svg>
+                <span><strong>WhatsApp</strong><small>Secure report link and support</small></span>
+              </a>
+            </div>
+          </aside>
         </div>
       </section>
 
-      <section class="page-section section-bg-white">
-        <div class="container">
-          <div class="section-heading section-heading--center">
-            <p class="overline">Choose your channel</p>
-            <h2>Access reports your way</h2>
-            <p>Same results, same insights — wherever you prefer to check in.</p>
+      <section class="sample-report-section section-pad-sm section-bg-white" id="sample">
+        <div class="container sample-report-layout">
+          <div class="sample-report-preview">
+            <div class="sample-report-preview__toolbar">
+              <span>Sample patient report</span>
+              <a href="assets/reports/patient-report-drswift-sample.pdf">Open PDF</a>
+            </div>
+            <div class="sample-report-preview__page">
+              <img src="assets/images/reports/patient-report-page-1.png" alt="Sample Dr.Swift patient report showing current and previous lab values with reference intervals" loading="lazy" decoding="async">
+            </div>
           </div>
-          <div class="channel-grid">
-            <article class="report-access-card">
-              <div class="report-access-card__icon" aria-hidden="true">
-                <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-phone"></use></svg>
-              </div>
-              <h3>Mobile app</h3>
-              <p>Health insights, graphs, and push notifications when new results are ready. Best for families tracking recurring panels.</p>
-              <a class="button secondary full" href="app.html">Open app</a>
-            </article>
-            <article class="report-access-card">
-              <div class="report-access-card__icon" aria-hidden="true">
-                <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-chat"></use></svg>
-              </div>
-              <h3>WhatsApp</h3>
-              <p>Get a secure link when your report is published. Ideal if you booked through our chat line.</p>
-              <a class="button secondary full" href="whatsapp.html">Message us</a>
-            </article>
-            <article class="report-access-card report-access-card--featured">
-              <div class="report-access-card__icon" aria-hidden="true">
-                <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-globe"></use></svg>
-              </div>
-              <h3>Web portal</h3>
-              <p>Log in on any browser to download PDFs, compare past results, and share with your doctor.</p>
-              <a class="button primary full" href="login.html">Login to view reports</a>
-            </article>
+
+          <div class="sample-report-summary">
+            <p class="overline">What the report includes</p>
+            <h2>Current values, prior values, and reference ranges in one view</h2>
+            <p>
+              The uploaded sample shows an 8-page patient report with CBC, CMP14,
+              lipid panel, HbA1c, TSH, Vitamin D, and Vitamin B12 sections.
+            </p>
+            <div class="report-metric-grid">
+              <article>
+                <span>Profile</span>
+                <strong>Sample patient</strong>
+                <small>Age and gender included</small>
+              </article>
+              <article>
+                <span>Report date</span>
+                <strong>02 Nov 2025</strong>
+                <small>Final report PDF</small>
+              </article>
+              <article>
+                <span>Comparison</span>
+                <strong>Current vs previous</strong>
+                <small>Previous date shown per marker</small>
+              </article>
+              <article>
+                <span>Panels</span>
+                <strong>8 pages</strong>
+                <small>CBC, lipids, HbA1c, vitamins</small>
+              </article>
+            </div>
           </div>
         </div>
       </section>
@@ -118,35 +120,17 @@
       <section class="page-section section-bg-soft">
         <div class="container">
           <div class="section-heading section-heading--center">
-            <p class="overline">Inside every report</p>
-            <h2>More than a PDF attachment</h2>
+            <p class="overline">Report tools</p>
+            <h2>Built around the way patients actually use results</h2>
           </div>
           <div class="report-features">
-            <article class="report-feature">
-              <div class="report-feature__icon" aria-hidden="true">
-                <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-cards"></use></svg>
-              </div>
-              <div>
-                <h3>Insight cards</h3>
-                <p>High, low, and healthy values summarized at a glance.</p>
-              </div>
-            </article>
-            <article class="report-feature">
-              <div class="report-feature__icon" aria-hidden="true">
-                <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-chart"></use></svg>
-              </div>
-              <div>
-                <h3>Trend graphs</h3>
-                <p>See how HbA1c, cholesterol, and more change over time.</p>
-              </div>
-            </article>
             <article class="report-feature">
               <div class="report-feature__icon" aria-hidden="true">
                 <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-compare"></use></svg>
               </div>
               <div>
                 <h3>Past vs. current</h3>
-                <p>Compare new results with previous tests side by side.</p>
+                <p>Compare each marker against earlier results and dates.</p>
               </div>
             </article>
             <article class="report-feature">
@@ -155,59 +139,26 @@
               </div>
               <div>
                 <h3>Doctor-ready PDF</h3>
-                <p>Download and share a clean report for your next visit.</p>
+                <p>Download the full clinical report for appointments.</p>
               </div>
             </article>
-          </div>
-        </div>
-      </section>
-
-      <section class="page-section section-bg-white" id="sample">
-        <div class="container page-grid-2">
-          <article class="info-card">
-            <p class="overline">Sample report</p>
-            <h2>See what a Dr.Swift report looks like</h2>
-            <p>
-              Our reports highlight what changed since your last test — with reference ranges,
-              color-coded values, and plain-language context where it helps.
-            </p>
-            <ul class="info-card-list">
-              <li>Current vs. past values side by side</li>
-              <li>Trend graphs for recurring markers like HbA1c and cholesterol</li>
-              <li>Downloadable PDF for your doctor or records</li>
-            </ul>
-            <div class="cta-band__actions cta-band__actions--start">
-              <a class="button primary" href="sample-report.html">Download sample PDF</a>
-              <a class="button secondary" href="index.html">See insights on homepage</a>
-            </div>
-          </article>
-          <div class="media-slot media-slot--wide has-image">
-            <img src="assets/images/health-insights-1280.jpg" alt="Health insights dashboard showing key lab metrics at a glance" loading="lazy" decoding="async">
-          </div>
-        </div>
-      </section>
-
-      <section class="page-section section-bg-soft">
-        <div class="container">
-          <div class="section-heading section-heading--center">
-            <p class="overline">Simple process</p>
-            <h2>From sample to insights</h2>
-          </div>
-          <div class="how-it-works-grid">
-            <article class="how-step">
-              <div class="how-step__number" aria-hidden="true">1</div>
-              <h3>Sample collected</h3>
-              <p>Your at-home phlebotomist visit is confirmed and tracked in the app.</p>
+            <article class="report-feature">
+              <div class="report-feature__icon" aria-hidden="true">
+                <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-chart"></use></svg>
+              </div>
+              <div>
+                <h3>Trend history</h3>
+                <p>Track recurring markers like HbA1c, LDL, TSH, and Vitamin D.</p>
+              </div>
             </article>
-            <article class="how-step">
-              <div class="how-step__number" aria-hidden="true">2</div>
-              <h3>Lab processing</h3>
-              <p>Accredited partner labs process your panel with full quality controls.</p>
-            </article>
-            <article class="how-step">
-              <div class="how-step__number" aria-hidden="true">3</div>
-              <h3>Report published</h3>
-              <p>You get a notification with insights, graphs, and a downloadable PDF.</p>
+            <article class="report-feature">
+              <div class="report-feature__icon" aria-hidden="true">
+                <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-lock"></use></svg>
+              </div>
+              <div>
+                <h3>Secure sharing</h3>
+                <p>Access reports through web, app, or WhatsApp support.</p>
+              </div>
             </article>
           </div>
         </div>
@@ -217,12 +168,12 @@
         <div class="container">
           <div class="band-cta band-cta--flush">
             <div class="band-cta__copy">
-              <h2>Already have results with us?</h2>
-              <p>Sign in to view your history, family profiles, and trend graphs.</p>
+              <h2>Need a fresh report?</h2>
+              <p>Book a new panel, then view the final report in the same report center.</p>
             </div>
             <div class="band-cta__actions">
-              <a class="button outline-light" href="login.html">Login / Sign up</a>
-              <a class="button primary" href="tests.html">Book a new test</a>
+              <a class="button outline-light" href="tests.html">Shop tests</a>
+              <a class="button primary" href="login.html">View reports</a>
             </div>
           </div>
         </div>
@@ -237,7 +188,7 @@
             <span>Dr.Swift Diagnostics</span>
           </a>
           <p class="footer-tagline">At-home lab tests, clear reports, and health insights for your whole family.</p>
-                              <div class="footer-social" aria-label="Contact shortcuts">
+          <div class="footer-social" aria-label="Contact shortcuts">
             <a href="mailto:care@drswift.health" aria-label="Email Dr.Swift" title="Email"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-email"/></svg></a>
             <a href="whatsapp.html" aria-label="Book on WhatsApp" title="WhatsApp"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-whatsapp"/></svg></a>
             <a href="app.html" aria-label="Open customer app page" title="App"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-app"/></svg></a>
@@ -246,9 +197,9 @@
         </div>
         <div>
           <h2 class="footer-col-title">Our Tests</h2>
-          <a href="tests.html">Browse all tests</a>
+          <a href="tests.html">Shop tests</a>
           <a href="tests.html#catalog">By category</a>
-          <a href="index.html#audience-tests-heading">For Him / Her / Family</a>
+          <a href="cart.html">Cart</a>
           <a href="promotions.html">Promotions</a>
         </div>
         <div>

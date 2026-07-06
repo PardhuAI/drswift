@@ -7,32 +7,40 @@
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
-  <body>
+  <body class="reports-page">
     <header class="site-header" id="site-header">
       <nav class="navbar container" aria-label="Primary navigation">
         <a class="brand" href="index.html"><img class="brand-mark" src="assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="40" height="40"><span>Dr.Swift Diagnostics</span></a>
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu"><span class="sr-only">Menu</span><span></span><span></span><span></span></button>
         <div class="nav-menu" id="primary-menu">
           <div class="nav-links"><a href="tests.html">Tests</a><a href="reports.html">Reports</a><a href="about.html">About</a></div>
-          <div class="nav-actions"><a href="login.html">Sign in</a><a href="doctors.html">Doctors</a><a class="button primary nav-cta" href="tests.html">Book a test</a></div>
+          <div class="nav-actions"><a class="cart-link" href="cart.html" aria-label="View cart"><svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-cart"></use></svg><span>Cart</span><span class="cart-count" data-cart-count hidden>0</span></a><a class="button primary nav-cta" href="tests.html">Shop tests</a></div>
         </div>
       </nav>
     </header>
     <main>
-      <section class="page-section section-bg-soft">
-        <div class="container page-grid-2">
-          <article class="info-card">
+      <section class="sample-report-section section-bg-soft">
+        <div class="container sample-report-layout">
+          <article class="sample-report-summary">
             <p class="overline">Sample report</p>
             <h1>Preview a Dr.Swift report</h1>
-            <p>See how we present current vs. past values, reference ranges, and downloadable PDFs.</p>
-            <div class="cta-band__actions cta-band__actions--start">
-              <button class="button primary" type="button" data-auth-form onclick="this.nextElementSibling.hidden=false;this.disabled=true">Download sample PDF</button>
-              <p class="auth-success" hidden>PDF download will be connected to storage later.</p>
+            <p>
+              See how Dr.Swift presents current values, previous values, reference intervals,
+              fasting status, doctor details, and clinical tables in one doctor-ready PDF.
+            </p>
+            <div class="report-center__actions">
+              <a class="button primary" href="assets/reports/patient-report-drswift-sample.pdf">Download PDF</a>
               <a class="button secondary" href="login.html">Sign in for real reports</a>
             </div>
           </article>
-          <div class="media-slot media-slot--wide has-image">
-            <img src="assets/images/health-insights-1280.jpg" alt="Sample health insights dashboard" loading="lazy">
+          <div class="sample-report-preview">
+            <div class="sample-report-preview__toolbar">
+              <span>Sample patient report</span>
+              <a href="assets/reports/patient-report-drswift-sample.pdf">Open PDF</a>
+            </div>
+            <div class="sample-report-preview__page">
+              <img src="assets/images/reports/patient-report-page-1.png" alt="Sample Dr.Swift patient report preview" loading="eager" decoding="async">
+            </div>
           </div>
         </div>
       </section>
