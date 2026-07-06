@@ -517,26 +517,21 @@ body :is(a, button, input, select, textarea, summary, [tabindex]):focus-visible 
 
 .hp-icon {
   flex: none;
-  width: 18px;
-  height: 18px;
-}
-
-.hp-icon-wrap {
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
   margin-top: 1px;
-  border-radius: 50%;
-  background: #fff;
-  color: var(--color-blue);
-  box-shadow: 0 2px 10px rgba(22, 32, 51, 0.12);
 }
 
-.hp-icon-wrap .hp-icon {
-  width: 18px;
-  height: 18px;
+.hp-icon .sq {
+  fill: #ffffff;
+  stroke: #111111;
+}
+
+.hero-points .item-1 .sq-top,
+.hero-points .item-2 .sq-right,
+.hero-points .item-3 .sq-bottom,
+.hero-points .item-4 .sq-left {
+  fill: #111111;
 }
 
 /* Dr.Swift icon system — sprite at assets/icons/drswift-sprite.svg */
