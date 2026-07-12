@@ -1,0 +1,221 @@
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <!-- Footer & contact -->
+  <symbol id="icon-email" viewBox="0 0 24 24" fill="none">
+    <rect x="2.5" y="5.5" width="19" height="13" rx="2.5" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round"/>
+    <path d="M3.5 7.5 12 13.2l8.5-5.7" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M8.2 12.2 3.8 16.2M15.8 12.2l4.4 4" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="icon-whatsapp" viewBox="0 0 24 24" fill="none">
+    <path d="M12 2.5c-5.25 0-9.5 4.1-9.5 9.15 0 1.62.43 3.2 1.25 4.58L2.5 21.5l5.55-1.12a9.6 9.6 0 0 0 3.95.84c5.25 0 9.5-4.1 9.5-9.15S17.25 2.5 12 2.5Z" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round"/>
+    <path d="M9.1 9.4c.2-.45.42-.46.68-.47.18 0 .37 0 .56.02.18.02.42.05.64.5.22.45.75 1.82.82 1.95.07.13.12.28.02.45-.1.17-.15.28-.3.43-.15.15-.32.34-.46.45-.15.12-.3.25-.13.5.18.25.78 1.28 1.68 2.07 1.16 1.02 2.14 1.34 2.48 1.48.34.15.54.13.74-.08.2-.2.85-.98 1.08-1.32.22-.33.45-.28.76-.17.3.12 1.92.9 2.25 1.07.33.17.55.25.63.38.08.13.08.75-.18 1.48-.25.72-1.48 1.38-2.05 1.47-.52.08-1.17.12-1.9-.12-.52-.18-1.18-.42-2.03-1.02-1.58-1.08-2.58-2.68-2.66-2.8-.08-.12-.7-.92-.7-1.76 0-.83.43-1.24.58-1.42Z" fill="currentColor"/>
+  </symbol>
+
+  <symbol id="icon-app" viewBox="0 0 24 24" fill="none">
+    <rect x="6.5" y="2.5" width="11" height="19" rx="2.5" stroke="currentColor" stroke-width="1.65"/>
+    <path d="M10 5.5h4" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/>
+    <rect x="8.5" y="8.5" width="7" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+    <path d="M10.2 14.2h3.6M10.2 11.8h2.4" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
+    <circle cx="12" cy="19.2" r=".85" fill="currentColor"/>
+  </symbol>
+
+  <symbol id="icon-doctors" viewBox="0 0 24 24" fill="none">
+    <path d="M8.5 4.5a3.5 3.5 0 0 1 7 0v3.2" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/>
+    <path d="M9.2 7.7h5.6v2.2a2.8 2.8 0 0 1-5.6 0V7.7Z" stroke="currentColor" stroke-width="1.55" stroke-linejoin="round"/>
+    <path d="M12 12.2v2.2" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/>
+    <path d="M12 14.4c-2.8 0-5 1.6-5 4.2v1.4h10v-1.4c0-2.6-2.2-4.2-5-4.2Z" stroke="currentColor" stroke-width="1.55" stroke-linejoin="round"/>
+    <circle cx="17.8" cy="16.2" r="2.2" stroke="currentColor" stroke-width="1.45"/>
+    <circle cx="17.8" cy="16.2" r=".9" fill="currentColor"/>
+    <path d="M15.6 16.2H12" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- Filter tabs -->
+  <symbol id="icon-filter-all" viewBox="0 0 24 24" fill="none">
+    <rect x="3.5" y="3.5" width="7" height="7" rx="1.8" stroke="currentColor" stroke-width="1.65"/>
+    <rect x="13.5" y="3.5" width="7" height="7" rx="1.8" stroke="currentColor" stroke-width="1.65"/>
+    <rect x="3.5" y="13.5" width="7" height="7" rx="1.8" stroke="currentColor" stroke-width="1.65"/>
+    <rect x="13.5" y="13.5" width="7" height="7" rx="1.8" stroke="currentColor" stroke-width="1.65"/>
+  </symbol>
+
+  <symbol id="icon-heart" viewBox="0 0 24 24" fill="none">
+    <path d="M12 20.2s-6.8-4.1-6.8-9.4C5.2 7.8 7.4 5.8 9.8 5.8c1.4 0 2.4.7 3.2 1.6.8-.9 1.8-1.6 3.2-1.6 2.4 0 4.6 2 4.6 5 0 5.3-6.8 9.4-6.8 9.4Z" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round"/>
+    <path d="M9.2 12.2h5.6M12 9.6v5.2" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="icon-diabetes" viewBox="0 0 24 24" fill="none">
+    <path d="M12 4.2c-2.2 0-3.8 1.7-3.8 3.9 0 2.8 3.8 7.2 3.8 7.2s3.8-4.4 3.8-7.2c0-2.2-1.6-3.9-3.8-3.9Z" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round"/>
+    <path d="M10.2 8.2h3.6M12 6.6v3.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+    <rect x="5.5" y="16.2" width="13" height="3.6" rx="1.2" stroke="currentColor" stroke-width="1.45"/>
+    <path d="M8.2 18h2.2M13.6 18h2.2" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="icon-women" viewBox="0 0 24 24" fill="none">
+    <circle cx="12" cy="8.2" r="3.6" stroke="currentColor" stroke-width="1.65"/>
+    <path d="M12 11.8v8.5M9.2 18.8h5.6" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/>
+    <path d="M8.8 6.8c.9-1.1 2-1.7 3.2-1.7" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" opacity=".55"/>
+  </symbol>
+
+  <symbol id="icon-thyroid" viewBox="0 0 24 24" fill="none">
+    <path d="M6.5 10.2c1.8-2.8 4.2-4.2 5.5-4.2s3.7 1.4 5.5 4.2c1.5 2.3 1.5 5.1 0 7.4-1.8 2.8-4.2 4.2-5.5 4.2s-3.7-1.4-5.5-4.2c-1.5-2.3-1.5-5.1 0-7.4Z" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round"/>
+    <path d="M9.2 12.8h5.6M12 10.2v5.2" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="icon-full-body" viewBox="0 0 24 24" fill="none">
+    <circle cx="12" cy="5.8" r="2.3" stroke="currentColor" stroke-width="1.65"/>
+    <path d="M12 8.1v5.2M9 20.5l3-7.2 3 7.2M8.2 13.2h7.6" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M6.5 11.2h11" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" opacity=".55"/>
+  </symbol>
+
+  <!-- Category cards -->
+  <symbol id="icon-cat-heart" viewBox="0 0 24 24" fill="none">
+    <path d="M12 19.5s-5.5-3.3-5.5-7.6c0-2 1.8-3.6 3.9-3.6 1.2 0 2 .5 2.6 1.2.6-.7 1.4-1.2 2.6-1.2 2.1 0 3.9 1.6 3.9 3.6 0 4.3-5.5 7.6-5.5 7.6Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M8.5 12.5c1.2 1.5 2.3 2.2 3.5 2.2s2.3-.7 3.5-2.2" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="icon-cat-diabetes" viewBox="0 0 24 24" fill="none">
+    <path d="M12 4.5c-1.9 0-3.3 1.5-3.3 3.4 0 2.4 3.3 6.2 3.3 6.2s3.3-3.8 3.3-6.2c0-1.9-1.4-3.4-3.3-3.4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+    <rect x="6" y="15.5" width="12" height="4" rx="1.2" stroke="currentColor" stroke-width="1.45"/>
+    <path d="M9 17.5h1.8M13.2 17.5h1.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="icon-cat-maternal" viewBox="0 0 24 24" fill="none">
+    <circle cx="12" cy="7.2" r="2.5" stroke="currentColor" stroke-width="1.55"/>
+    <path d="M8.5 19.5c.6-3.2 1.8-5 3.5-5s2.9 1.8 3.5 5" stroke="currentColor" stroke-width="1.55" stroke-linecap="round"/>
+    <path d="M15.8 10.2a2.8 2.8 0 0 1 2.4 4.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+    <circle cx="17.8" cy="8.8" r="1.3" stroke="currentColor" stroke-width="1.3"/>
+  </symbol>
+
+  <symbol id="icon-cat-hormone" viewBox="0 0 24 24" fill="none">
+    <path d="M12 3.5 14.8 9h5.7l-4.6 3.4 1.8 5.6L12 15.8 6.3 18l1.8-5.6L3.5 9h5.7L12 3.5Z" stroke="currentColor" stroke-width="1.55" stroke-linejoin="round"/>
+    <circle cx="12" cy="11.2" r="1.6" stroke="currentColor" stroke-width="1.35"/>
+  </symbol>
+
+  <symbol id="icon-cat-liver" viewBox="0 0 24 24" fill="none">
+    <path d="M7.5 8.5c0-2.2 2-4 4.5-4 2.2 0 4 1.4 4.5 3.3.8-.5 1.8-.8 2.8-.8 2.5 0 4.2 1.8 4.2 4.2 0 4.8-4.8 8.8-8.5 8.8-4.2 0-7.5-3.5-7.5-7.5 0-1.6.5-3 1.5-4Z" stroke="currentColor" stroke-width="1.55" stroke-linejoin="round"/>
+    <path d="M10.5 12.2h5" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" opacity=".6"/>
+  </symbol>
+
+  <symbol id="icon-cat-kidney" viewBox="0 0 24 24" fill="none">
+    <path d="M8.2 7.5c-2.2.8-3.5 2.8-3.5 5.2s1.3 4.4 3.5 5.2c1.5.6 3.2.2 4.3-1 1.1 1.2 2.8 1.6 4.3 1 2.2-.8 3.5-2.8 3.5-5.2s-1.3-4.4-3.5-5.2c-1.8-.6-3.8.2-4.8 1.8-1-1.6-3-2.4-4.8-1.8Z" stroke="currentColor" stroke-width="1.55" stroke-linejoin="round"/>
+  </symbol>
+
+  <symbol id="icon-cat-vitamin" viewBox="0 0 24 24" fill="none">
+    <circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.55"/>
+    <path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M5.8 5.8l1.6 1.6M16.6 16.6l1.6 1.6M5.8 18.2l1.6-1.6M16.6 7.4l1.6-1.6" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+    <path d="M10.6 12.2h2.8M12 10.8v2.8" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="icon-cat-fever" viewBox="0 0 24 24" fill="none">
+    <path d="M12 3.5v11.8" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/>
+    <circle cx="12" cy="18.8" r="2.2" stroke="currentColor" stroke-width="1.55"/>
+    <path d="M14.2 6.2c1.2.8 2 2.2 2 3.8 0 2.6-2.1 4.7-4.7 4.7" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" opacity=".65"/>
+    <path d="M9.8 6.8c-.9.7-1.5 1.8-1.5 3.1" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" opacity=".45"/>
+  </symbol>
+
+  <symbol id="icon-cat-checkup" viewBox="0 0 24 24" fill="none">
+    <rect x="5.5" y="4.5" width="13" height="16" rx="2" stroke="currentColor" stroke-width="1.55"/>
+    <path d="M9 4.5v2.8h6V4.5" stroke="currentColor" stroke-width="1.45" stroke-linejoin="round"/>
+    <path d="M9.2 11.2l1.8 1.8 3.8-3.8M9.2 16.2h5.6" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- Hero bullets -->
+  <symbol id="icon-home-collection" viewBox="0 0 24 24" fill="none">
+    <path d="M4.5 10.8 12 5.2l7.5 5.6V19a1.5 1.5 0 0 1-1.5 1.5H6a1.5 1.5 0 0 1-1.5-1.5V10.8Z" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round"/>
+    <path d="M9.5 20.5v-5.2a1.2 1.2 0 0 1 1.2-1.2h2.6a1.2 1.2 0 0 1 1.2 1.2v5.2" stroke="currentColor" stroke-width="1.55" stroke-linejoin="round"/>
+    <rect x="14.2" y="9.2" width="4.8" height="5.2" rx="1" stroke="currentColor" stroke-width="1.4"/>
+    <path d="M15.2 11.8h2.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="icon-results" viewBox="0 0 24 24" fill="none">
+    <rect x="4.5" y="3.5" width="11.5" height="15" rx="2" stroke="currentColor" stroke-width="1.55"/>
+    <path d="M8 8.2h4.5M8 11.2h3.2M8 14.2h4" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
+    <rect x="15.5" y="8.5" width="4.5" height="7.5" rx="1.2" stroke="currentColor" stroke-width="1.45"/>
+    <path d="M17 12.2h1.5M17 14.2h1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+    <circle cx="17.8" cy="6.8" r="2.8" stroke="currentColor" stroke-width="1.45"/>
+    <path d="M17.8 5.5v2.6M16.5 6.8h2.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="icon-insights" viewBox="0 0 24 24" fill="none">
+    <rect x="3.5" y="4.5" width="17" height="15" rx="2.2" stroke="currentColor" stroke-width="1.55"/>
+    <path d="M7 15.2 10.2 11.8l2.4 2.2L17 8.8" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="7" cy="15.2" r="1.1" fill="currentColor"/>
+    <circle cx="10.2" cy="11.8" r="1.1" fill="currentColor"/>
+    <circle cx="12.6" cy="14" r="1.1" fill="currentColor"/>
+    <circle cx="17" cy="8.8" r="1.1" fill="currentColor"/>
+  </symbol>
+
+  <symbol id="icon-family" viewBox="0 0 24 24" fill="none">
+    <circle cx="8.2" cy="8.2" r="2.2" stroke="currentColor" stroke-width="1.5"/>
+    <circle cx="15.8" cy="8.8" r="2" stroke="currentColor" stroke-width="1.5"/>
+    <circle cx="12" cy="6.5" r="1.8" stroke="currentColor" stroke-width="1.4"/>
+    <path d="M4.5 18.5c.5-2.4 1.8-3.8 3.7-3.8s3.2 1.4 3.8 3.8M12 18.5c.6-2.2 1.7-3.5 3.3-3.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M15.2 14.7c1.9.3 3.2 1.7 3.8 3.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- Reports & trust features -->
+  <symbol id="icon-report-trends" viewBox="0 0 24 24" fill="none">
+    <path d="M4 4v14.5a1.5 1.5 0 0 0 1.5 1.5H20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M7 15.5l3.2-3.6 2.6 2.1 4.5-5.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M14.7 8.7h2.6v2.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <symbol id="icon-report-pdf" viewBox="0 0 24 24" fill="none">
+    <path d="M6.5 3.5h7l4 4V15a1.8 1.8 0 0 1-1.8 1.8H6.5A1.8 1.8 0 0 1 4.7 15V5.3A1.8 1.8 0 0 1 6.5 3.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+    <path d="M13.3 3.6v3.6h3.6" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+    <path d="M12 11.4v5.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+    <path d="M9.5 14.6 12 17.2l2.5-2.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M7.5 20.3h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="icon-report-profiles" viewBox="0 0 24 24" fill="none">
+    <circle cx="9" cy="8.4" r="3.1" stroke="currentColor" stroke-width="1.7"/>
+    <path d="M3.7 19.4c0-3.2 2.4-5.2 5.3-5.2s5.3 2 5.3 5.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+    <path d="M16 6.4a3 3 0 0 1 0 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M16.6 14.4c2.3.5 3.7 2.3 3.7 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="icon-report-secure" viewBox="0 0 24 24" fill="none">
+    <path d="M12 3.5 5 6.4v5c0 4.4 3 8.5 7 10.1 4-1.6 7-5.7 7-10.1v-5L12 3.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+    <path d="m8.8 12 2.3 2.3 4.1-4.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <symbol id="icon-insight-cards" viewBox="0 0 24 24" fill="none">
+    <rect x="3.5" y="4.5" width="7.5" height="6.5" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+    <rect x="13" y="4.5" width="7.5" height="6.5" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+    <rect x="3.5" y="13" width="7.5" height="6.5" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+    <rect x="13" y="13" width="7.5" height="6.5" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+    <circle cx="6.8" cy="7.8" r="1" fill="currentColor"/>
+    <circle cx="16.8" cy="7.8" r="1" fill="currentColor" opacity=".45"/>
+    <circle cx="6.8" cy="16.2" r="1" fill="currentColor" opacity=".45"/>
+    <circle cx="16.8" cy="16.2" r="1" fill="currentColor"/>
+  </symbol>
+
+  <symbol id="icon-compare-results" viewBox="0 0 24 24" fill="none">
+    <rect x="4" y="5" width="6.5" height="14" rx="1.5" stroke="currentColor" stroke-width="1.55"/>
+    <rect x="13.5" y="5" width="6.5" height="14" rx="1.5" stroke="currentColor" stroke-width="1.55"/>
+    <path d="M6.2 16V12.5M8.8 16V9.5" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/>
+    <path d="M15.7 16V10.5M18.3 16V13" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/>
+    <path d="M11.2 12h1.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" opacity=".45"/>
+    <path d="M10.5 7.8h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity=".4"/>
+  </symbol>
+
+  <symbol id="icon-web-portal" viewBox="0 0 24 24" fill="none">
+    <rect x="3.5" y="5" width="17" height="13" rx="2" stroke="currentColor" stroke-width="1.6"/>
+    <path d="M3.5 8.5h17" stroke="currentColor" stroke-width="1.5"/>
+    <circle cx="6" cy="6.8" r=".7" fill="currentColor"/>
+    <circle cx="8.2" cy="6.8" r=".7" fill="currentColor" opacity=".45"/>
+    <path d="M7.5 12h9M7.5 14.8h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" opacity=".7"/>
+  </symbol>
+
+  <symbol id="icon-fast-results" viewBox="0 0 24 24" fill="none">
+    <circle cx="12" cy="12.5" r="7.5" stroke="currentColor" stroke-width="1.6"/>
+    <path d="M12 8.5v4.2l2.8 1.6" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M17.8 4.8 19 3.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="m18.2 6.5 1.5-.3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity=".55"/>
+  </symbol>
+
+  <symbol id="icon-accredited" viewBox="0 0 24 24" fill="none">
+    <path d="M12 3.8 5.5 6.8v5.2c0 4.2 2.8 8.1 6.5 9.8 3.7-1.7 6.5-5.6 6.5-9.8V6.8L12 3.8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="m9.4 12.2 1.8 1.8 3.6-3.8" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+</svg>

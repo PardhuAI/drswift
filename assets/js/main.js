@@ -2,15 +2,25 @@ const navToggle = document.querySelector(".nav-toggle");
 const navMenu = document.querySelector(".nav-menu");
 
 if (navToggle && navMenu) {
-  navToggle.addEventListener("click", () => {
-    const isOpen = navMenu.classList.toggle("is-open");
+  const setNavOpen = (isOpen) => {
+    navMenu.classList.toggle("is-open", isOpen);
     navToggle.setAttribute("aria-expanded", String(isOpen));
+    document.body.classList.toggle("nav-open", isOpen);
+  };
+
+  navToggle.addEventListener("click", () => {
+    setNavOpen(!navMenu.classList.contains("is-open"));
   });
 
   navMenu.addEventListener("click", (event) => {
     if (event.target.closest("a") && navMenu.classList.contains("is-open")) {
-      navMenu.classList.remove("is-open");
-      navToggle.setAttribute("aria-expanded", "false");
+      setNavOpen(false);
+    }
+  });
+
+  window.addEventListener("resize", () => {
+    if (window.matchMedia("(min-width: 880px)").matches) {
+      setNavOpen(false);
     }
   });
 }
@@ -153,167 +163,75 @@ document.querySelectorAll("[data-scroll-target]").forEach((button) => {
   });
 });
 
-// Hover-to-pan: desktop only (touch/mousemove on mobile caused runaway scrolling).
 const panSection = document.querySelector(".quick-select");
 const panTarget = document.getElementById("quick-cards");
-const desktopCarousel = window.matchMedia("(min-width: 880px)");
 
-// Shared so hover-pan pauses while the user is manually dragging the cards.
+// Shared so category auto-scroll pauses while the user is manually dragging the cards.
 let isDraggingCards = false;
 
-if (panSection && panTarget && !prefersReducedMotion && desktopCarousel.matches) {
-  const MAX_PAN_SPEED = 2; // px per frame at the far edges (slow, readable)
-  const DEAD_ZONE = 0.08; // fraction around center with no movement
-  let pointerX = null;
-  let rafId = null;
-  let savedSnap = "";
-  let savedBehavior = "";
-
-  function enterPanMode() {
-    savedSnap = panTarget.style.scrollSnapType;
-    savedBehavior = panTarget.style.scrollBehavior;
-    panTarget.style.scrollSnapType = "none";
-    panTarget.style.scrollBehavior = "auto";
-  }
-
-  function exitPanMode() {
-    panTarget.style.scrollSnapType = savedSnap;
-    panTarget.style.scrollBehavior = savedBehavior;
-  }
-
-  function panTick() {
-    if (pointerX === null) {
-      rafId = null;
-      exitPanMode();
-      return;
-    }
-
-    // Hold auto-pan while the user is dragging the cards manually.
-    if (isDraggingCards) {
-      rafId = requestAnimationFrame(panTick);
-      return;
-    }
-
-    const rect = panSection.getBoundingClientRect();
-    const ratio = ((pointerX - rect.left) / rect.width) * 2 - 1; // -1 (left) .. 1 (right)
-    const magnitude = Math.abs(ratio);
-
-    if (magnitude > DEAD_ZONE) {
-      const normalized = (magnitude - DEAD_ZONE) / (1 - DEAD_ZONE);
-      panTarget.scrollLeft += Math.sign(ratio) * normalized * MAX_PAN_SPEED;
-    }
-
-    rafId = requestAnimationFrame(panTick);
-  }
-
-  panSection.addEventListener("mousemove", (event) => {
-    pointerX = event.clientX;
-    if (rafId === null) {
-      enterPanMode();
-      rafId = requestAnimationFrame(panTick);
-    }
-  });
-
-  panSection.addEventListener("mouseleave", () => {
-    pointerX = null;
-  });
-}
-
-// Mobile: gently nudge one card to the right once, then stop (scrollability hint).
-const mobileCarousel = window.matchMedia("(max-width: 879px)");
-const MOBILE_NUDGE_DELAY_MS = 900;
-const MOBILE_NUDGE_DURATION_MS = 1100;
-
-function getQuickCardStep() {
-  const firstCard = panTarget?.querySelector(".quick-card");
-  return firstCard ? firstCard.getBoundingClientRect().width + 16 : 176;
-}
-
-function nudgeMobileCarouselOnce() {
-  if (
-    prefersReducedMotion ||
-    !mobileCarousel.matches ||
-    !panTarget ||
-    panTarget.dataset.nudged === "true" ||
-    panTarget.scrollWidth <= panTarget.clientWidth + 8
-  ) {
-    return;
-  }
-
-  panTarget.dataset.nudged = "true";
-  const nudgeTimer = window.setTimeout(() => {
-    if (panTarget.scrollLeft > 4) {
-      return;
-    }
-    animateScrollBy(panTarget, getQuickCardStep(), MOBILE_NUDGE_DURATION_MS);
-  }, MOBILE_NUDGE_DELAY_MS);
-
-  const cancelNudge = () => {
-    window.clearTimeout(nudgeTimer);
-  };
-
-  panTarget.addEventListener("scroll", cancelNudge, { once: true, passive: true });
-  panTarget.addEventListener("touchstart", cancelNudge, { once: true, passive: true });
-}
-
 if (panSection && panTarget && !prefersReducedMotion) {
-  const nudgeObserver = new IntersectionObserver(
-    (entries) => {
-      if (entries.some((entry) => entry.isIntersecting)) {
-        nudgeMobileCarouselOnce();
-        nudgeObserver.disconnect();
-      }
-    },
-    { threshold: 0.35 }
-  );
+  const AUTO_SCROLL_SPEED = 0.55;
+  const AUTO_RESUME_DELAY_MS = 1400;
+  let isAutoPaused = false;
+  let isSectionVisible = true;
+  let resumeTimer = null;
 
-  nudgeObserver.observe(panSection);
-
-  window.addEventListener("load", nudgeMobileCarouselOnce);
-  mobileCarousel.addEventListener("change", () => {
-    if (mobileCarousel.matches) {
-      nudgeMobileCarouselOnce();
-    }
-  });
-}
-
-// Mobile swipe hint: show for 5s when quick-select enters view, once per page load.
-const swipeHint = document.querySelector(".quick-select__hint.swipe-hint");
-const SWIPE_HINT_DURATION_MS = 5000;
-
-function showSwipeHintOnce() {
-  if (
-    !swipeHint ||
-    swipeHint.dataset.shown === "true" ||
-    !mobileCarousel.matches
-  ) {
-    return;
+  function pauseCategoryAutoScroll() {
+    isAutoPaused = true;
+    window.clearTimeout(resumeTimer);
   }
 
-  swipeHint.dataset.shown = "true";
-  swipeHint.classList.add("is-active");
-  swipeHint.setAttribute("aria-hidden", "false");
+  function resumeCategoryAutoScroll(delay = AUTO_RESUME_DELAY_MS) {
+    window.clearTimeout(resumeTimer);
+    resumeTimer = window.setTimeout(() => {
+      isAutoPaused = false;
+    }, delay);
+  }
 
-  window.setTimeout(() => {
-    swipeHint.classList.remove("is-active");
-    swipeHint.setAttribute("aria-hidden", "true");
-  }, SWIPE_HINT_DURATION_MS);
-}
-
-if (panSection && swipeHint) {
-  const swipeHintObserver = new IntersectionObserver(
-    (entries) => {
-      if (entries.some((entry) => entry.isIntersecting)) {
-        showSwipeHintOnce();
-        swipeHintObserver.disconnect();
+  function autoScrollTick() {
+    const maxScroll = panTarget.scrollWidth - panTarget.clientWidth;
+    if (
+      isSectionVisible &&
+      !isAutoPaused &&
+      !isDraggingCards &&
+      document.visibilityState === "visible" &&
+      maxScroll > 8
+    ) {
+      if (panTarget.scrollLeft >= maxScroll - 1) {
+        panTarget.scrollLeft = 0;
+      } else {
+        panTarget.scrollLeft += AUTO_SCROLL_SPEED;
       }
+    }
+
+    requestAnimationFrame(autoScrollTick);
+  }
+
+  panTarget.style.scrollSnapType = "none";
+  panTarget.style.scrollBehavior = "auto";
+
+  panTarget.addEventListener("mouseenter", pauseCategoryAutoScroll);
+  panTarget.addEventListener("mouseleave", () => resumeCategoryAutoScroll());
+  panTarget.addEventListener("focusin", pauseCategoryAutoScroll);
+  panTarget.addEventListener("focusout", () => resumeCategoryAutoScroll());
+  panTarget.addEventListener("touchstart", pauseCategoryAutoScroll, { passive: true });
+  panTarget.addEventListener("touchend", () => resumeCategoryAutoScroll(2200), { passive: true });
+  panTarget.addEventListener("wheel", () => {
+    pauseCategoryAutoScroll();
+    resumeCategoryAutoScroll(2200);
+  }, { passive: true });
+
+  const autoScrollObserver = new IntersectionObserver(
+    (entries) => {
+      const entry = entries.find((item) => item.target === panSection);
+      isSectionVisible = entry ? entry.isIntersecting : true;
     },
-    { threshold: 0.35 }
+    { threshold: 0.15 }
   );
 
-  swipeHintObserver.observe(panSection);
+  autoScrollObserver.observe(panSection);
+  requestAnimationFrame(autoScrollTick);
 }
-
 // Audience heading: gentle left-right wobble while the section is in view.
 const audienceSection = document.querySelector(".audience-tests");
 const audienceHeading = document.querySelector(".audience-tests .section-heading");
@@ -688,3 +606,1545 @@ if (!prefersReducedMotion) {
     initFeatureReplay();
   }
 }
+
+// Header scroll shadow
+const siteHeader = document.getElementById("site-header");
+
+if (siteHeader) {
+  const onScroll = () => {
+    siteHeader.classList.toggle("is-scrolled", window.scrollY > 8);
+  };
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+}
+
+// FAQ accordion
+document.querySelectorAll(".faq-item").forEach((item) => {
+  const button = item.querySelector(".faq-question");
+  const answer = item.querySelector(".faq-answer");
+
+  if (!button || !answer) {
+    return;
+  }
+
+  button.addEventListener("click", () => {
+    const isOpen = item.classList.toggle("is-open");
+    button.setAttribute("aria-expanded", String(isOpen));
+    answer.hidden = !isOpen;
+  });
+});
+
+// Newsletter form (front-end only until backend is wired)
+const newsletterForm = document.getElementById("newsletter-form");
+const newsletterSuccess = document.getElementById("newsletter-success");
+
+if (newsletterForm && newsletterSuccess) {
+  const emailInput = newsletterForm.querySelector('input[type="email"]');
+  const setNewsletterError = (message) => {
+    if (!emailInput) return;
+    let error = document.getElementById("newsletter-email-error");
+    if (!error) {
+      error = document.createElement("p");
+      error.className = "form-error";
+      error.id = "newsletter-email-error";
+      emailInput.closest(".newsletter-form-row")?.after(error);
+    }
+    error.textContent = message;
+    emailInput.setAttribute("aria-invalid", "true");
+    emailInput.setAttribute("aria-describedby", "newsletter-email-error");
+  };
+
+  const clearNewsletterError = () => {
+    if (!emailInput) return;
+    emailInput.removeAttribute("aria-invalid");
+    emailInput.removeAttribute("aria-describedby");
+    document.getElementById("newsletter-email-error")?.remove();
+  };
+
+  emailInput?.addEventListener("input", clearNewsletterError);
+
+  newsletterForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    if (!emailInput?.value.trim()) {
+      setNewsletterError("Enter your email address.");
+      emailInput?.focus();
+      return;
+    }
+
+    if (!emailInput.checkValidity()) {
+      setNewsletterError("Enter a valid email address.");
+      emailInput?.focus();
+      return;
+    }
+
+    clearNewsletterError();
+    newsletterSuccess.hidden = false;
+    newsletterForm.reset();
+  });
+}
+
+// Tests catalog filters
+const catalogGrid = document.getElementById("catalog-grid");
+const catalogEmpty = document.getElementById("catalog-empty");
+const filterButtons = document.querySelectorAll(".catalog-toolbar .filter-pill");
+const catalogSearch = document.querySelector("[data-catalog-search]");
+let activeCatalogFilter = "all";
+
+function applyCatalogFilter(filter) {
+  if (!catalogGrid) {
+    return;
+  }
+
+  const cards = catalogGrid.querySelectorAll(".test-card--catalog");
+  const query = catalogSearch?.value.trim().toLowerCase() || "";
+  let visibleCount = 0;
+
+  cards.forEach((card) => {
+    const categories = card.getAttribute("data-category") || "";
+    const haystack = card.getAttribute("data-search") || card.textContent || "";
+    const matchesFilter = filter === "all" || categories.split(/\s+/).includes(filter);
+    const matchesSearch = !query || haystack.toLowerCase().includes(query);
+    const matches = matchesFilter && matchesSearch;
+    card.classList.toggle("is-hidden", !matches);
+    if (matches) {
+      visibleCount += 1;
+    }
+  });
+
+  if (catalogEmpty) {
+    catalogEmpty.hidden = visibleCount > 0;
+  }
+
+  catalogGrid.classList.toggle("is-single-result", visibleCount === 1);
+  catalogGrid.classList.toggle("is-sparse", visibleCount === 2);
+
+  filterButtons.forEach((button) => {
+    button.classList.toggle("is-active", button.getAttribute("data-filter") === filter);
+  });
+
+}
+
+function setCatalogFilter(filter) {
+  activeCatalogFilter = filter;
+  applyCatalogFilter(filter);
+}
+
+filterButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setCatalogFilter(button.getAttribute("data-filter") || "all");
+  });
+});
+
+catalogSearch?.addEventListener("input", () => {
+  applyCatalogFilter(activeCatalogFilter);
+});
+
+// Test storefront, detail page, and cart
+let TESTS = Array.isArray(window.DRSWIFT_TESTS) ? window.DRSWIFT_TESTS : [];
+const CART_STORAGE_KEY = "drswift.cart.v1";
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function formatPrice(value) {
+  const amount = Number(value || 0);
+  return `₹${amount.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+}
+
+function hasDiscountPrice(test, livePrice) {
+  const oldPrice = Number(test?.oldPrice);
+  const price = livePrice != null ? Number(livePrice) : Number(test?.price || 0);
+  return Number.isFinite(oldPrice) && oldPrice > price;
+}
+
+function formatOldPriceHtml(test, livePrice, quantity = 1) {
+  if (!hasDiscountPrice(test, livePrice)) {
+    return "";
+  }
+  return `<span class="old-price">${formatPrice(Number(test.oldPrice) * quantity)}</span>`;
+}
+
+function detailUrl(slug) {
+  return `test-details.html?test=${encodeURIComponent(slug)}`;
+}
+
+function getTestBySlug(slug) {
+  return TESTS.find((test) => test.slug === slug);
+}
+
+function readCart() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || "[]");
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+    return parsed
+      .filter((item) => item && item.slug && (!TESTS.length || getTestBySlug(item.slug)))
+      .map((item) => ({
+        slug: item.slug,
+        quantity: Math.max(1, Number(item.quantity) || 1),
+        ...(Array.isArray(item.customPanels) ? { customPanels: item.customPanels } : {})
+      }));
+  } catch {
+    return [];
+  }
+}
+
+function writeCart(cart) {
+  localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+  updateCartBadges();
+}
+
+function cartQuantity() {
+  return readCart().reduce((sum, item) => sum + item.quantity, 0);
+}
+
+function updateCartBadges() {
+  const count = cartQuantity();
+  document.querySelectorAll("[data-cart-count]").forEach((badge) => {
+    badge.textContent = String(count);
+    badge.hidden = count === 0;
+  });
+}
+
+function getTestLivePrice(test, customPanels) {
+  if (!test) {
+    return 0;
+  }
+  if (test.customizable) {
+    const selected = Array.isArray(customPanels) ? customPanels : readCustomSelectionForTest(test);
+    return calculateBundlePrice(test, selected);
+  }
+  return Number(test.price || 0);
+}
+
+function addToCart(slug) {
+  const test = getTestBySlug(slug);
+  if (!test) {
+    return;
+  }
+  const cart = readCart();
+  const customPanels = test.customizable ? readCustomSelectionForTest(test) : undefined;
+  const existing = cart.find((item) => item.slug === slug);
+  if (existing) {
+    existing.quantity += 1;
+    if (customPanels) {
+      existing.customPanels = customPanels;
+    }
+  } else {
+    cart.push({
+      slug,
+      quantity: 1,
+      ...(customPanels ? { customPanels } : {})
+    });
+  }
+  writeCart(cart);
+}
+
+function updateCartItem(slug, action) {
+  let cart = readCart();
+  const item = cart.find((entry) => entry.slug === slug);
+
+  if (action === "clear") {
+    writeCart([]);
+    renderCartPage();
+    return;
+  }
+
+  if (!item) {
+    return;
+  }
+
+  if (action === "increase") {
+    item.quantity += 1;
+  }
+
+  if (action === "decrease") {
+    item.quantity -= 1;
+  }
+
+  if (action === "remove" || item.quantity <= 0) {
+    cart = cart.filter((entry) => entry.slug !== slug);
+  }
+
+  writeCart(cart);
+  renderCartPage();
+}
+
+function showCartToast(message) {
+  let toast = document.querySelector(".cart-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.className = "cart-toast";
+    toast.setAttribute("role", "status");
+    toast.setAttribute("aria-live", "polite");
+    document.body.append(toast);
+  }
+
+  toast.textContent = message;
+  toast.classList.add("is-visible");
+  window.clearTimeout(showCartToast.timer);
+  showCartToast.timer = window.setTimeout(() => {
+    toast.classList.remove("is-visible");
+  }, 2200);
+}
+
+function buildCatalogCard(test) {
+  const filters = (test.filters || ["all"]).join(" ");
+  const searchText = [
+    test.name,
+    test.category,
+    test.summary,
+    test.headline,
+    ...(test.markers || []),
+    ...(test.reasons || []).flat(),
+  ].join(" ");
+  const badge = test.badge
+    ? `<span class="test-badge test-badge--popular">${escapeHtml(test.badge)}</span>`
+    : "";
+  const displayPrice = getTestLivePrice(test);
+  return `
+    <article class="test-card test-card--catalog" data-category="${escapeHtml(filters)}" data-search="${escapeHtml(searchText)}">
+      <a class="test-image photo-thumb photo-thumb--${escapeHtml(test.imageTone || "blood")}" href="${detailUrl(test.slug)}" aria-label="View ${escapeHtml(test.name)} details">
+        <img src="${escapeHtml(test.image)}" alt="" loading="lazy" decoding="async">
+        ${badge}
+        <span class="test-badge test-badge--category">${escapeHtml(test.category)}</span>
+      </a>
+      <div class="test-body">
+        <h3><a href="${detailUrl(test.slug)}">${escapeHtml(test.name)}</a></h3>
+        <p>${escapeHtml(test.summary)}</p>
+        <ul class="test-meta">
+          <li>${escapeHtml(test.collection)}</li>
+          <li>${escapeHtml(test.results.replace(" after sample reaches the lab", ""))}</li>
+        </ul>
+        <div class="price-row">
+          <span class="price">${formatPrice(displayPrice)}</span>
+          ${formatOldPriceHtml(test, displayPrice)}
+        </div>
+        <div class="test-card-actions">
+          <a class="button secondary full" href="${detailUrl(test.slug)}">${test.customizable ? "Customize" : "View details"}</a>
+          <button class="button primary full" type="button" data-add-to-cart="${escapeHtml(test.slug)}">Add to cart</button>
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function renderTestsCatalog() {
+  const grid = document.querySelector("[data-catalog-grid]");
+  if (!grid || !TESTS.length) {
+    return;
+  }
+
+  grid.innerHTML = TESTS.map(buildCatalogCard).join("");
+  applyCatalogFilter("all");
+}
+
+function buildFact(icon, label, value) {
+  return `
+    <li>
+      <span class="detail-fact__icon" aria-hidden="true">
+        <svg class="ui-icon"><use href="assets/images/ui-icons.svg#${icon}"></use></svg>
+      </span>
+      <span>
+        <small>${escapeHtml(label)}</small>
+        <strong>${escapeHtml(value)}</strong>
+      </span>
+    </li>
+  `;
+}
+
+function normalizeMarker(marker) {
+  if (typeof marker === "string") {
+    return { name: marker, description: "" };
+  }
+  return {
+    name: marker?.name || "",
+    description: marker?.description || ""
+  };
+}
+
+function getPanelCatalog() {
+  return window.DRSWIFT_PANELS || {};
+}
+
+function getPanelById(panelId) {
+  return getPanelCatalog()[panelId] || null;
+}
+
+function getCustomPanelIds(test) {
+  if (!test?.customizable) {
+    return [];
+  }
+  return [
+    ...new Set([
+      ...(Array.isArray(test.basePanelIds) ? test.basePanelIds : []),
+      ...(Array.isArray(test.optionalPanelIds) ? test.optionalPanelIds : [])
+    ])
+  ];
+}
+
+function getDefaultCustomSelection(test) {
+  if (Array.isArray(test?.basePanelIds) && test.basePanelIds.length) {
+    return [...test.basePanelIds];
+  }
+  return getCustomPanelIds(test);
+}
+
+function resolveTestPanelIds(test, selectedPanelIds) {
+  if (!test) {
+    return [];
+  }
+  if (test.customizable) {
+    const customPanelIds = getCustomPanelIds(test);
+    const fallback = getDefaultCustomSelection(test);
+    return (Array.isArray(selectedPanelIds) ? selectedPanelIds : fallback).filter((id) =>
+      customPanelIds.includes(id)
+    );
+  }
+  if (Array.isArray(test.panelIds) && test.panelIds.length) {
+    return test.panelIds;
+  }
+  return [];
+}
+
+function resolveTestWhatsTested(test, selectedPanelIds) {
+  const panelIds = resolveTestPanelIds(test, selectedPanelIds);
+  if (panelIds.length && typeof window.buildPanelsWhatsTested === "function") {
+    return window.buildPanelsWhatsTested(panelIds);
+  }
+  return normalizeWhatsTested(test);
+}
+
+function calculateBundlePrice(test, selectedPanelIds) {
+  if (!test?.customizable) {
+    return Number(test?.price || 0);
+  }
+
+  const catalog = getPanelCatalog();
+  const customPanelIds = getCustomPanelIds(test);
+  const fallback = getDefaultCustomSelection(test);
+  const selectedIds = (Array.isArray(selectedPanelIds) ? selectedPanelIds : fallback).filter((id) =>
+    customPanelIds.includes(id)
+  );
+  return selectedIds.reduce((sum, id) => sum + Number(catalog[id]?.price || 0), 0);
+}
+
+function readCustomSelection(slug) {
+  try {
+    const parsed = JSON.parse(localStorage.getItem("drswift_custom_panels") || "{}");
+    return Array.isArray(parsed[slug]) ? parsed[slug] : [];
+  } catch {
+    return [];
+  }
+}
+
+function readCustomSelectionForTest(test) {
+  const customPanelIds = getCustomPanelIds(test);
+  const defaults = getDefaultCustomSelection(test);
+  try {
+    const parsed = JSON.parse(localStorage.getItem("drswift_custom_panels") || "{}");
+    if (Object.prototype.hasOwnProperty.call(parsed, test.slug) && Array.isArray(parsed[test.slug])) {
+      return parsed[test.slug].filter((id) => customPanelIds.includes(id));
+    }
+  } catch {
+    return defaults;
+  }
+  return defaults;
+}
+
+function writeCustomSelection(slug, panelIds) {
+  try {
+    const parsed = JSON.parse(localStorage.getItem("drswift_custom_panels") || "{}");
+    parsed[slug] = panelIds;
+    localStorage.setItem("drswift_custom_panels", JSON.stringify(parsed));
+  } catch {
+    // Ignore storage failures in private browsing.
+  }
+}
+
+function normalizeWhatsTested(test) {
+  if (Array.isArray(test.whatsTested) && test.whatsTested.length) {
+    return test.whatsTested.map((group) => ({
+      title: group.title || "Included markers",
+      description: group.description || "",
+      markers: Array.isArray(group.markers) ? group.markers.map(normalizeMarker) : []
+    }));
+  }
+
+  if (Array.isArray(test.markers) && test.markers.length) {
+    return [
+      {
+        title: "Included markers",
+        description: "",
+        markers: test.markers.map(normalizeMarker)
+      }
+    ];
+  }
+
+  return [];
+}
+
+function countWhatsTestedMarkers(groups) {
+  return groups.reduce((total, group) => total + group.markers.length, 0);
+}
+
+function buildPanelPills(panelIds, modifier = "") {
+  const catalog = getPanelCatalog();
+  return (panelIds || [])
+    .map((panelId) => {
+      const panel = catalog[panelId];
+      if (!panel) {
+        return "";
+      }
+      return `
+        <li class="panel-pill ${modifier}">
+          <span>${escapeHtml(panel.title)}</span>
+          <small>${escapeHtml(panel.testCode || "")}</small>
+        </li>
+      `;
+    })
+    .join("");
+}
+
+function panelGroupKey(group, index) {
+  return String(group.id || group.panelId || index);
+}
+
+function formatIncludedSummary(markerCount, panelCount) {
+  const markerLabel = `biomarker${markerCount === 1 ? "" : "s"}`;
+  const panelLabel = panelCount === 1 ? "panel" : "panels";
+  return `Currently included: ${markerCount} ${markerLabel} across ${panelCount} ${panelLabel}`;
+}
+
+function buildPanelDrawerMarkup(groups) {
+  return `
+    <div class="fixed-tested__drawer" data-panel-drawer hidden>
+      <button class="fixed-tested__scrim" type="button" data-panel-drawer-close aria-label="Close test details"></button>
+      <div class="fixed-tested__drawer-panel" role="dialog" aria-modal="true" aria-label="Test details" tabindex="-1">
+        ${groups
+          .map((group, index) => {
+            const key = panelGroupKey(group, index);
+            const markers = Array.isArray(group.markers) ? group.markers : [];
+            return `
+              <article class="fixed-tested__detail" data-panel-drawer-panel="${escapeHtml(key)}" hidden>
+                <button class="fixed-tested__back" type="button" data-panel-drawer-close>Back</button>
+                <header class="fixed-tested__detail-header">
+                  <h3>${escapeHtml(group.title)}</h3>
+                </header>
+                <div class="fixed-tested__detail-body">
+                  <p class="fixed-tested__section-title">About This Test</p>
+                  ${
+                    group.description
+                      ? `<p class="fixed-tested__copy fixed-tested__copy--lead">${escapeHtml(group.description)}</p>`
+                      : `<p class="fixed-tested__copy fixed-tested__copy--lead">Review the markers included in this panel.</p>`
+                  }
+                  <p class="fixed-tested__section-label">Markers measured · ${markers.length}</p>
+                  <ul class="fixed-tested__marker-grid">
+                    ${markers
+                      .map((marker) => {
+                        const item = normalizeMarker(marker);
+                        return `
+                          <li>
+                            <strong>${escapeHtml(item.name)}</strong>
+                            ${item.description ? `<span>${escapeHtml(item.description)}</span>` : ""}
+                          </li>
+                        `;
+                      })
+                      .join("")}
+                  </ul>
+                </div>
+              </article>
+            `;
+          })
+          .join("")}
+      </div>
+    </div>
+  `;
+}
+
+function buildWhatsTested(groups) {
+  if (!groups.length) {
+    return `
+      <div class="whats-tested">
+        <p class="whats-tested__empty">Marker details for this panel will be published soon.</p>
+      </div>
+    `;
+  }
+
+  const markerCount = countWhatsTestedMarkers(groups);
+
+  // Leaf tests: one parameter group — show a clean list (no drawer hop).
+  if (groups.length === 1) {
+    const markers = Array.isArray(groups[0].markers) ? groups[0].markers : [];
+    return `
+      <div class="whats-tested whats-tested--params">
+        <p class="fixed-tested__meta">${markerCount} parameter${markerCount === 1 ? "" : "s"}</p>
+        <ul class="whats-tested__param-list">
+          ${markers
+            .map((marker) => {
+              const name = marker?.name || String(marker || "");
+              const desc = marker?.description || "";
+              return `<li>
+                <strong>${escapeHtml(name)}</strong>
+                ${desc ? `<span>${escapeHtml(desc)}</span>` : ""}
+              </li>`;
+            })
+            .join("")}
+        </ul>
+      </div>
+    `;
+  }
+
+  const groupLabel = "panels";
+
+  return `
+    <div class="whats-tested whats-tested--fixed" data-panel-drawer-root data-fixed-tested>
+      <p class="fixed-tested__meta" data-marker-count>${markerCount} biomarker${markerCount === 1 ? "" : "s"} across ${groups.length} ${groupLabel}</p>
+      <div class="fixed-tested__grid" aria-label="Included tests">
+        ${groups
+          .map((group, index) => {
+            const key = panelGroupKey(group, index);
+            const markerLabel = `${group.markers.length} marker${group.markers.length === 1 ? "" : "s"}`;
+            return `
+              <button class="fixed-tested__card" type="button" data-panel-drawer-open="${escapeHtml(key)}" aria-haspopup="dialog">
+                <span class="fixed-tested__card-copy">
+                  <span class="fixed-tested__card-title">${escapeHtml(group.title)}</span>
+                  <span class="fixed-tested__card-meta">${escapeHtml(markerLabel)}</span>
+                </span>
+                <span class="fixed-tested__arrow" aria-hidden="true"></span>
+              </button>
+            `;
+          })
+          .join("")}
+      </div>
+      ${buildPanelDrawerMarkup(groups)}
+    </div>
+  `;
+}
+
+function buildCustomizeSection(test, selectedPanelIds) {
+  const panelIds = getCustomPanelIds(test);
+  if (!test.customizable || !panelIds.length) {
+    return "";
+  }
+
+  const catalog = getPanelCatalog();
+  const selected = new Set(selectedPanelIds);
+  const livePrice = calculateBundlePrice(test, selectedPanelIds);
+  const selectedGroups =
+    typeof window.buildPanelsWhatsTested === "function"
+      ? window.buildPanelsWhatsTested(selectedPanelIds)
+      : [];
+  const includedSummary = formatIncludedSummary(
+    countWhatsTestedMarkers(selectedGroups),
+    selectedGroups.length
+  );
+  const drawerGroups =
+    typeof window.buildPanelsWhatsTested === "function"
+      ? window.buildPanelsWhatsTested(panelIds)
+      : panelIds.map((id) => catalog[id]).filter(Boolean);
+
+  return `
+    <div class="customize-shell customize-shell--cards" data-customize-section data-panel-drawer-root id="customize-panels">
+      <div class="customize-shell__header customize-shell__header--cards">
+        <div class="customize-shell__copy">
+          <p class="customize-lead">Select the tests you want included. Use Read more to review biomarkers before you add a panel to cart.</p>
+          <div class="customize-shell__meta">
+            <p class="customize-count" data-selected-count>${selected.size} of ${panelIds.length} tests selected</p>
+            <p class="customize-included" data-included-summary>${escapeHtml(includedSummary)}</p>
+          </div>
+        </div>
+        <div class="customize-total" aria-live="polite">
+          <span class="customize-total__label">Total</span>
+          <strong class="customize-total__value" data-custom-total>${formatPrice(livePrice)}</strong>
+        </div>
+      </div>
+      <div class="customize-card-grid" role="list">
+        ${panelIds
+          .map((panelId) => {
+            const panel = catalog[panelId];
+            if (!panel) {
+              return "";
+            }
+            const checked = selected.has(panelId) ? "checked" : "";
+            const markerCount = Array.isArray(panel.markers) ? panel.markers.length : 0;
+            return `
+              <article class="custom-test-card" role="listitem" data-custom-card>
+                <div class="custom-test-card__frame">
+                  <input
+                    class="custom-test-card__input"
+                    id="custom-panel-${escapeHtml(panelId)}"
+                    type="checkbox"
+                    name="custom-panel"
+                    value="${escapeHtml(panelId)}"
+                    ${checked}
+                    data-custom-panel
+                  >
+                  <label class="custom-test-card__body" for="custom-panel-${escapeHtml(panelId)}">
+                    <strong class="custom-test-card__title">${escapeHtml(panel.title)}</strong>
+                    <span class="custom-test-card__meta">${markerCount} marker${markerCount === 1 ? "" : "s"}</span>
+                    <span class="custom-test-card__copy">${escapeHtml(panel.description)}</span>
+                  </label>
+                  <div class="custom-test-card__footer">
+                    <button class="custom-test-card__read" type="button" data-panel-drawer-open="${escapeHtml(panelId)}">Read more</button>
+                    <span class="custom-test-card__price">${formatPrice(panel.price)}</span>
+                    <label class="custom-test-card__check" for="custom-panel-${escapeHtml(panelId)}" aria-label="Toggle ${escapeHtml(panel.title)}"></label>
+                  </div>
+                </div>
+              </article>
+            `;
+          })
+          .join("")}
+      </div>
+      ${buildPanelDrawerMarkup(drawerGroups)}
+    </div>
+  `;
+}
+
+function buildPreparationCard(test) {
+  return `
+    <div class="custom-preparation-card">
+      <div>
+        <p class="overline">Preparation</p>
+        <h3>Before your sample collection</h3>
+      </div>
+      <p>${escapeHtml(test.preparation)}</p>
+      <p class="detail-note">If you have urgent symptoms, active medical concerns, or abnormal prior results, speak with a qualified clinician before booking self-directed testing.</p>
+    </div>
+  `;
+}
+
+function buildReasonsSection(test) {
+  const reasons = Array.isArray(test?.reasons) ? test.reasons : [];
+  if (!reasons.length) {
+    return "";
+  }
+  return `
+    <section class="detail-section section-pad section-bg-soft">
+      <div class="container">
+        <div class="section-heading text-center">
+          <p class="overline">Why this test</p>
+          <h2>Common reasons people book this</h2>
+        </div>
+        <div class="steps-grid">
+          ${reasons
+            .map((reason) => {
+              const title = Array.isArray(reason) ? reason[0] : reason?.title;
+              const copy = Array.isArray(reason) ? reason[1] : reason?.copy;
+              return `
+                <article class="step-card">
+                  <h3>${escapeHtml(title || "")}</h3>
+                  <p>${escapeHtml(copy || "")}</p>
+                </article>
+              `;
+            })
+            .join("")}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function compareStatusCell(included, optional) {
+  if (optional) {
+    return `<span class="labcorp-compare__status labcorp-compare__status--opt">Optional</span>`;
+  }
+  if (included) {
+    return `<span class="labcorp-compare__status labcorp-compare__status--yes" aria-label="Included"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7.7 14.3 3.5 10.1l1.4-1.4 2.8 2.8 7-7 1.4 1.4-8.4 8.4z"/></svg></span>`;
+  }
+  return `<span class="labcorp-compare__status labcorp-compare__status--no" aria-label="Not included">—</span>`;
+}
+
+function getComparePeerColumns(test, limit = 3) {
+  if (!test) {
+    return [];
+  }
+  const columns = [test];
+  const seen = new Set([test.slug]);
+
+  const push = (slug) => {
+    if (!slug || seen.has(slug) || columns.length >= limit) {
+      return;
+    }
+    const peer = getTestBySlug(slug);
+    if (!peer) {
+      return;
+    }
+    seen.add(slug);
+    columns.push(peer);
+  };
+
+  push(test.compareWith);
+  (test.related || []).forEach(push);
+
+  if (columns.length < 2) {
+    const filters = new Set(
+      (test.filters || []).filter((f) => f && f !== "all" && f !== "men" && f !== "women")
+    );
+    TESTS.forEach((candidate) => {
+      if (columns.length >= limit || seen.has(candidate.slug)) {
+        return;
+      }
+      const sameCategory =
+        String(candidate.category || "").toLowerCase() === String(test.category || "").toLowerCase();
+      const overlap = (candidate.filters || []).some((f) => filters.has(f));
+      if (sameCategory || overlap) {
+        push(candidate.slug);
+      }
+    });
+  }
+
+  return columns.length >= 2 ? columns : [];
+}
+
+function getCompareUnitsForTest(test) {
+  const units = [];
+  const catalog = getPanelCatalog();
+  const isProfile = String(test.testType || "").toLowerCase() === "profile";
+  const panelIds = test.customizable
+    ? getCustomPanelIds(test)
+    : resolveTestPanelIds(test, test.customizable ? readCustomSelectionForTest(test) : []);
+
+  if (panelIds.length > 1 || (isProfile && panelIds.length)) {
+    panelIds.forEach((panelId) => {
+      const panel = catalog[panelId];
+      const groups = normalizeWhatsTested(test);
+      const group = groups.find(
+        (item, index) =>
+          String(item.id || item.panelId || item.title || index) === String(panelId) ||
+          String(item.title || "").toLowerCase() === String(panel?.title || "").toLowerCase()
+      );
+      units.push({
+        key: `panel:${panelId}`,
+        title: panel?.title || group?.title || panelId,
+        description: panel?.description || group?.description || "",
+        markers: panel?.markers || group?.markers || [],
+        optional: false
+      });
+    });
+    return units;
+  }
+
+  const groups = normalizeWhatsTested(test);
+  // Leaf / single-product compare: one clean row for the test, Parameters inside accordion.
+  const markers = groups[0]?.markers?.length
+    ? groups[0].markers
+    : (test.markers || []).map((marker) =>
+        typeof marker === "string" ? { name: marker, description: "" } : marker
+      );
+
+  units.push({
+    key: `test:${test.slug}`,
+    title: test.shortName || test.name,
+    description: test.summary || test.headline || test.description || "",
+    markers,
+    optional: false
+  });
+  return units;
+}
+
+function buildCompareSection(test) {
+  const columns = getComparePeerColumns(test, 3);
+  if (columns.length < 2) {
+    return "";
+  }
+
+  const columnUnits = columns.map((column) => {
+    const units = getCompareUnitsForTest(column);
+    const includedKeys = new Set();
+    const optionalKeys = new Set();
+
+    if (column.customizable) {
+      const allCustomIds = new Set(getCustomPanelIds(column));
+      const baseIds = new Set(column.basePanelIds || []);
+      const optionalIds = new Set(column.optionalPanelIds || []);
+      units.forEach((unit) => {
+        if (!unit.key.startsWith("panel:")) {
+          includedKeys.add(unit.key);
+          return;
+        }
+        const panelId = unit.key.slice("panel:".length);
+        if (baseIds.has(panelId)) {
+          includedKeys.add(unit.key);
+          return;
+        }
+        if (optionalIds.has(panelId) || allCustomIds.has(panelId)) {
+          optionalKeys.add(unit.key);
+        }
+      });
+    } else {
+      units.forEach((unit) => includedKeys.add(unit.key));
+    }
+
+    return { test: column, units, includedKeys, optionalKeys };
+  });
+
+  const rowMap = new Map();
+  columnUnits.forEach(({ units }) => {
+    units.forEach((unit) => {
+      if (!rowMap.has(unit.key)) {
+        rowMap.set(unit.key, {
+          key: unit.key,
+          title: unit.title,
+          description: unit.description,
+          markers: unit.markers
+        });
+      } else if ((!rowMap.get(unit.key).description && unit.description) || (!rowMap.get(unit.key).markers?.length && unit.markers?.length)) {
+        const existing = rowMap.get(unit.key);
+        rowMap.set(unit.key, {
+          ...existing,
+          description: existing.description || unit.description,
+          markers: existing.markers?.length ? existing.markers : unit.markers
+        });
+      }
+    });
+  });
+
+  const rows = [...rowMap.values()];
+  if (!rows.length) {
+    return "";
+  }
+
+  const categoryLabel = String(test.category || "health").replace(/\s+test$/i, "") || "health";
+  const colTemplate = `minmax(140px, 1.5fr) ${columns.map(() => "minmax(88px, 1fr)").join(" ")}`;
+
+  const rowHtml = rows
+    .map((row, index) => {
+      const markers = Array.isArray(row.markers) ? row.markers : [];
+      const markerCount = markers.length;
+      const markerList = markerCount
+        ? `<div class="labcorp-compare__params">
+            <p class="labcorp-compare__params-label">${markerCount} parameter${markerCount === 1 ? "" : "s"}</p>
+            <ul class="labcorp-compare__markers">${markers
+              .map((marker) => {
+                const name = typeof marker === "string" ? marker : marker?.name || "";
+                const desc = typeof marker === "string" ? "" : marker?.description || "";
+                return `<li><strong>${escapeHtml(name)}</strong>${
+                  desc ? `<span>${escapeHtml(desc)}</span>` : ""
+                }</li>`;
+              })
+              .join("")}</ul>
+          </div>`
+        : "";
+
+      return `
+        <details class="labcorp-compare__row"${index === 0 ? " open" : ""} style="--compare-cols: ${colTemplate}">
+          <summary>
+            <span class="labcorp-compare__panel">
+              <span class="labcorp-compare__chevron" aria-hidden="true"></span>
+              <span class="labcorp-compare__panel-copy">
+                <span class="labcorp-compare__panel-title">${escapeHtml(row.title)}</span>
+                ${
+                  markerCount
+                    ? `<span class="labcorp-compare__panel-meta">${markerCount} parameter${
+                        markerCount === 1 ? "" : "s"
+                      }</span>`
+                    : ""
+                }
+              </span>
+            </span>
+            ${columnUnits
+              .map(({ includedKeys, optionalKeys }) => {
+                const included = includedKeys.has(row.key);
+                const optional = optionalKeys.has(row.key);
+                return `<span class="labcorp-compare__cell">${compareStatusCell(included, optional)}</span>`;
+              })
+              .join("")}
+          </summary>
+          <div class="labcorp-compare__body">
+            <p>${escapeHtml(row.description || "Review what this item covers.")}</p>
+            ${markerList}
+          </div>
+        </details>
+      `;
+    })
+    .join("");
+
+  return `
+    <section class="detail-section section-pad section-bg-white" id="package-compare" data-labcorp-compare>
+      <div class="container">
+        <div class="section-heading">
+          <p class="overline">Compare options</p>
+          <h2>Compare ${escapeHtml(categoryLabel)} tests</h2>
+          <p>See what’s included in this test versus similar or related options.</p>
+        </div>
+
+        <div class="labcorp-compare-wrap">
+          <div class="labcorp-compare">
+            <div class="labcorp-compare__head" role="row" style="--compare-cols: ${colTemplate}">
+              <div class="labcorp-compare__head-label">What’s tested</div>
+              ${columns
+                .map((column, index) => {
+                  const price = getTestLivePrice(column);
+                  return `
+                    <div class="labcorp-compare__head-product">
+                      ${index === 0 ? `<span class="labcorp-compare__you">This test</span>` : ""}
+                      <p class="labcorp-compare__product-name">${escapeHtml(column.shortName || column.name)}</p>
+                      <p class="labcorp-compare__product-price">${formatPrice(price)}</p>
+                      ${
+                        index === 0
+                          ? ""
+                          : `<a class="labcorp-compare__product-link" href="${detailUrl(column.slug)}">View details</a>`
+                      }
+                    </div>
+                  `;
+                })
+                .join("")}
+            </div>
+            <div class="labcorp-compare__list">
+              ${rowHtml}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function bindCustomPanelHandlers(test) {
+  if (!test?.customizable) {
+    return;
+  }
+
+  const section = document.querySelector("[data-customize-section]");
+  if (!section) {
+    return;
+  }
+
+  function syncSelection() {
+    const selected = [...section.querySelectorAll("[data-custom-panel]:checked")].map((node) => node.value);
+    writeCustomSelection(test.slug, selected);
+    refreshCustomTestDetail(test, selected);
+  }
+
+  section.addEventListener("click", (event) => {
+    const readMore = event.target.closest("[data-panel-drawer-open]");
+    if (readMore) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    const price = event.target.closest(".custom-test-card__price");
+    const card = event.target.closest("[data-custom-card]");
+    if (price && card) {
+      const input = card.querySelector("[data-custom-panel]");
+      if (input) {
+        event.preventDefault();
+        input.checked = !input.checked;
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+    }
+  });
+
+  section.addEventListener("change", (event) => {
+    const input = event.target.closest("[data-custom-panel]");
+    if (!input) {
+      return;
+    }
+    syncSelection();
+  });
+}
+
+function bindPanelDrawerHandlers() {
+  const roots = [...document.querySelectorAll("[data-panel-drawer-root]")];
+  if (!roots.length) {
+    return;
+  }
+
+  roots.forEach((root) => {
+    const drawer = root.querySelector("[data-panel-drawer]");
+    const drawerPanel = root.querySelector(".fixed-tested__drawer-panel");
+    const panels = [...root.querySelectorAll("[data-panel-drawer-panel]")];
+    const openers = [...root.querySelectorAll("[data-panel-drawer-open]")];
+    let activeOpener = null;
+
+    function activatePanel(key) {
+      openers.forEach((opener) => {
+        const isActive = opener.getAttribute("data-panel-drawer-open") === String(key);
+        opener.classList.toggle("is-active", isActive);
+      });
+
+      panels.forEach((panel) => {
+        panel.hidden = panel.getAttribute("data-panel-drawer-panel") !== String(key);
+      });
+    }
+
+    function openDrawer(key, opener) {
+      if (!drawer) {
+        return;
+      }
+      activeOpener = opener || null;
+      activatePanel(key);
+      drawer.hidden = false;
+      document.body.classList.add("drawer-open");
+      drawerPanel?.focus({ preventScroll: true });
+    }
+
+    function closeDrawer() {
+      if (!drawer || drawer.hidden) {
+        return;
+      }
+      drawer.hidden = true;
+      document.body.classList.remove("drawer-open");
+      openers.forEach((opener) => opener.classList.remove("is-active"));
+      activeOpener?.focus({ preventScroll: true });
+      activeOpener = null;
+    }
+
+    root.addEventListener("click", (event) => {
+      const opener = event.target.closest("[data-panel-drawer-open]");
+      if (opener && root.contains(opener)) {
+        event.preventDefault();
+        event.stopPropagation();
+        openDrawer(opener.getAttribute("data-panel-drawer-open"), opener);
+        return;
+      }
+
+      const close = event.target.closest("[data-panel-drawer-close]");
+      if (close && root.contains(close)) {
+        closeDrawer();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && drawer && !drawer.hidden) {
+        closeDrawer();
+      }
+    });
+  });
+}
+
+function refreshCustomTestDetail(test, selectedPanelIds) {
+  const livePrice = calculateBundlePrice(test, selectedPanelIds);
+  const savings = Math.max(0, Number(test.oldPrice || 0) - livePrice);
+  const groups = resolveTestWhatsTested(test, selectedPanelIds);
+  const markerCount = countWhatsTestedMarkers(groups);
+  const selectedCount = Array.isArray(selectedPanelIds) ? selectedPanelIds.length : getCustomPanelIds(test).length;
+  const totalCount = getCustomPanelIds(test).length;
+
+  const priceNode = document.querySelector("[data-live-price]");
+  const savingsNode = document.querySelector("[data-live-savings]");
+  const customTotalNode = document.querySelector("[data-custom-total]");
+  const selectedCountNode = document.querySelector("[data-selected-count]");
+  const includedSummaryNode = document.querySelector("[data-included-summary]");
+
+  if (priceNode) {
+    priceNode.textContent = formatPrice(livePrice);
+  }
+  if (customTotalNode) {
+    customTotalNode.textContent = formatPrice(livePrice);
+  }
+  if (selectedCountNode) {
+    selectedCountNode.textContent = `${selectedCount} of ${totalCount} tests selected`;
+  }
+  if (includedSummaryNode) {
+    includedSummaryNode.textContent = formatIncludedSummary(markerCount, groups.length);
+  }
+  if (savingsNode) {
+    savingsNode.textContent =
+      savings > 0 ? `Save ${formatPrice(savings)} today.` : "Transparent pricing before booking.";
+  }
+}
+
+function buildRelatedCard(slug) {
+  const test = getTestBySlug(slug);
+  if (!test) {
+    return "";
+  }
+  return `
+    <article class="related-test">
+      <a class="related-test__image photo-thumb photo-thumb--${escapeHtml(test.imageTone || "blood")}" href="${detailUrl(test.slug)}">
+        <img src="${escapeHtml(test.image)}" alt="" loading="lazy" decoding="async">
+      </a>
+      <div>
+        <p class="overline">${escapeHtml(test.category)}</p>
+        <h3><a href="${detailUrl(test.slug)}">${escapeHtml(test.name)}</a></h3>
+        <p>${escapeHtml(test.summary)}</p>
+        <div class="price-row">
+          <span class="price">${formatPrice(getTestLivePrice(test))}</span>
+          ${formatOldPriceHtml(test, getTestLivePrice(test))}
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function renderTestDetailPage() {
+  const main = document.querySelector("[data-test-detail]");
+  if (!main || !TESTS.length) {
+    return;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const slug = params.get("test") || TESTS[0].slug;
+  const test = getTestBySlug(slug);
+
+  if (!test) {
+    main.innerHTML = `
+      <section class="section-pad">
+        <div class="container not-found-panel">
+          <p class="eyebrow">Test not found</p>
+          <h1>We could not find that test.</h1>
+          <p>Browse the full catalog or message the care team for help choosing a panel.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="tests.html">Shop tests</a>
+            <a class="button secondary" href="whatsapp.html">WhatsApp us</a>
+          </div>
+        </div>
+      </section>
+    `;
+    return;
+  }
+
+  document.title = `${test.name} | Dr.Swift Diagnostics`;
+  const selectedPanelIds = test.customizable ? readCustomSelectionForTest(test) : [];
+  const livePrice = test.customizable ? calculateBundlePrice(test, selectedPanelIds) : Number(test.price || 0);
+  const savings = Math.max(0, Number(test.oldPrice || 0) - livePrice);
+  const whatsTestedGroups = resolveTestWhatsTested(test, selectedPanelIds);
+  const customizeCta = test.customizable
+    ? `<a class="button secondary full" href="#customize-panels">Customize your test</a>`
+    : "";
+
+  main.innerHTML = `
+    <section class="product-hero section-pad" data-test-slug="${escapeHtml(test.slug)}">
+      <div class="container product-hero__grid">
+        <div class="product-intro">
+          <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <a href="index.html">Home</a>
+            <span>/</span>
+            <a href="tests.html">Tests</a>
+            <span>/</span>
+            <span>${escapeHtml(test.name)}</span>
+          </nav>
+          <p class="eyebrow">${escapeHtml(test.category)} test</p>
+          <h1>${escapeHtml(test.name)}</h1>
+          <p class="product-headline">${escapeHtml(test.headline)}</p>
+        </div>
+        <aside class="product-buy-card" aria-label="Book ${escapeHtml(test.name)}">
+          <div class="product-price">
+            <span data-live-price>${formatPrice(livePrice)}</span>
+            ${hasDiscountPrice(test, livePrice) ? `<del>${formatPrice(test.oldPrice)}</del>` : ""}
+          </div>
+          <p data-live-savings>${savings > 0 ? `Save ${formatPrice(savings)} today.` : "Transparent pricing before booking."}</p>
+          ${customizeCta}
+          <button class="button primary full" type="button" data-add-to-cart="${escapeHtml(test.slug)}">Add to cart</button>
+          <a class="button secondary full" href="book.html?test=${encodeURIComponent(test.name)}">Book now</a>
+          <a class="cart-inline-link" href="cart.html">View cart</a>
+        </aside>
+        <div class="product-media photo-thumb photo-thumb--${escapeHtml(test.imageTone || "blood")}">
+          <img src="${escapeHtml(test.image)}" alt="" decoding="async">
+          <span class="test-badge test-badge--category">${escapeHtml(test.category)}</span>
+          ${test.customizable ? '<span class="test-badge test-badge--popular">Customizable</span>' : ""}
+        </div>
+        <p class="product-description">${escapeHtml(test.description)}</p>
+      </div>
+    </section>
+
+    <section class="section-pad-sm">
+      <div class="container">
+        <ul class="detail-facts" aria-label="Test facts">
+          ${buildFact("icon-price", "Sample type", test.sampleType)}
+          ${buildFact("icon-home", "Collection", test.collection)}
+          ${buildFact("icon-family", "Age", test.age)}
+          ${buildFact("icon-clock", "Results", test.results)}
+          ${buildFact("icon-shield-check", "HSA/FSA", test.hsa)}
+          ${buildFact("icon-document", "Booking", test.purchaser)}
+        </ul>
+      </div>
+    </section>
+
+    <section class="detail-section ${test.customizable ? "detail-section--editable" : "detail-section--fixed"} section-pad section-bg-white" id="whats-tested">
+      <div class="container detail-layout ${test.customizable ? "detail-layout--editable" : "detail-layout--fixed"}">
+        <div class="detail-copy">
+          <p class="overline">${test.customizable ? "Build your test" : "About this test"}</p>
+          <h2>What's tested</h2>
+          <p class="whats-tested__intro">${escapeHtml(test.description)}</p>
+          ${test.customizable ? buildCustomizeSection(test, selectedPanelIds) : ""}
+          ${test.customizable ? "" : buildWhatsTested(whatsTestedGroups)}
+          ${buildPreparationCard(test)}
+        </div>
+      </div>
+    </section>
+
+    ${buildReasonsSection(test)}
+
+    ${buildCompareSection(test)}
+
+    <section class="detail-section section-pad section-bg-white">
+      <div class="container">
+        <div class="section-heading text-center">
+          <p class="overline">How it works</p>
+          <h2>From cart to clear results</h2>
+        </div>
+        <div class="steps-grid">
+          <article class="step-card">
+            <span>1</span>
+            <h3>Add tests</h3>
+            <p>Build your cart online and choose the panels you need.</p>
+          </article>
+          <article class="step-card">
+            <span>2</span>
+            <h3>Schedule collection</h3>
+            <p>Share patient and address details during booking for at-home collection.</p>
+          </article>
+          <article class="step-card">
+            <span>3</span>
+            <h3>View results</h3>
+            <p>Get app-ready reports with trends, plain-language notes, and family profiles.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="detail-section section-pad section-bg-soft">
+      <div class="container">
+        <div class="section-heading split">
+          <div>
+            <p class="overline">Frequently bought together</p>
+            <h2>Related tests</h2>
+          </div>
+          <a class="button secondary" href="tests.html">Shop tests</a>
+        </div>
+        <div class="related-grid">
+          ${(test.related || []).map(buildRelatedCard).join("")}
+        </div>
+      </div>
+    </section>
+
+    <section class="detail-section section-pad section-bg-white">
+      <div class="container faq-container">
+        <p class="overline">FAQ</p>
+        <h2>Common questions</h2>
+        <div class="detail-faq-list">
+          ${(test.faqs || [])
+            .map((faq) => {
+              const question = Array.isArray(faq) ? faq[0] : faq?.question;
+              const answer = Array.isArray(faq) ? faq[1] : faq?.answer;
+              return `
+                <details>
+                  <summary>${escapeHtml(question || "")}</summary>
+                  <p>${escapeHtml(answer || "")}</p>
+                </details>
+              `;
+            })
+            .join("")}
+        </div>
+      </div>
+    </section>
+  `;
+
+  bindCustomPanelHandlers(test);
+  bindPanelDrawerHandlers();
+}
+
+function cartLineItems() {
+  return readCart()
+    .map((item) => ({ ...item, test: getTestBySlug(item.slug) }))
+    .filter((item) => item.test);
+}
+
+function cartTotals(items) {
+  return items.reduce(
+    (totals, item) => {
+      const unitPrice = getTestLivePrice(item.test, item.customPanels);
+      const unitOriginal = hasDiscountPrice(item.test, unitPrice)
+        ? Number(item.test.oldPrice)
+        : unitPrice;
+      totals.subtotal += unitPrice * item.quantity;
+      totals.original += unitOriginal * item.quantity;
+      return totals;
+    },
+    { subtotal: 0, original: 0 }
+  );
+}
+
+function renderCartPage() {
+  const container = document.querySelector("[data-cart-page]");
+  if (!container || !TESTS.length) {
+    return;
+  }
+
+  const items = cartLineItems();
+  if (!items.length) {
+    container.innerHTML = `
+      <div class="empty-cart">
+        <p class="eyebrow">Empty cart</p>
+        <h2>Your cart is ready for tests.</h2>
+        <p>Add one or more panels, then continue to booking for patient and collection details.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="tests.html">Shop tests</a>
+          <a class="button secondary" href="whatsapp.html">Book via WhatsApp</a>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  const totals = cartTotals(items);
+  const savings = Math.max(0, totals.original - totals.subtotal);
+  const cartNames = items.map((item) => `${item.test.name} x ${item.quantity}`).join(", ");
+
+  container.innerHTML = `
+    <div class="cart-items" aria-label="Selected tests">
+      ${items
+        .map((item) => {
+          const { test, quantity } = item;
+          const unitPrice = getTestLivePrice(test, item.customPanels);
+          return `
+            <article class="cart-item">
+              <a class="cart-item__image photo-thumb photo-thumb--${escapeHtml(test.imageTone || "blood")}" href="${detailUrl(test.slug)}">
+                <img src="${escapeHtml(test.image)}" alt="" loading="lazy" decoding="async">
+              </a>
+              <div class="cart-item__body">
+                <p class="overline">${escapeHtml(test.category)}</p>
+                <h2><a href="${detailUrl(test.slug)}">${escapeHtml(test.name)}</a></h2>
+                <p>${escapeHtml(test.summary)}</p>
+                <ul class="test-meta">
+                  <li>${escapeHtml(test.collection)}</li>
+                  <li>${escapeHtml(test.results.replace(" after sample reaches the lab", ""))}</li>
+                </ul>
+              </div>
+              <div class="cart-item__controls">
+                <div class="price-row">
+                  <span class="price">${formatPrice(unitPrice * quantity)}</span>
+                  ${formatOldPriceHtml(test, unitPrice, quantity)}
+                </div>
+                <div class="quantity-control" aria-label="Quantity for ${escapeHtml(test.name)}">
+                  <button type="button" data-cart-action="decrease" data-cart-slug="${escapeHtml(test.slug)}" aria-label="Decrease ${escapeHtml(test.name)} quantity">-</button>
+                  <span>${quantity}</span>
+                  <button type="button" data-cart-action="increase" data-cart-slug="${escapeHtml(test.slug)}" aria-label="Increase ${escapeHtml(test.name)} quantity">+</button>
+                </div>
+                <button class="cart-remove" type="button" data-cart-action="remove" data-cart-slug="${escapeHtml(test.slug)}">Remove</button>
+              </div>
+            </article>
+          `;
+        })
+        .join("")}
+    </div>
+    <aside class="cart-summary" aria-label="Cart summary">
+      <h2>Order summary</h2>
+      <dl>
+        <div><dt>Tests</dt><dd>${items.reduce((sum, item) => sum + item.quantity, 0)}</dd></div>
+        <div><dt>Subtotal</dt><dd>${formatPrice(totals.original)}</dd></div>
+        <div><dt>Savings</dt><dd>-${formatPrice(savings)}</dd></div>
+        <div class="cart-summary__total"><dt>Total</dt><dd>${formatPrice(totals.subtotal)}</dd></div>
+      </dl>
+      <a class="button primary full" href="book.html?cart=checkout">Continue to booking</a>
+      <a class="button secondary full" href="whatsapp.html?message=${encodeURIComponent(`I want to book: ${cartNames}`)}">Book via WhatsApp</a>
+      <button class="cart-clear-link" type="button" data-cart-action="clear">Clear cart</button>
+      <ul class="cart-assurance">
+        <li>No payment is taken until your slot is confirmed.</li>
+        <li>Care team reviews address, timing, and preparation.</li>
+        <li>You can switch to WhatsApp support anytime.</li>
+      </ul>
+    </aside>
+  `;
+}
+
+document.addEventListener("click", (event) => {
+  const addButton = event.target.closest("[data-add-to-cart]");
+  if (addButton) {
+    const slug = addButton.getAttribute("data-add-to-cart");
+    const test = getTestBySlug(slug);
+    if (test) {
+      addToCart(slug);
+      renderCartPage();
+      showCartToast(`${test.name} added to cart.`);
+    }
+    return;
+  }
+
+  const cartButton = event.target.closest("[data-cart-action]");
+  if (cartButton) {
+    updateCartItem(
+      cartButton.getAttribute("data-cart-slug"),
+      cartButton.getAttribute("data-cart-action")
+    );
+  }
+});
+
+function renderHomeFeatured() {
+  const rail = document.querySelector("[data-home-featured]");
+  if (!rail) {
+    return;
+  }
+  const preferred = String(rail.getAttribute("data-home-featured-slugs") || "")
+    .split(",")
+    .map((slug) => slug.trim())
+    .filter(Boolean);
+  const bySlug = new Map(TESTS.map((test) => [test.slug, test]));
+  let featured = preferred.map((slug) => bySlug.get(slug)).filter(Boolean);
+  if (!featured.length) {
+    featured = TESTS.filter((test) => test.badge).slice(0, 5);
+  }
+  if (!featured.length) {
+    featured = TESTS.slice(0, 5);
+  }
+  rail.innerHTML = featured.map(buildCatalogCard).join("");
+}
+
+async function bootStorefront() {
+  if (typeof window.DRSWIFT_BOOTSTRAP_CATALOG === "function") {
+    await window.DRSWIFT_BOOTSTRAP_CATALOG();
+  }
+  TESTS = Array.isArray(window.DRSWIFT_TESTS) ? window.DRSWIFT_TESTS : [];
+  renderHomeFeatured();
+  renderTestsCatalog();
+  renderTestDetailPage();
+  renderCartPage();
+  renderPromotionsPage();
+  updateCartBadges();
+}
+
+function renderPromotionsPage() {
+  const grid = document.querySelector("[data-promo-grid]");
+  if (!grid) {
+    return;
+  }
+  const promotions = Array.isArray(window.DRSWIFT_PROMOTIONS) ? window.DRSWIFT_PROMOTIONS : [];
+  if (!promotions.length) {
+    grid.innerHTML = `
+      <article class="promo-card">
+        <span class="promo-card__badge">Offers</span>
+        <h3>No active promotions right now</h3>
+        <p>Mark tests as promotional in the CMS to show seasonal packages here. Browse the full catalog meanwhile.</p>
+        <a class="button primary full" href="tests.html">Shop tests</a>
+      </article>
+    `;
+    return;
+  }
+  grid.innerHTML = promotions
+    .map((promo) => {
+      const href = promo.slug ? detailUrl(promo.slug) : "tests.html";
+      const priceRow =
+        promo.price > 0
+          ? `<div class="price-row"><span class="price">${formatPrice(promo.price)}</span>${
+              promo.oldPrice && promo.oldPrice > promo.price
+                ? `<span class="old-price">${formatPrice(promo.oldPrice)}</span>`
+                : ""
+            }</div>`
+          : "";
+      return `
+        <article class="promo-card">
+          <span class="promo-card__badge">${escapeHtml(promo.badge || "Offer")}</span>
+          <h3>${escapeHtml(promo.title)}</h3>
+          <p>${escapeHtml(promo.subtitle || "")}</p>
+          ${promo.dateRange ? `<p class="detail-note">${escapeHtml(promo.dateRange)}</p>` : ""}
+          ${priceRow}
+          <a class="button primary full" href="${href}">View offer</a>
+        </article>
+      `;
+    })
+    .join("");
+}
+
+bootStorefront();

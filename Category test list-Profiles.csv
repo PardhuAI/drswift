@@ -1,0 +1,87 @@
+SI.NO,Test Code,Profile Name,Test Names,Test Names - Telugu
+1,DRSP001,DRS Diabetic,"Glucose - Fasting
+Glycosylated Hemoglobin (GHb/HbA1c)","గ్లూకోజ్-బ్లడ్-ఫాస్టింగ్
+గ్లైకోసిలేటెడ్ హిమోగ్లోబిన్ (GHb/HbA1c)-WB-EDTA"
+2,DRSP002,DRS Check 72,"25 - Hydroxy Vitamin D - Serum
+Complete Blood Count (CBC)
+Complete Urine Analysis (CUE)
+Glucose - Fasting
+Glycosylated Hemoglobin (GHb/HbA1c)
+Vitamin - B12 - Serum
+Iron Deficiency Profile-II
+Erythrocyte Sedimentation Rate (ESR)
+Lipid Profile
+Liver Function Test (LFT)
+Thyroid Profile I
+Kidney Function Test (KFT) - I
+Calcium - Serum","25-హైడ్రాక్సీ విటమిన్ డి-సీరం
+సంపూర్ణ రక్త పరీక్ష (సీబీసీ)
+కంప్లీట్ యూరిన్ అనాలిసిస్
+గ్లూకోజ్-బ్లడ్-ఫాస్టింగ్
+గ్లైకోసిలేటెడ్ హిమోగ్లోబిన్ (GHb/HbA1c)-WB-EDTA
+విటమిన్-బి12-సీరం
+ఎరిత్రోసైట్ సెడిమెంటేషన్ రేట్ (ESR)
+ఐరన్ లోపం ప్రొఫైల్-II
+లిపిడ్ ప్రొఫైల్-సీరం
+లివర్ ఫంక్షన్ టెస్ట్ (LFT)-సీరం
+థైరాయిడ్ ప్రొఫైల్-టోటల్
+కిడ్నీ ఫంక్షన్ టెస్ట్ (KFT)-సీరం
+కాల్షియం-సీరం"
+3,DRSP003,DRS Fever,"Dengue Ns1 Antigen / Antibody - Rapid
+Complete Blood Count (CBC)
+Complete Urine Analysis (CUE)
+Erythrocyte Sedimentation Rate (ESR)
+WIDAL slide test for Salmonella typhi
+Malarial Falciparum and Vivax Antigen (PV/PF)","డెంగ్యూ NS1 ర్యాపిడ్
+సంపూర్ణ రక్త పరీక్ష (సీబీసీ)
+కంప్లీట్ యూరిన్ అనాలిసిస్
+ఎరిత్రోసైట్ సెడిమెంటేషన్ రేట్ (ESR)
+విడాల్ టెస్ట్ (స్లైడ్ టెస్ట్)-సీరం
+మలేరియా ఫాల్సిపారం మరియు వివాక్స్ యాంటిజెన్ (పరాన్నజీవి V & F)
+"
+4,DRSP004,DRS Check 42,"Complete Blood Count (CBC)
+Complete Urine Analysis (CUE)
+Erythrocyte Sedimentation Rate (ESR)
+Glucose - Fasting
+Glucose-Urine -Fasting
+Lipid Profile
+Liver Function Test (LFT)
+Thyroid Profile I","సంపూర్ణ రక్త పరీక్ష (సీబీసీ)
+ఎరిత్రోసైట్ సెడిమెంటేషన్ రేట్ (ESR)
+కంప్లీట్ యూరిన్ అనాలిసిస్
+గ్లూకోజ్-బ్లడ్-ఫాస్టింగ్
+గ్లూకోజ్-మూత్రం
+లిపిడ్ ప్రొఫైల్-సీరం
+లివర్ ఫంక్షన్ టెస్ట్ (LFT)-సీరం
+థైరాయిడ్ ప్రొఫైల్-టోటల్
+"
+5,DRSP005,DRS Wellness,"Complete Blood Count (CBC)
+Glycosylated Hemoglobin (GHb/HbA1c)
+Lipid Profile
+Liver Function Test (LFT)
+Kidney Function Test (KFT) 
+Thyroid Stimulating Hormone (TSH) - Serum","సంపూర్ణ రక్త పరీక్ష (సీబీసీ)
+గ్లైకోసిలేటెడ్ హిమోగ్లోబిన్ (GHb/HbA1c)-WB-EDTA
+లిపిడ్ ప్రొఫైల్-సీరం
+లివర్ ఫంక్షన్ టెస్ట్ (LFT)-సీరం
+కిడ్నీ ఫంక్షన్ టెస్ట్ (KFT)-సీరం
+థైరాయిడ్ స్టిమ్యులేటింగ్ హార్మోన్ (TSH)-సీరం"
+6,DRSP006,DRS Ortho,"25 - Hydroxy Vitamin D - Serum
+Complete Blood Count (CBC)
+Erythrocyte Sedimentation Rate (ESR)
+Rheumatoid Factor (RA Test) - Serum","25-హైడ్రాక్సీ విటమిన్ డి-సీరం
+సంపూర్ణ రక్త పరీక్ష (సీబీసీ)
+ఎరిత్రోసైట్ సెడిమెంటేషన్ రేట్ (ESR)
+రుమటాయిడ్ ఫ్యాక్టర్ (RA టెస్ట్)-సీరం
+"
+7,DRSP007,DRS Vital,"Dengue Ns1 Antigen / Antibody - Rapid
+Complete Blood Count (CBC)
+Complete Urine Analysis (CUE)
+Erythrocyte Sedimentation Rate (ESR)
+WIDAL slide test for Salmonella typhi
+Malarial Falciparum and Vivax Antigen (PV/PF)","డెంగ్యూ NS1 ర్యాపిడ్
+సంపూర్ణ రక్త పరీక్ష (సీబీసీ)
+కంప్లీట్ యూరిన్ అనాలిసిస్
+ఎరిత్రోసైట్ సెడిమెంటేషన్ రేట్ (ESR)
+విడాల్ టెస్ట్ (స్లైడ్ టెస్ట్)-సీరం
+మలేరియా ఫాల్సిపారం మరియు వివాక్స్ యాంటిజెన్ (పరాన్నజీవి V & F)"

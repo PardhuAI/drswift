@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Book a test | Dr.Swift Diagnostics</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
+  </head>
+  <body class="auth-page">
+    <header class="site-header" id="site-header">
+      <nav class="navbar container" aria-label="Primary navigation">
+        <a class="brand" href="index.html"><img class="brand-mark" src="assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="40" height="40"><span>Dr.Swift Diagnostics</span></a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu"><span class="sr-only">Menu</span><span></span><span></span><span></span></button>
+        <div class="nav-menu" id="primary-menu">
+          <div class="nav-links"><a href="tests.html">Tests</a><a href="reports.html">Reports</a><a href="about.html">About</a></div>
+          <div class="nav-actions"><a class="cart-link" href="cart.html" aria-label="View cart"><svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-cart"></use></svg><span>Cart</span><span class="cart-count" data-cart-count hidden>0</span></a><a class="button primary nav-cta" href="tests.html">Shop tests</a></div>
+        </div>
+      </nav>
+    </header>
+    <main class="auth-shell">
+      <div class="container container--centered">
+        <div class="auth-card auth-card--wide">
+          <div class="auth-card__header">
+            <p class="eyebrow">At-home collection</p>
+            <h1>Schedule your collection</h1>
+            <p>Confirm the patient details, preferred slot, and contact method. Our care team will lock the appointment and payment link.</p>
+          </div>
+          <ol class="booking-steps" aria-label="Booking steps">
+            <li><span>1</span>Review tests</li>
+            <li><span>2</span>Choose slot</li>
+            <li><span>3</span>Confirm payment</li>
+          </ol>
+          <div class="booking-cart-summary booking-cart-summary--panel" data-booking-cart hidden></div>
+          <form class="auth-form" data-auth-form id="book-form" novalidate>
+            <p class="secure-note">Booking details are used to schedule sample collection and send report updates securely.</p>
+            <div class="form-field">
+              <label for="book-test">Select test</label>
+              <select id="book-test" name="test" required>
+                <option value="">Choose a panel</option>
+                <option>Complete Blood Count</option>
+                <option>Lipid Profile</option>
+                <option>Thyroid Profile</option>
+                <option>Vitamin D Test</option>
+                <option>Full Body Checkup</option>
+                <option>HbA1c &amp; Glucose</option>
+                <option>Women's Hormone Panel</option>
+                <option>Kidney Function Panel</option>
+                <option>Tuberculosis (TB) Blood Test</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="book-name">Full name</label>
+              <input id="book-name" type="text" name="name" required>
+            </div>
+            <div class="form-field">
+              <label for="book-phone">Phone</label>
+              <input id="book-phone" type="tel" name="phone" required>
+            </div>
+            <div class="form-field">
+              <label for="book-address">Collection address</label>
+              <textarea id="book-address" name="address" required></textarea>
+            </div>
+            <div class="form-row-split form-row-split--fields">
+              <div class="form-field">
+                <label for="book-date">Preferred date</label>
+                <input id="book-date" type="date" name="date" required>
+              </div>
+              <div class="form-field">
+                <label for="book-window">Preferred time</label>
+                <select id="book-window" name="window" required>
+                  <option value="">Choose a slot</option>
+                  <option>7:00 AM - 9:00 AM</option>
+                  <option>9:00 AM - 11:00 AM</option>
+                  <option>11:00 AM - 1:00 PM</option>
+                  <option>4:00 PM - 6:00 PM</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="book-contact">Preferred confirmation method</label>
+              <select id="book-contact" name="contact" required>
+                <option value="">Choose a method</option>
+                <option>WhatsApp</option>
+                <option>Phone call</option>
+                <option>SMS</option>
+                <option>Email</option>
+              </select>
+            </div>
+            <label class="form-check" for="book-consent">
+              <input id="book-consent" type="checkbox" name="consent" required>
+              <span>I confirm these details are correct and understand the care team will confirm payment and final collection timing.</span>
+            </label>
+            <button class="button primary full" type="submit">Request booking</button>
+            <p class="auth-success" data-auth-success aria-live="polite" hidden>Booking request received. We will confirm the collection slot and payment link shortly.</p>
+          </form>
+          <p class="auth-alt">Or <a href="whatsapp.html">book via WhatsApp</a> · <a href="login.html">Sign in</a> for faster checkout</p>
+        </div>
+      </div>
+    </main>
+    <footer class="site-footer"><div class="container footer-bottom footer-bottom--plain"><p>&copy; 2026 Dr.Swift Diagnostics</p></div></footer>
+    <script src="assets/js/panel-catalog.js"></script>
+    <script src="assets/js/test-data.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script>
+      async function initBookingPage() {
+        if (typeof window.DRSWIFT_BOOTSTRAP_CATALOG === "function") {
+          await window.DRSWIFT_BOOTSTRAP_CATALOG();
+        }
+        const params = new URLSearchParams(location.search);
+        const test = params.get("test");
+        const select = document.getElementById("book-test");
+        const tests = Array.isArray(window.DRSWIFT_TESTS) ? window.DRSWIFT_TESTS : [];
+
+        if (select && tests.length) {
+          const existing = new Set([...select.options].map((opt) => opt.text.trim().toLowerCase()));
+          tests.forEach((entry) => {
+            const label = entry.name || "";
+            if (!label || existing.has(label.toLowerCase())) {
+              return;
+            }
+            const option = document.createElement("option");
+            option.value = entry.slug || label;
+            option.textContent = label;
+            select.appendChild(option);
+          });
+        }
+
+        if (test && select) {
+          [...select.options].forEach((opt) => {
+            if (opt.text.toLowerCase().includes(test.toLowerCase()) || opt.value === test) {
+              opt.selected = true;
+            }
+          });
+        }
+
+        const cartSummary = document.querySelector("[data-booking-cart]");
+        if (params.get("cart") === "checkout" && cartSummary && tests.length) {
+          try {
+            const cart = JSON.parse(localStorage.getItem("drswift.cart.v1") || "[]");
+            const items = cart
+              .map((item) => ({
+                quantity: Math.max(1, Number(item.quantity) || 1),
+                test: tests.find((entry) => entry.slug === item.slug),
+                customPanels: item.customPanels
+              }))
+              .filter((item) => item.test);
+            if (items.length) {
+              const total = items.reduce((sum, item) => {
+                let unit = Number(item.test.price || 0);
+                if (item.test.customizable && Array.isArray(item.customPanels) && window.DRSWIFT_PANELS) {
+                  unit = item.customPanels.reduce(
+                    (panelSum, panelId) => panelSum + Number(window.DRSWIFT_PANELS[panelId]?.price || 0),
+                    0
+                  );
+                }
+                return sum + unit * item.quantity;
+              }, 0);
+              cartSummary.hidden = false;
+              cartSummary.innerHTML = `<strong>Order summary</strong><ul>${items
+                .map((item) => `<li>${item.test.name} x ${item.quantity}</li>`)
+                .join("")}</ul><p class="booking-cart-summary__total">Estimated total: ₹${total.toLocaleString("en-IN")}</p>`;
+              if (items.length === 1 && select) {
+                [...select.options].forEach((opt) => {
+                  if (opt.text === items[0].test.name || opt.value === items[0].test.slug) {
+                    opt.selected = true;
+                  }
+                });
+              }
+            }
+          } catch {
+            cartSummary.hidden = true;
+          }
+        }
+      }
+      initBookingPage();
+    </script>
+  </body>
+</html>

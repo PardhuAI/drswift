@@ -4,20 +4,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>About | Dr.Swift Diagnostics</title>
-    <meta name="description" content="Learn about Dr.Swift Diagnostics.">
+    <meta name="description" content="Learn about Dr.Swift Diagnostics — at-home lab testing with clear reports and family health insights.">
     <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
-  <body>
-    <header class="site-header">
+  <body class="about-page">
+    <header class="site-header" id="site-header">
       <nav class="navbar container" aria-label="Primary navigation">
         <a class="brand" href="index.html" aria-label="Dr.Swift Diagnostics home">
-          <img
-            class="brand-mark"
-            src="assets/images/drswift_leaf_logo_precise_trace.svg"
-            alt=""
-            width="40"
-            height="40"
-          >
+          <img class="brand-mark" src="assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="40" height="40">
           <span>Dr.Swift Diagnostics</span>
         </a>
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu">
@@ -25,49 +20,266 @@
         </button>
         <div class="nav-menu" id="primary-menu">
           <div class="nav-links">
-            <a href="tests.html">tests</a>
-            <a href="reports.html">reports</a>
-            <a class="active" href="about.html">about</a>
+            <a href="tests.html">Tests</a>
+            <a href="reports.html">Reports</a>
+            <a class="active" href="about.html">About</a>
           </div>
-          <div class="nav-actions">
-            <a href="#">login/signup</a><a href="#">doctors</a><a href="#">customer</a>
+          <div class="nav-actions" aria-label="Account links">
+            <a class="cart-link" href="cart.html" aria-label="View cart">
+              <svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-cart"></use></svg>
+              <span>Cart</span>
+              <span class="cart-count" data-cart-count hidden>0</span>
+            </a>
+            <a class="button primary nav-cta" href="tests.html">Shop tests</a>
           </div>
         </div>
       </nav>
     </header>
 
-    <main class="placeholder-page">
-      <section class="container placeholder-panel">
-        <p class="eyebrow">About</p>
-        <h1>About Dr.Swift Diagnostics.</h1>
-        <p>This placeholder is reserved for clinic details, service areas, and care standards.</p>
-        <a class="button primary" href="index.html">Back home</a>
+    <main>
+      <section class="about-hero section-pad">
+        <div class="container about-hero__grid">
+          <div class="about-hero__copy">
+            <p class="overline">About Dr.Swift</p>
+            <h1>At-home diagnostics with reports people can actually use</h1>
+            <p>
+              Dr.Swift brings trained sample collection, accredited lab processing, and clear digital
+              reports into one calmer experience for families.
+            </p>
+            <div class="about-hero__actions">
+              <a class="button primary" href="tests.html">Shop tests</a>
+              <a class="button secondary" href="#contact">Contact us</a>
+            </div>
+            <ul class="about-proof-list" aria-label="Dr.Swift care standards">
+              <li>
+                <svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-shield-check"></use></svg>
+                Accredited partner labs
+              </li>
+              <li>
+                <svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-home"></use></svg>
+                Doorstep sample collection
+              </li>
+              <li>
+                <svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-document"></use></svg>
+                Doctor-ready reports
+              </li>
+            </ul>
+          </div>
+          <div class="about-hero__media">
+            <picture>
+              <source srcset="assets/images/about-team.webp" type="image/webp">
+              <img
+                src="assets/images/about-team.jpg"
+                alt="A Dr.Swift phlebotomist arriving at a home for sample collection"
+                loading="eager"
+                decoding="async"
+              >
+            </picture>
+            <div class="about-hero__note">
+              <strong>Home collection</strong>
+              <span>Trained phlebotomists collect samples at your door.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page-section section-bg-white">
+        <div class="container about-story">
+          <article>
+            <p class="overline">Our mission</p>
+            <h2>Make preventive testing easier to start and easier to understand</h2>
+          </article>
+          <div class="about-story__copy">
+            <p>
+              Health data often gets scattered across PDFs, WhatsApp forwards, and forgotten folders.
+              Dr.Swift keeps the journey simpler: choose a panel, complete sample collection at home,
+              and receive results with reference ranges, history, and context in one place.
+            </p>
+            <p>
+              The goal is not to replace a doctor. It is to help families arrive at the next appointment
+              better prepared, with results that are readable, shareable, and easier to compare over time.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="page-section section-bg-soft">
+        <div class="container">
+          <div class="section-heading section-heading--center">
+            <p class="overline">Care standards</p>
+            <h2>The parts that matter most in diagnostics</h2>
+          </div>
+          <div class="report-features about-standards">
+            <article class="report-feature">
+              <div class="report-feature__icon" aria-hidden="true">
+                <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-shield-check"></use></svg>
+              </div>
+              <div>
+                <h3>Clinical quality</h3>
+                <p>Accredited lab partners, trained collectors, and proper sample handling.</p>
+              </div>
+            </article>
+            <article class="report-feature">
+              <div class="report-feature__icon" aria-hidden="true">
+                <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-document"></use></svg>
+              </div>
+              <div>
+                <h3>Readable reports</h3>
+                <p>Current values, prior values, units, and ranges stay visible together.</p>
+              </div>
+            </article>
+            <article class="report-feature">
+              <div class="report-feature__icon" aria-hidden="true">
+                <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-family"></use></svg>
+              </div>
+              <div>
+                <h3>Family profiles</h3>
+                <p>Manage recurring tests and reports for household members from one account.</p>
+              </div>
+            </article>
+            <article class="report-feature">
+              <div class="report-feature__icon" aria-hidden="true">
+                <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-lock"></use></svg>
+              </div>
+              <div>
+                <h3>Controlled sharing</h3>
+                <p>Reports are built for secure access and patient-approved doctor sharing.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="page-section section-bg-white">
+        <div class="container">
+          <div class="section-heading section-heading--center">
+            <p class="overline">Simple process</p>
+            <h2>How Dr.Swift fits into your routine</h2>
+          </div>
+          <div class="how-it-works-grid">
+            <article class="how-step">
+              <div class="how-step__number" aria-hidden="true">1</div>
+              <h3>Book online or on WhatsApp</h3>
+              <p>Pick a panel, choose a slot, and confirm your address in minutes.</p>
+            </article>
+            <article class="how-step">
+              <div class="how-step__number" aria-hidden="true">2</div>
+              <h3>We come to you</h3>
+              <p>A trained phlebotomist collects your sample safely at home.</p>
+            </article>
+            <article class="how-step">
+              <div class="how-step__number" aria-hidden="true">3</div>
+              <h3>Insights, not just numbers</h3>
+              <p>Results arrive with trends, graphs, and family profiles in the app.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="page-section section-bg-soft" id="contact">
+        <div class="container page-grid-2">
+          <article class="info-card contact-card">
+            <p class="overline">Contact</p>
+            <h2>We are here to help</h2>
+            <p>Questions about a panel, booking, or your report? Reach our care team anytime.</p>
+            <ul class="contact-list">
+              <li>
+                <strong>Email</strong>
+                <span>care@drswift.health</span>
+              </li>
+              <li>
+                <strong>Phone / WhatsApp</strong>
+                <span>+91 90000 90000</span>
+              </li>
+              <li>
+                <strong>Hours</strong>
+                <span>Mon – Sat, 7:00 AM – 9:00 PM</span>
+              </li>
+              <li>
+                <strong>Service areas</strong>
+                <span>Home collection in select cities — expanding soon.</span>
+              </li>
+            </ul>
+            <div class="contact-actions">
+              <a class="button primary" href="whatsapp.html">WhatsApp us</a>
+              <a class="button secondary" href="mailto:care@drswift.health">Email care</a>
+            </div>
+          </article>
+          <div class="info-card partner-card">
+            <p class="overline">For doctors &amp; partners</p>
+            <h2>Work with Dr.Swift</h2>
+            <p>
+              Refer patients, access shared reports, and offer at-home collection through our doctors portal.
+            </p>
+            <ul class="info-card-list">
+              <li>Doctor referral dashboard</li>
+              <li>Shared report access with patient consent</li>
+              <li>Corporate wellness programs</li>
+            </ul>
+            <a class="button secondary" href="doctors.html">Doctors portal</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="community-band section-pad section-bg-navy">
+        <div class="container">
+          <h2>Join families who test smarter</h2>
+          <p>Book your first panel or download the app to explore health insights built for everyday life.</p>
+          <div class="cta-band__actions">
+            <a class="button outline-light" href="tests.html">Shop tests</a>
+            <a class="button primary" href="app.html">Get the app</a>
+          </div>
+        </div>
       </section>
     </main>
 
     <footer class="site-footer">
-      <div class="container footer-grid">
-        <div>
-          <a class="brand footer-brand" href="index.html">
-            <span class="brand-mark">DS</span>
+      <div class="container footer-grid footer-grid--expanded">
+        <div class="footer-brand-col">
+          <a class="brand footer-brand" href="index.html" aria-label="Dr.Swift Diagnostics home">
+            <img class="brand-mark" src="assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="40" height="40">
             <span>Dr.Swift Diagnostics</span>
           </a>
-          <p>Simple lab testing, clear reports, and helpful diagnostic support.</p>
+          <p class="footer-tagline">At-home lab tests, clear reports, and health insights for your whole family.</p>
+                              <div class="footer-social" aria-label="Contact shortcuts">
+            <a href="mailto:care@drswift.health" aria-label="Email Dr.Swift" title="Email"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-email"/></svg></a>
+            <a href="whatsapp.html" aria-label="Book on WhatsApp" title="WhatsApp"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-whatsapp"/></svg></a>
+            <a href="app.html" aria-label="Open customer app page" title="App"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-app"/></svg></a>
+            <a href="doctors.html" aria-label="Doctors portal" title="Doctors Portal"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-doctors"/></svg></a>
+          </div>
         </div>
         <div>
-          <h2>Links</h2>
-          <a href="tests.html">Tests</a>
-          <a href="reports.html">Reports</a>
-          <a href="about.html">About</a>
+          <h2 class="footer-col-title">Our Tests</h2>
+          <a href="tests.html">Shop tests</a>
+          <a href="tests.html#catalog">By category</a>
+          <a href="index.html#audience-tests-heading">For Him / Her / Family</a>
+          <a href="promotions.html">Promotions</a>
         </div>
         <div>
-          <h2>Contact</h2>
-          <p>support@drswift.example</p>
-          <p>(555) 014-2200</p>
+          <h2 class="footer-col-title">Resources</h2>
+          <a href="reports.html">View reports</a>
+          <a href="sample-report.html">Sample report</a>
+          <a href="index.html#faq">FAQs</a>
+          <a href="help.html">Help center</a>
+        </div>
+        <div>
+          <h2 class="footer-col-title">Account</h2>
+          <a href="login.html">Login / Sign up</a>
+          <a href="doctors.html">Doctors portal</a>
+          <a href="app.html">Customer app</a>
+          <a href="whatsapp.html">WhatsApp booking</a>
+        </div>
+        <div>
+          <h2 class="footer-col-title">Company</h2>
+          <a href="about.html">About us</a>
+          <a href="about.html#contact">Contact</a>
+          <a href="privacy.html">Privacy policy</a>
+          <a href="terms.html">Terms of service</a>
         </div>
       </div>
       <div class="container footer-bottom">
         <p>&copy; 2026 Dr.Swift Diagnostics. All rights reserved.</p>
+        <a href="privacy-choices.html">Privacy choices</a>
       </div>
     </footer>
 

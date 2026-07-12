@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Create account | Dr.Swift Diagnostics</title>
+    <meta name="description" content="Create a Dr.Swift family account for at-home lab tests and health insights.">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
+  </head>
+  <body class="auth-page">
+    <header class="site-header" id="site-header">
+      <nav class="navbar container" aria-label="Primary navigation">
+        <a class="brand" href="index.html" aria-label="Dr.Swift Diagnostics home">
+          <img class="brand-mark" src="assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="40" height="40">
+          <span>Dr.Swift Diagnostics</span>
+        </a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu">
+          <span class="sr-only">Menu</span><span></span><span></span><span></span>
+        </button>
+        <div class="nav-menu" id="primary-menu">
+          <div class="nav-links">
+            <a href="tests.html">Tests</a>
+            <a href="reports.html">Reports</a>
+            <a href="about.html">About</a>
+          </div>
+          <div class="nav-actions" aria-label="Account links">
+            <a class="cart-link" href="cart.html" aria-label="View cart">
+              <svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-cart"></use></svg>
+              <span>Cart</span>
+              <span class="cart-count" data-cart-count hidden>0</span>
+            </a>
+            <a class="button primary nav-cta" href="tests.html">Shop tests</a>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="auth-shell">
+      <div class="container container--centered">
+        <div class="auth-card auth-card--wide">
+          <div class="auth-split">
+            <aside class="auth-split__aside">
+              <p class="overline">Family account</p>
+              <h2>One account for your whole household</h2>
+              <p>Track parents, partners, and children — each with their own reports and trends.</p>
+              <ul class="auth-split__list">
+                <li>At-home sample collection</li>
+                <li>Insights, graphs, and PDF reports</li>
+                <li>Book via web, app, or WhatsApp</li>
+              </ul>
+            </aside>
+            <div>
+              <div class="auth-card__header auth-card__header--left">
+                <h1>Create your account</h1>
+                <p>Start with one profile — add family members anytime.</p>
+              </div>
+              <form class="auth-form" data-auth-form novalidate>
+                <p class="secure-note">Your contact details are used only for account access, test updates, and report notifications.</p>
+                <div class="form-field">
+                  <label for="signup-name">Full name</label>
+                  <input id="signup-name" type="text" name="name" autocomplete="name" required>
+                </div>
+                <div class="form-field">
+                  <label for="signup-email">Email</label>
+                  <input id="signup-email" type="email" name="email" autocomplete="email" required>
+                </div>
+                <div class="form-field">
+                  <label for="signup-phone">Phone (for WhatsApp updates)</label>
+                  <input id="signup-phone" type="tel" name="phone" autocomplete="tel" placeholder="+91" required>
+                </div>
+                <div class="form-field">
+                  <label for="signup-password">Password</label>
+                  <input id="signup-password" type="password" name="password" autocomplete="new-password" minlength="8" required>
+                </div>
+                <label class="form-check">
+                  <input type="checkbox" name="terms" required>
+                  <span>I agree to the <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a></span>
+                </label>
+                <button class="button primary full" type="submit">Create account</button>
+                <p class="auth-success" data-auth-success aria-live="polite" hidden>Account created. Verification and backend connection coming soon.</p>
+              </form>
+              <p class="auth-alt">Already have an account? <a href="login.html">Sign in</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-bottom footer-bottom--flat">
+        <p>&copy; 2026 Dr.Swift Diagnostics. <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></p>
+      </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/auth.js"></script>
+  </body>
+</html>
