@@ -23,35 +23,16 @@
         <div class="container page-hero__inner container--narrow text-center">
           <p class="eyebrow">Offers</p>
           <h1>Promotions &amp; seasonal packages</h1>
-          <p>Save on panels and family checkups. Offers update regularly.</p>
+          <p>Save on panels and family checkups. Offers update from the CMS when tests are marked promotional.</p>
         </div>
       </section>
       <section class="page-section section-bg-white">
         <div class="container">
-          <div class="promo-grid">
+          <div class="promo-grid" data-promo-grid>
             <article class="promo-card">
-              <span class="promo-card__badge">10% off</span>
-              <h3>First test welcome offer</h3>
-              <p>New accounts get 10% off their first at-home panel. Sign up to apply at checkout.</p>
-              <a class="button primary full" href="signup.html">Create account</a>
-            </article>
-            <article class="promo-card">
-              <span class="promo-card__badge">Family</span>
-              <h3>Family wellness bundle</h3>
-              <p>Book checkups for two or more profiles in one week and save on collection fees.</p>
-              <a class="button secondary full" href="book.html">Book bundle</a>
-            </article>
-            <article class="promo-card">
-              <span class="promo-card__badge">Annual</span>
-              <h3>Full body annual checkup</h3>
-              <p>Comprehensive preventive panel with insights dashboard — priced for yearly wellness.</p>
-              <a class="button secondary full" href="book.html?test=Full">Book checkup</a>
-            </article>
-            <article class="promo-card">
-              <span class="promo-card__badge">Diabetes</span>
-              <h3>HbA1c follow-up pack</h3>
-              <p>Track glucose trends with two tests 90 days apart — ideal for diabetic care plans.</p>
-              <a class="button secondary full" href="book.html?test=HbA1c">Learn more</a>
+              <span class="promo-card__badge">Loading</span>
+              <h3>Loading offers…</h3>
+              <p>Fetching the latest promotions from Dr.Swift CMS.</p>
             </article>
           </div>
         </div>
@@ -60,6 +41,9 @@
     <footer class="site-footer">
       <div class="container footer-bottom footer-bottom--compact"><p>&copy; 2026 Dr.Swift Diagnostics · <a href="terms.html">Terms apply</a></p></div>
     </footer>
+    <script src="assets/js/panel-catalog.js"></script>
+    <script src="assets/js/test-data.js"></script>
+    <script src="assets/js/api.js"></script>
     <script src="assets/js/main.js"></script>
   </body>
 </html>

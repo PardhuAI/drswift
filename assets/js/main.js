@@ -2,15 +2,25 @@ const navToggle = document.querySelector(".nav-toggle");
 const navMenu = document.querySelector(".nav-menu");
 
 if (navToggle && navMenu) {
-  navToggle.addEventListener("click", () => {
-    const isOpen = navMenu.classList.toggle("is-open");
+  const setNavOpen = (isOpen) => {
+    navMenu.classList.toggle("is-open", isOpen);
     navToggle.setAttribute("aria-expanded", String(isOpen));
+    document.body.classList.toggle("nav-open", isOpen);
+  };
+
+  navToggle.addEventListener("click", () => {
+    setNavOpen(!navMenu.classList.contains("is-open"));
   });
 
   navMenu.addEventListener("click", (event) => {
     if (event.target.closest("a") && navMenu.classList.contains("is-open")) {
-      navMenu.classList.remove("is-open");
-      navToggle.setAttribute("aria-expanded", "false");
+      setNavOpen(false);
+    }
+  });
+
+  window.addEventListener("resize", () => {
+    if (window.matchMedia("(min-width: 880px)").matches) {
+      setNavOpen(false);
     }
   });
 }
@@ -707,6 +717,7 @@ function applyCatalogFilter(filter) {
   }
 
   catalogGrid.classList.toggle("is-single-result", visibleCount === 1);
+  catalogGrid.classList.toggle("is-sparse", visibleCount === 2);
 
   filterButtons.forEach((button) => {
     button.classList.toggle("is-active", button.getAttribute("data-filter") === filter);
@@ -730,7 +741,7 @@ catalogSearch?.addEventListener("input", () => {
 });
 
 // Test storefront, detail page, and cart
-const TESTS = Array.isArray(window.DRSWIFT_TESTS) ? window.DRSWIFT_TESTS : [];
+let TESTS = Array.isArray(window.DRSWIFT_TESTS) ? window.DRSWIFT_TESTS : [];
 const CART_STORAGE_KEY = "drswift.cart.v1";
 
 function escapeHtml(value) {
@@ -743,7 +754,21 @@ function escapeHtml(value) {
 }
 
 function formatPrice(value) {
-  return `$${Number(value || 0).toFixed(0)}`;
+  const amount = Number(value || 0);
+  return `₹${amount.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+}
+
+function hasDiscountPrice(test, livePrice) {
+  const oldPrice = Number(test?.oldPrice);
+  const price = livePrice != null ? Number(livePrice) : Number(test?.price || 0);
+  return Number.isFinite(oldPrice) && oldPrice > price;
+}
+
+function formatOldPriceHtml(test, livePrice, quantity = 1) {
+  if (!hasDiscountPrice(test, livePrice)) {
+    return "";
+  }
+  return `<span class="old-price">${formatPrice(Number(test.oldPrice) * quantity)}</span>`;
 }
 
 function detailUrl(slug) {
@@ -765,6 +790,7 @@ function readCart() {
       .map((item) => ({
         slug: item.slug,
         quantity: Math.max(1, Number(item.quantity) || 1),
+        ...(Array.isArray(item.customPanels) ? { customPanels: item.customPanels } : {})
       }));
   } catch {
     return [];
@@ -788,16 +814,36 @@ function updateCartBadges() {
   });
 }
 
+function getTestLivePrice(test, customPanels) {
+  if (!test) {
+    return 0;
+  }
+  if (test.customizable) {
+    const selected = Array.isArray(customPanels) ? customPanels : readCustomSelectionForTest(test);
+    return calculateBundlePrice(test, selected);
+  }
+  return Number(test.price || 0);
+}
+
 function addToCart(slug) {
-  if (!getTestBySlug(slug)) {
+  const test = getTestBySlug(slug);
+  if (!test) {
     return;
   }
   const cart = readCart();
+  const customPanels = test.customizable ? readCustomSelectionForTest(test) : undefined;
   const existing = cart.find((item) => item.slug === slug);
   if (existing) {
     existing.quantity += 1;
+    if (customPanels) {
+      existing.customPanels = customPanels;
+    }
   } else {
-    cart.push({ slug, quantity: 1 });
+    cart.push({
+      slug,
+      quantity: 1,
+      ...(customPanels ? { customPanels } : {})
+    });
   }
   writeCart(cart);
 }
@@ -863,6 +909,7 @@ function buildCatalogCard(test) {
   const badge = test.badge
     ? `<span class="test-badge test-badge--popular">${escapeHtml(test.badge)}</span>`
     : "";
+  const displayPrice = getTestLivePrice(test);
   return `
     <article class="test-card test-card--catalog" data-category="${escapeHtml(filters)}" data-search="${escapeHtml(searchText)}">
       <a class="test-image photo-thumb photo-thumb--${escapeHtml(test.imageTone || "blood")}" href="${detailUrl(test.slug)}" aria-label="View ${escapeHtml(test.name)} details">
@@ -878,10 +925,11 @@ function buildCatalogCard(test) {
           <li>${escapeHtml(test.results.replace(" after sample reaches the lab", ""))}</li>
         </ul>
         <div class="price-row">
-          <span class="price">${formatPrice(test.price)}</span>
-          <span class="old-price">${formatPrice(test.oldPrice)}</span>
+          <span class="price">${formatPrice(displayPrice)}</span>
+          ${formatOldPriceHtml(test, displayPrice)}
         </div>
         <div class="test-card-actions">
+          <a class="button secondary full" href="${detailUrl(test.slug)}">${test.customizable ? "Customize" : "View details"}</a>
           <button class="button primary full" type="button" data-add-to-cart="${escapeHtml(test.slug)}">Add to cart</button>
         </div>
       </div>
@@ -913,6 +961,800 @@ function buildFact(icon, label, value) {
   `;
 }
 
+function normalizeMarker(marker) {
+  if (typeof marker === "string") {
+    return { name: marker, description: "" };
+  }
+  return {
+    name: marker?.name || "",
+    description: marker?.description || ""
+  };
+}
+
+function getPanelCatalog() {
+  return window.DRSWIFT_PANELS || {};
+}
+
+function getPanelById(panelId) {
+  return getPanelCatalog()[panelId] || null;
+}
+
+function getCustomPanelIds(test) {
+  if (!test?.customizable) {
+    return [];
+  }
+  return [
+    ...new Set([
+      ...(Array.isArray(test.basePanelIds) ? test.basePanelIds : []),
+      ...(Array.isArray(test.optionalPanelIds) ? test.optionalPanelIds : [])
+    ])
+  ];
+}
+
+function getDefaultCustomSelection(test) {
+  if (Array.isArray(test?.basePanelIds) && test.basePanelIds.length) {
+    return [...test.basePanelIds];
+  }
+  return getCustomPanelIds(test);
+}
+
+function resolveTestPanelIds(test, selectedPanelIds) {
+  if (!test) {
+    return [];
+  }
+  if (test.customizable) {
+    const customPanelIds = getCustomPanelIds(test);
+    const fallback = getDefaultCustomSelection(test);
+    return (Array.isArray(selectedPanelIds) ? selectedPanelIds : fallback).filter((id) =>
+      customPanelIds.includes(id)
+    );
+  }
+  if (Array.isArray(test.panelIds) && test.panelIds.length) {
+    return test.panelIds;
+  }
+  return [];
+}
+
+function resolveTestWhatsTested(test, selectedPanelIds) {
+  const panelIds = resolveTestPanelIds(test, selectedPanelIds);
+  if (panelIds.length && typeof window.buildPanelsWhatsTested === "function") {
+    return window.buildPanelsWhatsTested(panelIds);
+  }
+  return normalizeWhatsTested(test);
+}
+
+function calculateBundlePrice(test, selectedPanelIds) {
+  if (!test?.customizable) {
+    return Number(test?.price || 0);
+  }
+
+  const catalog = getPanelCatalog();
+  const customPanelIds = getCustomPanelIds(test);
+  const fallback = getDefaultCustomSelection(test);
+  const selectedIds = (Array.isArray(selectedPanelIds) ? selectedPanelIds : fallback).filter((id) =>
+    customPanelIds.includes(id)
+  );
+  return selectedIds.reduce((sum, id) => sum + Number(catalog[id]?.price || 0), 0);
+}
+
+function readCustomSelection(slug) {
+  try {
+    const parsed = JSON.parse(localStorage.getItem("drswift_custom_panels") || "{}");
+    return Array.isArray(parsed[slug]) ? parsed[slug] : [];
+  } catch {
+    return [];
+  }
+}
+
+function readCustomSelectionForTest(test) {
+  const customPanelIds = getCustomPanelIds(test);
+  const defaults = getDefaultCustomSelection(test);
+  try {
+    const parsed = JSON.parse(localStorage.getItem("drswift_custom_panels") || "{}");
+    if (Object.prototype.hasOwnProperty.call(parsed, test.slug) && Array.isArray(parsed[test.slug])) {
+      return parsed[test.slug].filter((id) => customPanelIds.includes(id));
+    }
+  } catch {
+    return defaults;
+  }
+  return defaults;
+}
+
+function writeCustomSelection(slug, panelIds) {
+  try {
+    const parsed = JSON.parse(localStorage.getItem("drswift_custom_panels") || "{}");
+    parsed[slug] = panelIds;
+    localStorage.setItem("drswift_custom_panels", JSON.stringify(parsed));
+  } catch {
+    // Ignore storage failures in private browsing.
+  }
+}
+
+function normalizeWhatsTested(test) {
+  if (Array.isArray(test.whatsTested) && test.whatsTested.length) {
+    return test.whatsTested.map((group) => ({
+      title: group.title || "Included markers",
+      description: group.description || "",
+      markers: Array.isArray(group.markers) ? group.markers.map(normalizeMarker) : []
+    }));
+  }
+
+  if (Array.isArray(test.markers) && test.markers.length) {
+    return [
+      {
+        title: "Included markers",
+        description: "",
+        markers: test.markers.map(normalizeMarker)
+      }
+    ];
+  }
+
+  return [];
+}
+
+function countWhatsTestedMarkers(groups) {
+  return groups.reduce((total, group) => total + group.markers.length, 0);
+}
+
+function buildPanelPills(panelIds, modifier = "") {
+  const catalog = getPanelCatalog();
+  return (panelIds || [])
+    .map((panelId) => {
+      const panel = catalog[panelId];
+      if (!panel) {
+        return "";
+      }
+      return `
+        <li class="panel-pill ${modifier}">
+          <span>${escapeHtml(panel.title)}</span>
+          <small>${escapeHtml(panel.testCode || "")}</small>
+        </li>
+      `;
+    })
+    .join("");
+}
+
+function panelGroupKey(group, index) {
+  return String(group.id || group.panelId || index);
+}
+
+function formatIncludedSummary(markerCount, panelCount) {
+  const markerLabel = `biomarker${markerCount === 1 ? "" : "s"}`;
+  const panelLabel = panelCount === 1 ? "panel" : "panels";
+  return `Currently included: ${markerCount} ${markerLabel} across ${panelCount} ${panelLabel}`;
+}
+
+function buildPanelDrawerMarkup(groups) {
+  return `
+    <div class="fixed-tested__drawer" data-panel-drawer hidden>
+      <button class="fixed-tested__scrim" type="button" data-panel-drawer-close aria-label="Close test details"></button>
+      <div class="fixed-tested__drawer-panel" role="dialog" aria-modal="true" aria-label="Test details" tabindex="-1">
+        ${groups
+          .map((group, index) => {
+            const key = panelGroupKey(group, index);
+            const markers = Array.isArray(group.markers) ? group.markers : [];
+            return `
+              <article class="fixed-tested__detail" data-panel-drawer-panel="${escapeHtml(key)}" hidden>
+                <button class="fixed-tested__back" type="button" data-panel-drawer-close>Back</button>
+                <header class="fixed-tested__detail-header">
+                  <h3>${escapeHtml(group.title)}</h3>
+                </header>
+                <div class="fixed-tested__detail-body">
+                  <p class="fixed-tested__section-title">About This Test</p>
+                  ${
+                    group.description
+                      ? `<p class="fixed-tested__copy fixed-tested__copy--lead">${escapeHtml(group.description)}</p>`
+                      : `<p class="fixed-tested__copy fixed-tested__copy--lead">Review the markers included in this panel.</p>`
+                  }
+                  <p class="fixed-tested__section-label">Markers measured · ${markers.length}</p>
+                  <ul class="fixed-tested__marker-grid">
+                    ${markers
+                      .map((marker) => {
+                        const item = normalizeMarker(marker);
+                        return `
+                          <li>
+                            <strong>${escapeHtml(item.name)}</strong>
+                            ${item.description ? `<span>${escapeHtml(item.description)}</span>` : ""}
+                          </li>
+                        `;
+                      })
+                      .join("")}
+                  </ul>
+                </div>
+              </article>
+            `;
+          })
+          .join("")}
+      </div>
+    </div>
+  `;
+}
+
+function buildWhatsTested(groups) {
+  if (!groups.length) {
+    return `
+      <div class="whats-tested">
+        <p class="whats-tested__empty">Marker details for this panel will be published soon.</p>
+      </div>
+    `;
+  }
+
+  const markerCount = countWhatsTestedMarkers(groups);
+
+  // Leaf tests: one parameter group — show a clean list (no drawer hop).
+  if (groups.length === 1) {
+    const markers = Array.isArray(groups[0].markers) ? groups[0].markers : [];
+    return `
+      <div class="whats-tested whats-tested--params">
+        <p class="fixed-tested__meta">${markerCount} parameter${markerCount === 1 ? "" : "s"}</p>
+        <ul class="whats-tested__param-list">
+          ${markers
+            .map((marker) => {
+              const name = marker?.name || String(marker || "");
+              const desc = marker?.description || "";
+              return `<li>
+                <strong>${escapeHtml(name)}</strong>
+                ${desc ? `<span>${escapeHtml(desc)}</span>` : ""}
+              </li>`;
+            })
+            .join("")}
+        </ul>
+      </div>
+    `;
+  }
+
+  const groupLabel = "panels";
+
+  return `
+    <div class="whats-tested whats-tested--fixed" data-panel-drawer-root data-fixed-tested>
+      <p class="fixed-tested__meta" data-marker-count>${markerCount} biomarker${markerCount === 1 ? "" : "s"} across ${groups.length} ${groupLabel}</p>
+      <div class="fixed-tested__grid" aria-label="Included tests">
+        ${groups
+          .map((group, index) => {
+            const key = panelGroupKey(group, index);
+            const markerLabel = `${group.markers.length} marker${group.markers.length === 1 ? "" : "s"}`;
+            return `
+              <button class="fixed-tested__card" type="button" data-panel-drawer-open="${escapeHtml(key)}" aria-haspopup="dialog">
+                <span class="fixed-tested__card-copy">
+                  <span class="fixed-tested__card-title">${escapeHtml(group.title)}</span>
+                  <span class="fixed-tested__card-meta">${escapeHtml(markerLabel)}</span>
+                </span>
+                <span class="fixed-tested__arrow" aria-hidden="true"></span>
+              </button>
+            `;
+          })
+          .join("")}
+      </div>
+      ${buildPanelDrawerMarkup(groups)}
+    </div>
+  `;
+}
+
+function buildCustomizeSection(test, selectedPanelIds) {
+  const panelIds = getCustomPanelIds(test);
+  if (!test.customizable || !panelIds.length) {
+    return "";
+  }
+
+  const catalog = getPanelCatalog();
+  const selected = new Set(selectedPanelIds);
+  const livePrice = calculateBundlePrice(test, selectedPanelIds);
+  const selectedGroups =
+    typeof window.buildPanelsWhatsTested === "function"
+      ? window.buildPanelsWhatsTested(selectedPanelIds)
+      : [];
+  const includedSummary = formatIncludedSummary(
+    countWhatsTestedMarkers(selectedGroups),
+    selectedGroups.length
+  );
+  const drawerGroups =
+    typeof window.buildPanelsWhatsTested === "function"
+      ? window.buildPanelsWhatsTested(panelIds)
+      : panelIds.map((id) => catalog[id]).filter(Boolean);
+
+  return `
+    <div class="customize-shell customize-shell--cards" data-customize-section data-panel-drawer-root id="customize-panels">
+      <div class="customize-shell__header customize-shell__header--cards">
+        <div class="customize-shell__copy">
+          <p class="customize-lead">Select the tests you want included. Use Read more to review biomarkers before you add a panel to cart.</p>
+          <div class="customize-shell__meta">
+            <p class="customize-count" data-selected-count>${selected.size} of ${panelIds.length} tests selected</p>
+            <p class="customize-included" data-included-summary>${escapeHtml(includedSummary)}</p>
+          </div>
+        </div>
+        <div class="customize-total" aria-live="polite">
+          <span class="customize-total__label">Total</span>
+          <strong class="customize-total__value" data-custom-total>${formatPrice(livePrice)}</strong>
+        </div>
+      </div>
+      <div class="customize-card-grid" role="list">
+        ${panelIds
+          .map((panelId) => {
+            const panel = catalog[panelId];
+            if (!panel) {
+              return "";
+            }
+            const checked = selected.has(panelId) ? "checked" : "";
+            const markerCount = Array.isArray(panel.markers) ? panel.markers.length : 0;
+            return `
+              <article class="custom-test-card" role="listitem" data-custom-card>
+                <div class="custom-test-card__frame">
+                  <input
+                    class="custom-test-card__input"
+                    id="custom-panel-${escapeHtml(panelId)}"
+                    type="checkbox"
+                    name="custom-panel"
+                    value="${escapeHtml(panelId)}"
+                    ${checked}
+                    data-custom-panel
+                  >
+                  <label class="custom-test-card__body" for="custom-panel-${escapeHtml(panelId)}">
+                    <strong class="custom-test-card__title">${escapeHtml(panel.title)}</strong>
+                    <span class="custom-test-card__meta">${markerCount} marker${markerCount === 1 ? "" : "s"}</span>
+                    <span class="custom-test-card__copy">${escapeHtml(panel.description)}</span>
+                  </label>
+                  <div class="custom-test-card__footer">
+                    <button class="custom-test-card__read" type="button" data-panel-drawer-open="${escapeHtml(panelId)}">Read more</button>
+                    <span class="custom-test-card__price">${formatPrice(panel.price)}</span>
+                    <label class="custom-test-card__check" for="custom-panel-${escapeHtml(panelId)}" aria-label="Toggle ${escapeHtml(panel.title)}"></label>
+                  </div>
+                </div>
+              </article>
+            `;
+          })
+          .join("")}
+      </div>
+      ${buildPanelDrawerMarkup(drawerGroups)}
+    </div>
+  `;
+}
+
+function buildPreparationCard(test) {
+  return `
+    <div class="custom-preparation-card">
+      <div>
+        <p class="overline">Preparation</p>
+        <h3>Before your sample collection</h3>
+      </div>
+      <p>${escapeHtml(test.preparation)}</p>
+      <p class="detail-note">If you have urgent symptoms, active medical concerns, or abnormal prior results, speak with a qualified clinician before booking self-directed testing.</p>
+    </div>
+  `;
+}
+
+function buildReasonsSection(test) {
+  const reasons = Array.isArray(test?.reasons) ? test.reasons : [];
+  if (!reasons.length) {
+    return "";
+  }
+  return `
+    <section class="detail-section section-pad section-bg-soft">
+      <div class="container">
+        <div class="section-heading text-center">
+          <p class="overline">Why this test</p>
+          <h2>Common reasons people book this</h2>
+        </div>
+        <div class="steps-grid">
+          ${reasons
+            .map((reason) => {
+              const title = Array.isArray(reason) ? reason[0] : reason?.title;
+              const copy = Array.isArray(reason) ? reason[1] : reason?.copy;
+              return `
+                <article class="step-card">
+                  <h3>${escapeHtml(title || "")}</h3>
+                  <p>${escapeHtml(copy || "")}</p>
+                </article>
+              `;
+            })
+            .join("")}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function compareStatusCell(included, optional) {
+  if (optional) {
+    return `<span class="labcorp-compare__status labcorp-compare__status--opt">Optional</span>`;
+  }
+  if (included) {
+    return `<span class="labcorp-compare__status labcorp-compare__status--yes" aria-label="Included"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7.7 14.3 3.5 10.1l1.4-1.4 2.8 2.8 7-7 1.4 1.4-8.4 8.4z"/></svg></span>`;
+  }
+  return `<span class="labcorp-compare__status labcorp-compare__status--no" aria-label="Not included">—</span>`;
+}
+
+function getComparePeerColumns(test, limit = 3) {
+  if (!test) {
+    return [];
+  }
+  const columns = [test];
+  const seen = new Set([test.slug]);
+
+  const push = (slug) => {
+    if (!slug || seen.has(slug) || columns.length >= limit) {
+      return;
+    }
+    const peer = getTestBySlug(slug);
+    if (!peer) {
+      return;
+    }
+    seen.add(slug);
+    columns.push(peer);
+  };
+
+  push(test.compareWith);
+  (test.related || []).forEach(push);
+
+  if (columns.length < 2) {
+    const filters = new Set(
+      (test.filters || []).filter((f) => f && f !== "all" && f !== "men" && f !== "women")
+    );
+    TESTS.forEach((candidate) => {
+      if (columns.length >= limit || seen.has(candidate.slug)) {
+        return;
+      }
+      const sameCategory =
+        String(candidate.category || "").toLowerCase() === String(test.category || "").toLowerCase();
+      const overlap = (candidate.filters || []).some((f) => filters.has(f));
+      if (sameCategory || overlap) {
+        push(candidate.slug);
+      }
+    });
+  }
+
+  return columns.length >= 2 ? columns : [];
+}
+
+function getCompareUnitsForTest(test) {
+  const units = [];
+  const catalog = getPanelCatalog();
+  const isProfile = String(test.testType || "").toLowerCase() === "profile";
+  const panelIds = test.customizable
+    ? getCustomPanelIds(test)
+    : resolveTestPanelIds(test, test.customizable ? readCustomSelectionForTest(test) : []);
+
+  if (panelIds.length > 1 || (isProfile && panelIds.length)) {
+    panelIds.forEach((panelId) => {
+      const panel = catalog[panelId];
+      const groups = normalizeWhatsTested(test);
+      const group = groups.find(
+        (item, index) =>
+          String(item.id || item.panelId || item.title || index) === String(panelId) ||
+          String(item.title || "").toLowerCase() === String(panel?.title || "").toLowerCase()
+      );
+      units.push({
+        key: `panel:${panelId}`,
+        title: panel?.title || group?.title || panelId,
+        description: panel?.description || group?.description || "",
+        markers: panel?.markers || group?.markers || [],
+        optional: false
+      });
+    });
+    return units;
+  }
+
+  const groups = normalizeWhatsTested(test);
+  // Leaf / single-product compare: one clean row for the test, Parameters inside accordion.
+  const markers = groups[0]?.markers?.length
+    ? groups[0].markers
+    : (test.markers || []).map((marker) =>
+        typeof marker === "string" ? { name: marker, description: "" } : marker
+      );
+
+  units.push({
+    key: `test:${test.slug}`,
+    title: test.shortName || test.name,
+    description: test.summary || test.headline || test.description || "",
+    markers,
+    optional: false
+  });
+  return units;
+}
+
+function buildCompareSection(test) {
+  const columns = getComparePeerColumns(test, 3);
+  if (columns.length < 2) {
+    return "";
+  }
+
+  const columnUnits = columns.map((column) => {
+    const units = getCompareUnitsForTest(column);
+    const includedKeys = new Set();
+    const optionalKeys = new Set();
+
+    if (column.customizable) {
+      const allCustomIds = new Set(getCustomPanelIds(column));
+      const baseIds = new Set(column.basePanelIds || []);
+      const optionalIds = new Set(column.optionalPanelIds || []);
+      units.forEach((unit) => {
+        if (!unit.key.startsWith("panel:")) {
+          includedKeys.add(unit.key);
+          return;
+        }
+        const panelId = unit.key.slice("panel:".length);
+        if (baseIds.has(panelId)) {
+          includedKeys.add(unit.key);
+          return;
+        }
+        if (optionalIds.has(panelId) || allCustomIds.has(panelId)) {
+          optionalKeys.add(unit.key);
+        }
+      });
+    } else {
+      units.forEach((unit) => includedKeys.add(unit.key));
+    }
+
+    return { test: column, units, includedKeys, optionalKeys };
+  });
+
+  const rowMap = new Map();
+  columnUnits.forEach(({ units }) => {
+    units.forEach((unit) => {
+      if (!rowMap.has(unit.key)) {
+        rowMap.set(unit.key, {
+          key: unit.key,
+          title: unit.title,
+          description: unit.description,
+          markers: unit.markers
+        });
+      } else if ((!rowMap.get(unit.key).description && unit.description) || (!rowMap.get(unit.key).markers?.length && unit.markers?.length)) {
+        const existing = rowMap.get(unit.key);
+        rowMap.set(unit.key, {
+          ...existing,
+          description: existing.description || unit.description,
+          markers: existing.markers?.length ? existing.markers : unit.markers
+        });
+      }
+    });
+  });
+
+  const rows = [...rowMap.values()];
+  if (!rows.length) {
+    return "";
+  }
+
+  const categoryLabel = String(test.category || "health").replace(/\s+test$/i, "") || "health";
+  const colTemplate = `minmax(140px, 1.5fr) ${columns.map(() => "minmax(88px, 1fr)").join(" ")}`;
+
+  const rowHtml = rows
+    .map((row, index) => {
+      const markers = Array.isArray(row.markers) ? row.markers : [];
+      const markerCount = markers.length;
+      const markerList = markerCount
+        ? `<div class="labcorp-compare__params">
+            <p class="labcorp-compare__params-label">${markerCount} parameter${markerCount === 1 ? "" : "s"}</p>
+            <ul class="labcorp-compare__markers">${markers
+              .map((marker) => {
+                const name = typeof marker === "string" ? marker : marker?.name || "";
+                const desc = typeof marker === "string" ? "" : marker?.description || "";
+                return `<li><strong>${escapeHtml(name)}</strong>${
+                  desc ? `<span>${escapeHtml(desc)}</span>` : ""
+                }</li>`;
+              })
+              .join("")}</ul>
+          </div>`
+        : "";
+
+      return `
+        <details class="labcorp-compare__row"${index === 0 ? " open" : ""} style="--compare-cols: ${colTemplate}">
+          <summary>
+            <span class="labcorp-compare__panel">
+              <span class="labcorp-compare__chevron" aria-hidden="true"></span>
+              <span class="labcorp-compare__panel-copy">
+                <span class="labcorp-compare__panel-title">${escapeHtml(row.title)}</span>
+                ${
+                  markerCount
+                    ? `<span class="labcorp-compare__panel-meta">${markerCount} parameter${
+                        markerCount === 1 ? "" : "s"
+                      }</span>`
+                    : ""
+                }
+              </span>
+            </span>
+            ${columnUnits
+              .map(({ includedKeys, optionalKeys }) => {
+                const included = includedKeys.has(row.key);
+                const optional = optionalKeys.has(row.key);
+                return `<span class="labcorp-compare__cell">${compareStatusCell(included, optional)}</span>`;
+              })
+              .join("")}
+          </summary>
+          <div class="labcorp-compare__body">
+            <p>${escapeHtml(row.description || "Review what this item covers.")}</p>
+            ${markerList}
+          </div>
+        </details>
+      `;
+    })
+    .join("");
+
+  return `
+    <section class="detail-section section-pad section-bg-white" id="package-compare" data-labcorp-compare>
+      <div class="container">
+        <div class="section-heading">
+          <p class="overline">Compare options</p>
+          <h2>Compare ${escapeHtml(categoryLabel)} tests</h2>
+          <p>See what’s included in this test versus similar or related options.</p>
+        </div>
+
+        <div class="labcorp-compare-wrap">
+          <div class="labcorp-compare">
+            <div class="labcorp-compare__head" role="row" style="--compare-cols: ${colTemplate}">
+              <div class="labcorp-compare__head-label">What’s tested</div>
+              ${columns
+                .map((column, index) => {
+                  const price = getTestLivePrice(column);
+                  return `
+                    <div class="labcorp-compare__head-product">
+                      ${index === 0 ? `<span class="labcorp-compare__you">This test</span>` : ""}
+                      <p class="labcorp-compare__product-name">${escapeHtml(column.shortName || column.name)}</p>
+                      <p class="labcorp-compare__product-price">${formatPrice(price)}</p>
+                      ${
+                        index === 0
+                          ? ""
+                          : `<a class="labcorp-compare__product-link" href="${detailUrl(column.slug)}">View details</a>`
+                      }
+                    </div>
+                  `;
+                })
+                .join("")}
+            </div>
+            <div class="labcorp-compare__list">
+              ${rowHtml}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function bindCustomPanelHandlers(test) {
+  if (!test?.customizable) {
+    return;
+  }
+
+  const section = document.querySelector("[data-customize-section]");
+  if (!section) {
+    return;
+  }
+
+  function syncSelection() {
+    const selected = [...section.querySelectorAll("[data-custom-panel]:checked")].map((node) => node.value);
+    writeCustomSelection(test.slug, selected);
+    refreshCustomTestDetail(test, selected);
+  }
+
+  section.addEventListener("click", (event) => {
+    const readMore = event.target.closest("[data-panel-drawer-open]");
+    if (readMore) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    const price = event.target.closest(".custom-test-card__price");
+    const card = event.target.closest("[data-custom-card]");
+    if (price && card) {
+      const input = card.querySelector("[data-custom-panel]");
+      if (input) {
+        event.preventDefault();
+        input.checked = !input.checked;
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+    }
+  });
+
+  section.addEventListener("change", (event) => {
+    const input = event.target.closest("[data-custom-panel]");
+    if (!input) {
+      return;
+    }
+    syncSelection();
+  });
+}
+
+function bindPanelDrawerHandlers() {
+  const roots = [...document.querySelectorAll("[data-panel-drawer-root]")];
+  if (!roots.length) {
+    return;
+  }
+
+  roots.forEach((root) => {
+    const drawer = root.querySelector("[data-panel-drawer]");
+    const drawerPanel = root.querySelector(".fixed-tested__drawer-panel");
+    const panels = [...root.querySelectorAll("[data-panel-drawer-panel]")];
+    const openers = [...root.querySelectorAll("[data-panel-drawer-open]")];
+    let activeOpener = null;
+
+    function activatePanel(key) {
+      openers.forEach((opener) => {
+        const isActive = opener.getAttribute("data-panel-drawer-open") === String(key);
+        opener.classList.toggle("is-active", isActive);
+      });
+
+      panels.forEach((panel) => {
+        panel.hidden = panel.getAttribute("data-panel-drawer-panel") !== String(key);
+      });
+    }
+
+    function openDrawer(key, opener) {
+      if (!drawer) {
+        return;
+      }
+      activeOpener = opener || null;
+      activatePanel(key);
+      drawer.hidden = false;
+      document.body.classList.add("drawer-open");
+      drawerPanel?.focus({ preventScroll: true });
+    }
+
+    function closeDrawer() {
+      if (!drawer || drawer.hidden) {
+        return;
+      }
+      drawer.hidden = true;
+      document.body.classList.remove("drawer-open");
+      openers.forEach((opener) => opener.classList.remove("is-active"));
+      activeOpener?.focus({ preventScroll: true });
+      activeOpener = null;
+    }
+
+    root.addEventListener("click", (event) => {
+      const opener = event.target.closest("[data-panel-drawer-open]");
+      if (opener && root.contains(opener)) {
+        event.preventDefault();
+        event.stopPropagation();
+        openDrawer(opener.getAttribute("data-panel-drawer-open"), opener);
+        return;
+      }
+
+      const close = event.target.closest("[data-panel-drawer-close]");
+      if (close && root.contains(close)) {
+        closeDrawer();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && drawer && !drawer.hidden) {
+        closeDrawer();
+      }
+    });
+  });
+}
+
+function refreshCustomTestDetail(test, selectedPanelIds) {
+  const livePrice = calculateBundlePrice(test, selectedPanelIds);
+  const savings = Math.max(0, Number(test.oldPrice || 0) - livePrice);
+  const groups = resolveTestWhatsTested(test, selectedPanelIds);
+  const markerCount = countWhatsTestedMarkers(groups);
+  const selectedCount = Array.isArray(selectedPanelIds) ? selectedPanelIds.length : getCustomPanelIds(test).length;
+  const totalCount = getCustomPanelIds(test).length;
+
+  const priceNode = document.querySelector("[data-live-price]");
+  const savingsNode = document.querySelector("[data-live-savings]");
+  const customTotalNode = document.querySelector("[data-custom-total]");
+  const selectedCountNode = document.querySelector("[data-selected-count]");
+  const includedSummaryNode = document.querySelector("[data-included-summary]");
+
+  if (priceNode) {
+    priceNode.textContent = formatPrice(livePrice);
+  }
+  if (customTotalNode) {
+    customTotalNode.textContent = formatPrice(livePrice);
+  }
+  if (selectedCountNode) {
+    selectedCountNode.textContent = `${selectedCount} of ${totalCount} tests selected`;
+  }
+  if (includedSummaryNode) {
+    includedSummaryNode.textContent = formatIncludedSummary(markerCount, groups.length);
+  }
+  if (savingsNode) {
+    savingsNode.textContent =
+      savings > 0 ? `Save ${formatPrice(savings)} today.` : "Transparent pricing before booking.";
+  }
+}
+
 function buildRelatedCard(slug) {
   const test = getTestBySlug(slug);
   if (!test) {
@@ -928,8 +1770,8 @@ function buildRelatedCard(slug) {
         <h3><a href="${detailUrl(test.slug)}">${escapeHtml(test.name)}</a></h3>
         <p>${escapeHtml(test.summary)}</p>
         <div class="price-row">
-          <span class="price">${formatPrice(test.price)}</span>
-          <span class="old-price">${formatPrice(test.oldPrice)}</span>
+          <span class="price">${formatPrice(getTestLivePrice(test))}</span>
+          ${formatOldPriceHtml(test, getTestLivePrice(test))}
         </div>
       </div>
     </article>
@@ -964,10 +1806,16 @@ function renderTestDetailPage() {
   }
 
   document.title = `${test.name} | Dr.Swift Diagnostics`;
-  const savings = Math.max(0, Number(test.oldPrice || 0) - Number(test.price || 0));
+  const selectedPanelIds = test.customizable ? readCustomSelectionForTest(test) : [];
+  const livePrice = test.customizable ? calculateBundlePrice(test, selectedPanelIds) : Number(test.price || 0);
+  const savings = Math.max(0, Number(test.oldPrice || 0) - livePrice);
+  const whatsTestedGroups = resolveTestWhatsTested(test, selectedPanelIds);
+  const customizeCta = test.customizable
+    ? `<a class="button secondary full" href="#customize-panels">Customize your test</a>`
+    : "";
 
   main.innerHTML = `
-    <section class="product-hero section-pad">
+    <section class="product-hero section-pad" data-test-slug="${escapeHtml(test.slug)}">
       <div class="container product-hero__grid">
         <div class="product-intro">
           <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -983,10 +1831,11 @@ function renderTestDetailPage() {
         </div>
         <aside class="product-buy-card" aria-label="Book ${escapeHtml(test.name)}">
           <div class="product-price">
-            <span>${formatPrice(test.price)}</span>
-            <del>${formatPrice(test.oldPrice)}</del>
+            <span data-live-price>${formatPrice(livePrice)}</span>
+            ${hasDiscountPrice(test, livePrice) ? `<del>${formatPrice(test.oldPrice)}</del>` : ""}
           </div>
-          <p>${savings > 0 ? `Save ${formatPrice(savings)} today.` : "Transparent pricing before booking."}</p>
+          <p data-live-savings>${savings > 0 ? `Save ${formatPrice(savings)} today.` : "Transparent pricing before booking."}</p>
+          ${customizeCta}
           <button class="button primary full" type="button" data-add-to-cart="${escapeHtml(test.slug)}">Add to cart</button>
           <a class="button secondary full" href="book.html?test=${encodeURIComponent(test.name)}">Book now</a>
           <a class="cart-inline-link" href="cart.html">View cart</a>
@@ -994,6 +1843,7 @@ function renderTestDetailPage() {
         <div class="product-media photo-thumb photo-thumb--${escapeHtml(test.imageTone || "blood")}">
           <img src="${escapeHtml(test.image)}" alt="" decoding="async">
           <span class="test-badge test-badge--category">${escapeHtml(test.category)}</span>
+          ${test.customizable ? '<span class="test-badge test-badge--popular">Customizable</span>' : ""}
         </div>
         <p class="product-description">${escapeHtml(test.description)}</p>
       </div>
@@ -1012,46 +1862,22 @@ function renderTestDetailPage() {
       </div>
     </section>
 
-    <section class="detail-section section-pad section-bg-white">
-      <div class="container detail-layout">
+    <section class="detail-section ${test.customizable ? "detail-section--editable" : "detail-section--fixed"} section-pad section-bg-white" id="whats-tested">
+      <div class="container detail-layout ${test.customizable ? "detail-layout--editable" : "detail-layout--fixed"}">
         <div class="detail-copy">
-          <p class="overline">Test details</p>
+          <p class="overline">${test.customizable ? "Build your test" : "About this test"}</p>
           <h2>What's tested</h2>
-          <p>${escapeHtml(test.description)}</p>
-          <ul class="marker-list">
-            ${test.markers.map((marker) => `<li>${escapeHtml(marker)}</li>`).join("")}
-          </ul>
+          <p class="whats-tested__intro">${escapeHtml(test.description)}</p>
+          ${test.customizable ? buildCustomizeSection(test, selectedPanelIds) : ""}
+          ${test.customizable ? "" : buildWhatsTested(whatsTestedGroups)}
+          ${buildPreparationCard(test)}
         </div>
-        <aside class="preparation-panel">
-          <h2>Preparation</h2>
-          <p>${escapeHtml(test.preparation)}</p>
-          <p class="detail-note">If you have urgent symptoms, active medical concerns, or abnormal prior results, speak with a qualified clinician before booking self-directed testing.</p>
-        </aside>
       </div>
     </section>
 
-    <section class="detail-section section-pad section-bg-soft">
-      <div class="container">
-        <div class="section-heading split">
-          <div>
-            <p class="overline">Why consider this test</p>
-            <h2>Helpful for these situations</h2>
-          </div>
-        </div>
-        <div class="reason-grid">
-          ${test.reasons
-            .map(
-              ([title, copy]) => `
-                <article class="reason-card">
-                  <h3>${escapeHtml(title)}</h3>
-                  <p>${escapeHtml(copy)}</p>
-                </article>
-              `
-            )
-            .join("")}
-        </div>
-      </div>
-    </section>
+    ${buildReasonsSection(test)}
+
+    ${buildCompareSection(test)}
 
     <section class="detail-section section-pad section-bg-white">
       <div class="container">
@@ -1089,7 +1915,7 @@ function renderTestDetailPage() {
           <a class="button secondary" href="tests.html">Shop tests</a>
         </div>
         <div class="related-grid">
-          ${test.related.map(buildRelatedCard).join("")}
+          ${(test.related || []).map(buildRelatedCard).join("")}
         </div>
       </div>
     </section>
@@ -1099,20 +1925,25 @@ function renderTestDetailPage() {
         <p class="overline">FAQ</p>
         <h2>Common questions</h2>
         <div class="detail-faq-list">
-          ${test.faqs
-            .map(
-              ([question, answer]) => `
+          ${(test.faqs || [])
+            .map((faq) => {
+              const question = Array.isArray(faq) ? faq[0] : faq?.question;
+              const answer = Array.isArray(faq) ? faq[1] : faq?.answer;
+              return `
                 <details>
-                  <summary>${escapeHtml(question)}</summary>
-                  <p>${escapeHtml(answer)}</p>
+                  <summary>${escapeHtml(question || "")}</summary>
+                  <p>${escapeHtml(answer || "")}</p>
                 </details>
-              `
-            )
+              `;
+            })
             .join("")}
         </div>
       </div>
     </section>
   `;
+
+  bindCustomPanelHandlers(test);
+  bindPanelDrawerHandlers();
 }
 
 function cartLineItems() {
@@ -1124,8 +1955,12 @@ function cartLineItems() {
 function cartTotals(items) {
   return items.reduce(
     (totals, item) => {
-      totals.subtotal += item.test.price * item.quantity;
-      totals.original += item.test.oldPrice * item.quantity;
+      const unitPrice = getTestLivePrice(item.test, item.customPanels);
+      const unitOriginal = hasDiscountPrice(item.test, unitPrice)
+        ? Number(item.test.oldPrice)
+        : unitPrice;
+      totals.subtotal += unitPrice * item.quantity;
+      totals.original += unitOriginal * item.quantity;
       return totals;
     },
     { subtotal: 0, original: 0 }
@@ -1161,8 +1996,10 @@ function renderCartPage() {
   container.innerHTML = `
     <div class="cart-items" aria-label="Selected tests">
       ${items
-        .map(
-          ({ test, quantity }) => `
+        .map((item) => {
+          const { test, quantity } = item;
+          const unitPrice = getTestLivePrice(test, item.customPanels);
+          return `
             <article class="cart-item">
               <a class="cart-item__image photo-thumb photo-thumb--${escapeHtml(test.imageTone || "blood")}" href="${detailUrl(test.slug)}">
                 <img src="${escapeHtml(test.image)}" alt="" loading="lazy" decoding="async">
@@ -1178,8 +2015,8 @@ function renderCartPage() {
               </div>
               <div class="cart-item__controls">
                 <div class="price-row">
-                  <span class="price">${formatPrice(test.price * quantity)}</span>
-                  <span class="old-price">${formatPrice(test.oldPrice * quantity)}</span>
+                  <span class="price">${formatPrice(unitPrice * quantity)}</span>
+                  ${formatOldPriceHtml(test, unitPrice, quantity)}
                 </div>
                 <div class="quantity-control" aria-label="Quantity for ${escapeHtml(test.name)}">
                   <button type="button" data-cart-action="decrease" data-cart-slug="${escapeHtml(test.slug)}" aria-label="Decrease ${escapeHtml(test.name)} quantity">-</button>
@@ -1189,8 +2026,8 @@ function renderCartPage() {
                 <button class="cart-remove" type="button" data-cart-action="remove" data-cart-slug="${escapeHtml(test.slug)}">Remove</button>
               </div>
             </article>
-          `
-        )
+          `;
+        })
         .join("")}
     </div>
     <aside class="cart-summary" aria-label="Cart summary">
@@ -1235,7 +2072,79 @@ document.addEventListener("click", (event) => {
   }
 });
 
-renderTestsCatalog();
-renderTestDetailPage();
-renderCartPage();
-updateCartBadges();
+function renderHomeFeatured() {
+  const rail = document.querySelector("[data-home-featured]");
+  if (!rail) {
+    return;
+  }
+  const preferred = String(rail.getAttribute("data-home-featured-slugs") || "")
+    .split(",")
+    .map((slug) => slug.trim())
+    .filter(Boolean);
+  const bySlug = new Map(TESTS.map((test) => [test.slug, test]));
+  let featured = preferred.map((slug) => bySlug.get(slug)).filter(Boolean);
+  if (!featured.length) {
+    featured = TESTS.filter((test) => test.badge).slice(0, 5);
+  }
+  if (!featured.length) {
+    featured = TESTS.slice(0, 5);
+  }
+  rail.innerHTML = featured.map(buildCatalogCard).join("");
+}
+
+async function bootStorefront() {
+  if (typeof window.DRSWIFT_BOOTSTRAP_CATALOG === "function") {
+    await window.DRSWIFT_BOOTSTRAP_CATALOG();
+  }
+  TESTS = Array.isArray(window.DRSWIFT_TESTS) ? window.DRSWIFT_TESTS : [];
+  renderHomeFeatured();
+  renderTestsCatalog();
+  renderTestDetailPage();
+  renderCartPage();
+  renderPromotionsPage();
+  updateCartBadges();
+}
+
+function renderPromotionsPage() {
+  const grid = document.querySelector("[data-promo-grid]");
+  if (!grid) {
+    return;
+  }
+  const promotions = Array.isArray(window.DRSWIFT_PROMOTIONS) ? window.DRSWIFT_PROMOTIONS : [];
+  if (!promotions.length) {
+    grid.innerHTML = `
+      <article class="promo-card">
+        <span class="promo-card__badge">Offers</span>
+        <h3>No active promotions right now</h3>
+        <p>Mark tests as promotional in the CMS to show seasonal packages here. Browse the full catalog meanwhile.</p>
+        <a class="button primary full" href="tests.html">Shop tests</a>
+      </article>
+    `;
+    return;
+  }
+  grid.innerHTML = promotions
+    .map((promo) => {
+      const href = promo.slug ? detailUrl(promo.slug) : "tests.html";
+      const priceRow =
+        promo.price > 0
+          ? `<div class="price-row"><span class="price">${formatPrice(promo.price)}</span>${
+              promo.oldPrice && promo.oldPrice > promo.price
+                ? `<span class="old-price">${formatPrice(promo.oldPrice)}</span>`
+                : ""
+            }</div>`
+          : "";
+      return `
+        <article class="promo-card">
+          <span class="promo-card__badge">${escapeHtml(promo.badge || "Offer")}</span>
+          <h3>${escapeHtml(promo.title)}</h3>
+          <p>${escapeHtml(promo.subtitle || "")}</p>
+          ${promo.dateRange ? `<p class="detail-note">${escapeHtml(promo.dateRange)}</p>` : ""}
+          ${priceRow}
+          <a class="button primary full" href="${href}">View offer</a>
+        </article>
+      `;
+    })
+    .join("");
+}
+
+bootStorefront();

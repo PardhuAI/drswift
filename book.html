@@ -99,44 +99,83 @@
       </div>
     </main>
     <footer class="site-footer"><div class="container footer-bottom footer-bottom--plain"><p>&copy; 2026 Dr.Swift Diagnostics</p></div></footer>
+    <script src="assets/js/panel-catalog.js"></script>
     <script src="assets/js/test-data.js"></script>
+    <script src="assets/js/api.js"></script>
     <script src="assets/js/main.js"></script>
     <script src="assets/js/auth.js"></script>
     <script>
-      const params = new URLSearchParams(location.search);
-      const test = params.get("test");
-      const select = document.getElementById("book-test");
-      if (test && select) {
-        [...select.options].forEach((opt) => {
-          if (opt.text.toLowerCase().includes(test.toLowerCase())) opt.selected = true;
-        });
-      }
-      const cartSummary = document.querySelector("[data-booking-cart]");
-      if (params.get("cart") === "checkout" && cartSummary && window.DRSWIFT_TESTS) {
-        try {
-          const cart = JSON.parse(localStorage.getItem("drswift.cart.v1") || "[]");
-          const items = cart
-            .map((item) => ({
-              quantity: Math.max(1, Number(item.quantity) || 1),
-              test: window.DRSWIFT_TESTS.find((entry) => entry.slug === item.slug),
-            }))
-            .filter((item) => item.test);
-          if (items.length) {
-            const total = items.reduce((sum, item) => sum + item.test.price * item.quantity, 0);
-            cartSummary.hidden = false;
-            cartSummary.innerHTML = `<strong>Order summary</strong><ul>${items
-              .map((item) => `<li>${item.test.name} x ${item.quantity}</li>`)
-              .join("")}</ul><p class="booking-cart-summary__total">Estimated total: $${total}</p>`;
-            if (items.length === 1 && select) {
-              [...select.options].forEach((opt) => {
-                if (opt.text === items[0].test.name) opt.selected = true;
-              });
+      async function initBookingPage() {
+        if (typeof window.DRSWIFT_BOOTSTRAP_CATALOG === "function") {
+          await window.DRSWIFT_BOOTSTRAP_CATALOG();
+        }
+        const params = new URLSearchParams(location.search);
+        const test = params.get("test");
+        const select = document.getElementById("book-test");
+        const tests = Array.isArray(window.DRSWIFT_TESTS) ? window.DRSWIFT_TESTS : [];
+
+        if (select && tests.length) {
+          const existing = new Set([...select.options].map((opt) => opt.text.trim().toLowerCase()));
+          tests.forEach((entry) => {
+            const label = entry.name || "";
+            if (!label || existing.has(label.toLowerCase())) {
+              return;
             }
+            const option = document.createElement("option");
+            option.value = entry.slug || label;
+            option.textContent = label;
+            select.appendChild(option);
+          });
+        }
+
+        if (test && select) {
+          [...select.options].forEach((opt) => {
+            if (opt.text.toLowerCase().includes(test.toLowerCase()) || opt.value === test) {
+              opt.selected = true;
+            }
+          });
+        }
+
+        const cartSummary = document.querySelector("[data-booking-cart]");
+        if (params.get("cart") === "checkout" && cartSummary && tests.length) {
+          try {
+            const cart = JSON.parse(localStorage.getItem("drswift.cart.v1") || "[]");
+            const items = cart
+              .map((item) => ({
+                quantity: Math.max(1, Number(item.quantity) || 1),
+                test: tests.find((entry) => entry.slug === item.slug),
+                customPanels: item.customPanels
+              }))
+              .filter((item) => item.test);
+            if (items.length) {
+              const total = items.reduce((sum, item) => {
+                let unit = Number(item.test.price || 0);
+                if (item.test.customizable && Array.isArray(item.customPanels) && window.DRSWIFT_PANELS) {
+                  unit = item.customPanels.reduce(
+                    (panelSum, panelId) => panelSum + Number(window.DRSWIFT_PANELS[panelId]?.price || 0),
+                    0
+                  );
+                }
+                return sum + unit * item.quantity;
+              }, 0);
+              cartSummary.hidden = false;
+              cartSummary.innerHTML = `<strong>Order summary</strong><ul>${items
+                .map((item) => `<li>${item.test.name} x ${item.quantity}</li>`)
+                .join("")}</ul><p class="booking-cart-summary__total">Estimated total: ₹${total.toLocaleString("en-IN")}</p>`;
+              if (items.length === 1 && select) {
+                [...select.options].forEach((opt) => {
+                  if (opt.text === items[0].test.name || opt.value === items[0].test.slug) {
+                    opt.selected = true;
+                  }
+                });
+              }
+            }
+          } catch {
+            cartSummary.hidden = true;
           }
-        } catch {
-          cartSummary.hidden = true;
         }
       }
+      initBookingPage();
     </script>
   </body>
 </html>

@@ -160,123 +160,13 @@
             </div>
           </div>
 
-          <div class="test-cards horizontal-scroll" id="test-cards" data-scroll-container>
-            <article class="test-card test-card--catalog">
-              <a class="test-image photo-thumb photo-thumb--blood" href="test-details.html?test=cbc">
-                <img src="assets/images/test-cbc.jpg" alt="" loading="lazy" decoding="async">
-                <span class="test-badge test-badge--popular">Popular</span>
-                <span class="test-badge test-badge--category">General</span>
-              </a>
-              <div class="test-body">
-                <h3><a href="test-details.html?test=cbc">Complete Blood Count</a></h3>
-                <p>Checks blood cells, anemia indicators, and infection clues.</p>
-                <ul class="test-meta">
-                  <li>At-home collection</li>
-                  <li>24–48 hr results</li>
-                </ul>
-                <div class="price-row">
-                  <span class="price">$29</span>
-                  <span class="old-price">$45</span>
-                </div>
-                <div class="test-card-actions">
-                  <button class="button primary full" type="button" data-add-to-cart="cbc">Add to cart</button>
-                  <a class="button secondary full" href="test-details.html?test=cbc">View details</a>
-                </div>
-              </div>
-            </article>
-
-            <article class="test-card test-card--catalog">
-              <a class="test-image photo-thumb photo-thumb--heart" href="test-details.html?test=lipid-profile">
-                <img src="assets/images/test-heart.jpg" alt="" loading="lazy" decoding="async">
-                <span class="test-badge test-badge--category">Heart</span>
-              </a>
-              <div class="test-body">
-                <h3><a href="test-details.html?test=lipid-profile">Lipid Profile</a></h3>
-                <p>Measures cholesterol, triglycerides, HDL, and LDL.</p>
-                <ul class="test-meta">
-                  <li>At-home collection</li>
-                  <li>24–48 hr results</li>
-                </ul>
-                <div class="price-row">
-                  <span class="price">$39</span>
-                  <span class="old-price">$58</span>
-                </div>
-                <div class="test-card-actions">
-                  <button class="button primary full" type="button" data-add-to-cart="lipid-profile">Add to cart</button>
-                  <a class="button secondary full" href="test-details.html?test=lipid-profile">View details</a>
-                </div>
-              </div>
-            </article>
-
-            <article class="test-card test-card--catalog">
-              <a class="test-image photo-thumb photo-thumb--thyroid" href="test-details.html?test=thyroid-profile">
-                <img src="assets/images/test-thyroid.jpg" alt="" loading="lazy" decoding="async">
-                <span class="test-badge test-badge--category">Thyroid</span>
-              </a>
-              <div class="test-body">
-                <h3><a href="test-details.html?test=thyroid-profile">Thyroid Profile</a></h3>
-                <p>Includes T3, T4, and TSH for thyroid screening.</p>
-                <ul class="test-meta">
-                  <li>At-home collection</li>
-                  <li>24–48 hr results</li>
-                </ul>
-                <div class="price-row">
-                  <span class="price">$35</span>
-                  <span class="old-price">$52</span>
-                </div>
-                <div class="test-card-actions">
-                  <button class="button primary full" type="button" data-add-to-cart="thyroid-profile">Add to cart</button>
-                  <a class="button secondary full" href="test-details.html?test=thyroid-profile">View details</a>
-                </div>
-              </div>
-            </article>
-
-            <article class="test-card test-card--catalog">
-              <a class="test-image photo-thumb photo-thumb--vitamin" href="test-details.html?test=vitamin-d">
-                <img src="assets/images/test-vitamin-d.jpg" alt="" loading="lazy" decoding="async">
-                <span class="test-badge test-badge--category">Wellness</span>
-              </a>
-              <div class="test-body">
-                <h3><a href="test-details.html?test=vitamin-d">Vitamin D Test</a></h3>
-                <p>Useful for fatigue, bone health, and wellness checks.</p>
-                <ul class="test-meta">
-                  <li>At-home collection</li>
-                  <li>24–48 hr results</li>
-                </ul>
-                <div class="price-row">
-                  <span class="price">$31</span>
-                  <span class="old-price">$49</span>
-                </div>
-                <div class="test-card-actions">
-                  <button class="button primary full" type="button" data-add-to-cart="vitamin-d">Add to cart</button>
-                  <a class="button secondary full" href="test-details.html?test=vitamin-d">View details</a>
-                </div>
-              </div>
-            </article>
-
-            <article class="test-card test-card--catalog">
-              <a class="test-image photo-thumb photo-thumb--body" href="test-details.html?test=full-body-checkup">
-                <img src="assets/images/test-full-body.jpg" alt="" loading="lazy" decoding="async">
-                <span class="test-badge test-badge--category">Full body</span>
-              </a>
-              <div class="test-body">
-                <h3><a href="test-details.html?test=full-body-checkup">Full Body Checkup</a></h3>
-                <p>A broad wellness panel for annual preventive testing.</p>
-                <ul class="test-meta">
-                  <li>At-home collection</li>
-                  <li>48 hr results</li>
-                </ul>
-                <div class="price-row">
-                  <span class="price">$99</span>
-                  <span class="old-price">$149</span>
-                </div>
-                <div class="test-card-actions">
-                  <button class="button primary full" type="button" data-add-to-cart="full-body-checkup">Add to cart</button>
-                  <a class="button secondary full" href="test-details.html?test=full-body-checkup">View details</a>
-                </div>
-              </div>
-            </article>
-          </div>
+          <div
+            class="test-cards horizontal-scroll"
+            id="test-cards"
+            data-scroll-container
+            data-home-featured
+            data-home-featured-slugs="cbc,lipid-profile-serum,thyroid-profile-total,25-hydroxy-vitamin-d-serum,drs-check-72"
+          ></div>
         </div>
       </section>
 
@@ -697,7 +587,9 @@
       </div>
     </footer>
 
+    <script src="assets/js/panel-catalog.js"></script>
     <script src="assets/js/test-data.js"></script>
+    <script src="assets/js/api.js"></script>
     <script src="assets/js/main.js"></script>
   </body>
 </html>
