@@ -8,7 +8,7 @@
       name="description"
       content="Dr.Swift Diagnostics offers clean, simple health testing, report access, and care-friendly lab services."
     >
-    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/styles.css?v=card-image-fade-3">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
   <body>
@@ -66,7 +66,7 @@
               <p class="hero-subcopy">
                 Book at-home lab tests, track clear digital reports, and compare health trends for your family.
               </p>
-              <ul class="hero-points">
+              <ul class="hero-points hero-points--reveal">
                 <li class="item-1">
                   <svg class="hp-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                     <path d="M4 11 12 4l8 7v8.5a1.5 1.5 0 0 1-1.5 1.5H15v-6H9v6H5.5A1.5 1.5 0 0 1 4 19.5V11Z"></path>
@@ -108,10 +108,55 @@
             <article class="hero-image hero-image--photo" aria-label="Couple reviewing their health results at home">
               <img class="hero-photo" src="assets/images/hero-couple.png" alt="A couple looking at their health results together on a desktop computer at home">
               <div class="hero-image-note">
-                <span>At-home collection</span>
-                <span>Reports with trends</span>
+                <span class="hero-image-note__chip">At-home collection</span>
+                <a class="button primary hero-image-note__cta" href="tests.html">Shop tests</a>
+                <a class="hero-image-note__chip hero-image-note__chip--keep" href="#features">Reports with trends</a>
               </div>
             </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="audience-tests section-pad" aria-labelledby="audience-tests-heading">
+        <div class="container">
+          <div class="section-heading centered">
+            <p class="overline">For everyone you care about</p>
+            <h2 id="audience-tests-heading">Quick tests,<br>picked for who you care about</h2>
+          </div>
+
+          <div class="audience-tests-grid">
+            <div class="audience-column audience-column--him">
+              <h3 class="audience-column__title">For Him</h3>
+              <div class="audience-tiles">
+                <a class="audience-tile" href="tests.html">Men's Health</a>
+                <a class="audience-tile" href="tests.html">Athletic Performance</a>
+                <a class="audience-tile" href="tests.html">Heart Health</a>
+                <a class="audience-tile" href="tests.html">Hormones</a>
+              </div>
+              <a class="button audience-more" href="tests.html">See more for Him</a>
+            </div>
+
+            <div class="audience-column audience-column--her">
+              <h3 class="audience-column__title">For Her</h3>
+              <div class="audience-tiles">
+                <a class="audience-tile" href="tests.html">Women's Health</a>
+                <a class="audience-tile" href="tests.html">Maternal Tests</a>
+                <a class="audience-tile" href="tests.html">Hormonal Balance</a>
+                <a class="audience-tile" href="tests.html">Thyroid Profile</a>
+              </div>
+              <a class="button audience-more" href="tests.html">See more for Her</a>
+            </div>
+
+            <div class="audience-column audience-column--loved">
+              <h3 class="audience-column__title">For Loved Ones</h3>
+              <div class="audience-tiles">
+                <a class="audience-tile" href="tests.html">General Health</a>
+                <a class="audience-tile" href="tests.html">Diabetic Risk</a>
+                <a class="audience-tile" href="tests.html">Senior Wellness</a>
+                <a class="audience-tile" href="tests.html">Heart Health</a>
+              </div>
+              <a class="button audience-more" href="tests.html">See more for Loved Ones</a>
+            </div>
           </div>
         </div>
       </section>
@@ -135,6 +180,16 @@
               <a class="quick-card" href="tests.html">Fever &amp; Infection</a>
               <a class="quick-card" href="tests.html">Full Body Checkup</a>
             </div>
+          </div>
+          <div class="quick-select__hint swipe-hint" aria-hidden="true">
+            <span class="sr-only">Swipe sideways to see more tests</span>
+            <img
+              class="swipe-hint__svg"
+              src="assets/images/scroll_left_right_hint_animated.svg"
+              alt=""
+              height="32"
+              decoding="async"
+            >
           </div>
           <div class="section-cta">
             <a class="button primary" href="tests.html">Shop all tests</a>
@@ -170,34 +225,7 @@
         </div>
       </section>
 
-      <section class="how-it-works section-pad section-bg-white" aria-labelledby="how-it-works-heading">
-        <div class="container">
-          <div class="section-heading section-heading--center">
-            <p class="overline">Simple process</p>
-            <h2 id="how-it-works-heading">How home collection works</h2>
-            <p>Book in minutes. We handle collection at your door and deliver clear results to your phone.</p>
-          </div>
-          <div class="how-it-works-grid">
-            <article class="how-step">
-              <div class="how-step__number" aria-hidden="true">1</div>
-              <h3>Book your test</h3>
-              <p>Choose a panel online, in the app, or message us on WhatsApp. Pick a time that fits your day.</p>
-            </article>
-            <article class="how-step">
-              <div class="how-step__number" aria-hidden="true">2</div>
-              <h3>We collect at home</h3>
-              <p>A trained phlebotomist visits your home, verifies details, and collects your sample safely.</p>
-            </article>
-            <article class="how-step">
-              <div class="how-step__number" aria-hidden="true">3</div>
-              <h3>Results with insights</h3>
-              <p>Reports arrive in the app with trends, graphs, and family profiles — not just numbers on a PDF.</p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section class="features section-pad">
+      <section id="features" class="features section-pad">
         <div class="container">
           <div class="section-heading section-heading--center">
             <p class="eyebrow">Clear diagnostics</p>
@@ -247,7 +275,7 @@
                 </p>
               </article>
               <div class="feature-image card-surface photo-card photo-card--report" aria-label="Table comparing current and past lab results">
-                <svg class="report-table-svg" viewBox="0 0 1080 800" role="img" aria-labelledby="reportTitle reportDesc" xmlns="http://www.w3.org/2000/svg">
+                <svg class="report-table-svg" viewBox="0 0 1080 800" role="img" aria-labelledby="reportTitle reportDesc" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                   <title id="reportTitle">Diagnostic Test Results Report</title>
                   <desc id="reportDesc">A lab-style report of current lab results compared with readings from 45 and 90 days ago.</desc>
 
@@ -282,6 +310,20 @@
                   </style>
 
                   <rect class="bg" width="1080" height="800"/>
+
+                  <!-- Brand mark — top right -->
+                  <image
+                    href="assets/images/drswift_leaf_logo_precise_trace.svg"
+                    xlink:href="assets/images/drswift_leaf_logo_precise_trace.svg"
+                    x="957"
+                    y="22"
+                    width="80"
+                    height="86"
+                    preserveAspectRatio="xMidYMid meet"
+                    opacity="0.96"
+                  >
+                    <title>Dr.Swift Diagnostics</title>
+                  </image>
 
                   <text x="90" y="62" class="patient-info"><tspan>Patient Name: XXXXX</tspan><tspan dx="72">Account: XXXXXX</tspan></text>
 
@@ -352,13 +394,12 @@
 
             <div class="feature-pair">
               <figure class="graph-card" aria-label="Health trend graph">
-                <img
+                <object
                   class="graph-card__img"
-                  src="assets/images/hba1c_artistic_vector_clean.svg"
-                  alt="Line graph showing HbA1c improving over time: 6.0 borderline high on 04-09-24, 5.6 good on 28-09-24, 5.2 healthy on 17-11-24, and 5.1 healthy on 05-01-25."
-                  loading="lazy"
-                  decoding="async"
-                >
+                  type="image/svg+xml"
+                  data="assets/images/hba1c_artistic_vector_clean.svg"
+                  aria-label="Line graph showing HbA1c improving over time: 6.0 (borderline high) on 04-09-24, 5.6 (good) on 28-09-24, 5.2 (healthy) on 17-11-24, and 5.1 (healthy) on 05-01-25."
+                ></object>
               </figure>
               <article class="feature-copy">
                 <h3 class="accent-green">Graphs that explain what changed</h3>
@@ -418,28 +459,28 @@
             <h2 id="reasons-heading">Four reasons to test with Dr.Swift</h2>
           </div>
           <div class="reasons-grid">
-            <article class="reason-card">
+            <article class="reason-card" tabindex="0">
               <div class="reason-card__icon" aria-hidden="true">
                 <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-cart"></use></svg>
               </div>
               <h3>Book your way</h3>
               <p>Web, iOS, Android, or WhatsApp — whichever channel fits your routine.</p>
             </article>
-            <article class="reason-card">
+            <article class="reason-card" tabindex="0">
               <div class="reason-card__icon" aria-hidden="true">
                 <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-price"></use></svg>
               </div>
               <h3>Clear, fair pricing</h3>
               <p>Transparent panel pricing with no surprise add-ons at collection time.</p>
             </article>
-            <article class="reason-card">
+            <article class="reason-card" tabindex="0">
               <div class="reason-card__icon" aria-hidden="true">
                 <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-clock"></use></svg>
               </div>
               <h3>Fast turnaround</h3>
               <p>Most results land in your app within 24–48 hours with notifications when ready.</p>
             </article>
-            <article class="reason-card">
+            <article class="reason-card" tabindex="0">
               <div class="reason-card__icon" aria-hidden="true">
                 <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-shield-check"></use></svg>
               </div>
@@ -519,12 +560,12 @@
         </div>
       </section>
 
-      <section class="community-band section-pad section-bg-navy" aria-labelledby="community-heading">
+      <section class="community-band section-pad" aria-labelledby="community-heading">
         <div class="container">
           <h2 id="community-heading">Ready to see more than numbers?</h2>
           <p>Book your first at-home test or download the app to explore health insights built for real families.</p>
           <div class="cta-band__actions">
-            <a class="button outline-light" href="tests.html">Shop tests</a>
+            <a class="button secondary" href="tests.html">Shop tests</a>
             <a class="button primary" href="app.html">Get the app</a>
           </div>
         </div>
@@ -545,7 +586,7 @@
             <span>Dr.Swift Diagnostics</span>
           </a>
           <p class="footer-tagline">At-home lab tests, clear reports, and health insights for your whole family.</p>
-                              <div class="footer-social" aria-label="Contact shortcuts">
+          <div class="footer-social" aria-label="Contact shortcuts">
             <a href="mailto:care@drswift.health" aria-label="Email Dr.Swift" title="Email"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-email"/></svg></a>
             <a href="whatsapp.html" aria-label="Book on WhatsApp" title="WhatsApp"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-whatsapp"/></svg></a>
             <a href="app.html" aria-label="Open customer app page" title="App"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-app"/></svg></a>
@@ -590,6 +631,6 @@
     <script src="assets/js/panel-catalog.js"></script>
     <script src="assets/js/test-data.js"></script>
     <script src="assets/js/api.js"></script>
-    <script src="assets/js/main.js"></script>
+    <script src="assets/js/main.js?v=card-click-detail"></script>
   </body>
 </html>

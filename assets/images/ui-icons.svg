@@ -71,7 +71,9 @@
     <circle cx="17.4" cy="19.1" r="1.2"/>
   </symbol>
   <symbol id="icon-price" viewBox="0 0 24 24">
-    <path d="M12 3v18"/>
-    <path d="M16.5 6.7H9.9a3.2 3.2 0 0 0 0 6.4h4.2a3.2 3.2 0 1 1 0 6.4H7.2"/>
+    <path d="M6 4h12"/>
+    <path d="M6 9h12"/>
+    <path d="M6 14h3.8c4.1 0 4.1-7 0-7"/>
+    <path d="m6 14 9.5 7"/>
   </symbol>
 </svg>

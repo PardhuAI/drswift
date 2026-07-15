@@ -5,7 +5,7 @@
  * Static test-data.js remains offline fallback only when CMS is unreachable.
  */
 (function (global) {
-  const API_BASE = String(global.DRSWIFT_API_BASE || "http://localhost:8080").replace(/\/$/, "");
+  const API_BASE = String(global.DRSWIFT_API_BASE || "http://localhost:8081").replace(/\/$/, "");
   const FETCH_OPTS = { headers: { Accept: "application/json" }, cache: "no-store" };
 
   function asArray(value) {
@@ -106,6 +106,7 @@
       name: apiTest.name || "",
       shortName: apiTest.name || "",
       category: apiTest.category || "General",
+      eyebrow: String(apiTest.eyebrow || "").trim(),
       filters: asArray(apiTest.filters).length ? asArray(apiTest.filters) : ["all"],
       image: apiTest.imageUrl || apiTest.image || "",
       imageTone: toneFromCategory(apiTest.category),
@@ -236,7 +237,7 @@
       "position:sticky;top:0;z-index:9999;background:#7c2d12;color:#fff;padding:8px 16px;font:14px/1.4 system-ui,sans-serif;text-align:center";
     banner.textContent =
       source === "static-fallback"
-        ? "CMS catalog unavailable — showing offline demo catalog. Start CMS on localhost:8080 and refresh."
+        ? "CMS catalog unavailable — showing offline demo catalog. Start CMS on localhost:8081 and refresh."
         : `Catalog source: ${source}`;
     document.body.prepend(banner);
   }

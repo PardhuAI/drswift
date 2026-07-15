@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="800" viewBox="0 0 1080 800">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1080" height="800" viewBox="0 0 1080 800">
   <defs>
     <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
       <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#2ea44f" flood-opacity="0.14"/>
@@ -42,6 +42,20 @@
   <rect width="1080" height="800" fill="#ffffff"/>
 
   <!-- 15% clear whitespace is preserved around the main chart composition -->
+
+  <!-- Brand mark — top right of the zoomed chart view -->
+  <image
+    href="drswift_leaf_logo_precise_trace.svg"
+    xlink:href="drswift_leaf_logo_precise_trace.svg"
+    x="935"
+    y="96"
+    width="94"
+    height="102"
+    preserveAspectRatio="xMidYMid meet"
+    opacity="0.96"
+  >
+    <title>Dr.Swift Diagnostics</title>
+  </image>
 
   <!-- Chart title -->
   <text x="918" y="280" text-anchor="end" font-family="Inter, SF Pro Display, Arial, sans-serif" font-size="46" font-weight="400" fill="#095bd8">HbA1c</text>

@@ -232,6 +232,45 @@ if (panSection && panTarget && !prefersReducedMotion) {
   autoScrollObserver.observe(panSection);
   requestAnimationFrame(autoScrollTick);
 }
+
+// Mobile swipe hint: show for 5s when quick-select enters view, once per page load.
+const swipeHint = document.querySelector(".quick-select__hint.swipe-hint");
+const mobileCarousel = window.matchMedia("(max-width: 879px)");
+const SWIPE_HINT_DURATION_MS = 5000;
+
+function showSwipeHintOnce() {
+  if (
+    !swipeHint ||
+    swipeHint.dataset.shown === "true" ||
+    !mobileCarousel.matches
+  ) {
+    return;
+  }
+
+  swipeHint.dataset.shown = "true";
+  swipeHint.classList.add("is-active");
+  swipeHint.setAttribute("aria-hidden", "false");
+
+  window.setTimeout(() => {
+    swipeHint.classList.remove("is-active");
+    swipeHint.setAttribute("aria-hidden", "true");
+  }, SWIPE_HINT_DURATION_MS);
+}
+
+if (panSection && swipeHint) {
+  const swipeHintObserver = new IntersectionObserver(
+    (entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        showSwipeHintOnce();
+        swipeHintObserver.disconnect();
+      }
+    },
+    { threshold: 0.35 }
+  );
+
+  swipeHintObserver.observe(panSection);
+}
+
 // Audience heading: gentle left-right wobble while the section is in view.
 const audienceSection = document.querySelector(".audience-tests");
 const audienceHeading = document.querySelector(".audience-tests .section-heading");
@@ -428,25 +467,53 @@ function buildMetricCard(metric) {
   `;
 }
 
+function metricLabelKey(metrics) {
+  return metrics
+    .map((metric) => metric.label)
+    .sort()
+    .join("|");
+}
+
 function pickRandomMetrics(count, excludeLabels = []) {
-  const pool = METRIC_POOL.filter((metric) => !excludeLabels.includes(metric.label));
-  const source = pool.length >= count ? pool : METRIC_POOL;
+  const excludeKey = [...excludeLabels].sort().join("|");
+  // Prefer unused cards first, then the full pool. Excluding the default trio
+  // removes both non-healthy cards; without a full-pool fallback the old code
+  // built an undefined card and crashed the rotation timer.
+  const sources = [];
+  const unused = METRIC_POOL.filter((metric) => !excludeLabels.includes(metric.label));
+  if (unused.length >= count) {
+    sources.push(unused);
+  }
+  sources.push(METRIC_POOL);
 
-  for (let attempt = 0; attempt < 24; attempt += 1) {
-    const shuffled = [...source].sort(() => Math.random() - 0.5);
-    const picked = shuffled.slice(0, count);
-    const allHealthy = picked.every((metric) => metric.tone === "good");
+  for (const source of sources) {
+    for (let attempt = 0; attempt < 24; attempt += 1) {
+      const shuffled = [...source].sort(() => Math.random() - 0.5);
+      const picked = shuffled.slice(0, count);
+      const allHealthy = picked.every((metric) => metric.tone === "good");
+      const sameAsCurrent = metricLabelKey(picked) === excludeKey;
 
-    if (!allHealthy) {
+      if (!allHealthy && !sameAsCurrent) {
+        return picked;
+      }
+    }
+
+    const mixed = source.filter((metric) => metric.tone !== "good");
+    if (!mixed.length) {
+      continue;
+    }
+
+    const healthy = source
+      .filter((metric) => metric.tone === "good")
+      .sort(() => Math.random() - 0.5);
+    const anchor = mixed[Math.floor(Math.random() * mixed.length)];
+    const picked = [anchor, ...healthy].slice(0, count);
+    if (metricLabelKey(picked) !== excludeKey) {
       return picked;
     }
   }
 
-  const mixed = source.filter((metric) => metric.tone !== "good");
-  const healthy = source.filter((metric) => metric.tone === "good").sort(() => Math.random() - 0.5);
-  const anchor = mixed[Math.floor(Math.random() * mixed.length)];
-
-  return [anchor, ...healthy].slice(0, count);
+  return [...METRIC_POOL].sort(() => Math.random() - 0.5).slice(0, count);
 }
 
 function renderMetricRow(row, metrics) {
@@ -595,15 +662,17 @@ function initFeatureReplay() {
   featureReplayTimer = setInterval(restartFeatureAnimations, FEATURE_REPLAY_INTERVAL);
 }
 
-if (!prefersReducedMotion) {
-  if (graphObject) {
-    if (graphObject.contentDocument?.querySelector(".trend-line-main")) {
-      initFeatureReplay();
-    } else {
-      graphObject.addEventListener("load", initFeatureReplay, { once: true });
-    }
-  } else if (document.querySelector(".metric-row")) {
+// Metric rotation starts immediately. Graph line redraw needs an <object> embed
+// (not <img>) so we can reach contentDocument and re-trigger the SVG draw animation.
+if (!prefersReducedMotion && document.querySelector(".metric-row")) {
+  initFeatureReplay();
+  // First swap sooner than the 10s replay cadence so desktop rotation is obvious.
+  window.setTimeout(() => rotateMetrics(), 2800);
+} else if (!prefersReducedMotion && graphObject) {
+  if (graphObject.contentDocument?.querySelector(".trend-line-main")) {
     initFeatureReplay();
+  } else {
+    graphObject.addEventListener("load", initFeatureReplay, { once: true });
   }
 }
 
@@ -764,6 +833,16 @@ function hasDiscountPrice(test, livePrice) {
   return Number.isFinite(oldPrice) && oldPrice > price;
 }
 
+/** Details hero eyebrow: CMS `eyebrow`, else `{category} test`. */
+function detailEyebrow(test) {
+  const fromCms = String(test?.eyebrow || "").trim();
+  if (fromCms) {
+    return fromCms;
+  }
+  const category = String(test?.category || "Health").trim() || "Health";
+  return /test$/i.test(category) ? category : `${category} test`;
+}
+
 function formatOldPriceHtml(test, livePrice, quantity = 1) {
   if (!hasDiscountPrice(test, livePrice)) {
     return "";
@@ -911,7 +990,7 @@ function buildCatalogCard(test) {
     : "";
   const displayPrice = getTestLivePrice(test);
   return `
-    <article class="test-card test-card--catalog" data-category="${escapeHtml(filters)}" data-search="${escapeHtml(searchText)}">
+    <article class="test-card test-card--catalog" data-category="${escapeHtml(filters)}" data-search="${escapeHtml(searchText)}" data-detail-url="${detailUrl(test.slug)}">
       <a class="test-image photo-thumb photo-thumb--${escapeHtml(test.imageTone || "blood")}" href="${detailUrl(test.slug)}" aria-label="View ${escapeHtml(test.name)} details">
         <img src="${escapeHtml(test.image)}" alt="" loading="lazy" decoding="async">
         ${badge}
@@ -920,16 +999,11 @@ function buildCatalogCard(test) {
       <div class="test-body">
         <h3><a href="${detailUrl(test.slug)}">${escapeHtml(test.name)}</a></h3>
         <p>${escapeHtml(test.summary)}</p>
-        <ul class="test-meta">
-          <li>${escapeHtml(test.collection)}</li>
-          <li>${escapeHtml(test.results.replace(" after sample reaches the lab", ""))}</li>
-        </ul>
         <div class="price-row">
           <span class="price">${formatPrice(displayPrice)}</span>
           ${formatOldPriceHtml(test, displayPrice)}
         </div>
         <div class="test-card-actions">
-          <a class="button secondary full" href="${detailUrl(test.slug)}">${test.customizable ? "Customize" : "View details"}</a>
           <button class="button primary full" type="button" data-add-to-cart="${escapeHtml(test.slug)}">Add to cart</button>
         </div>
       </div>
@@ -1405,6 +1479,10 @@ function getComparePeerColumns(test, limit = 3) {
   return columns.length >= 2 ? columns : [];
 }
 
+function markerDisplayName(marker) {
+  return typeof marker === "string" ? marker.trim() : String(marker?.name || "").trim();
+}
+
 function getCompareUnitsForTest(test) {
   const units = [];
   const catalog = getPanelCatalog();
@@ -1434,7 +1512,6 @@ function getCompareUnitsForTest(test) {
   }
 
   const groups = normalizeWhatsTested(test);
-  // Leaf / single-product compare: one clean row for the test, Parameters inside accordion.
   const markers = groups[0]?.markers?.length
     ? groups[0].markers
     : (test.markers || []).map((marker) =>
@@ -1449,6 +1526,37 @@ function getCompareUnitsForTest(test) {
     optional: false
   });
   return units;
+}
+
+/** Marker names included (or optional) for one compare column. */
+function getCompareMarkerStatuses(columnEntry) {
+  const byKey = new Map();
+  columnEntry.units.forEach((unit) => {
+    const included = columnEntry.includedKeys.has(unit.key);
+    const optional = columnEntry.optionalKeys.has(unit.key);
+    if (!included && !optional) {
+      return;
+    }
+    (unit.markers || []).forEach((marker) => {
+      const name = markerDisplayName(marker);
+      if (!name) {
+        return;
+      }
+      const key = name.toLowerCase();
+      const existing = byKey.get(key);
+      if (!existing) {
+        byKey.set(key, { name, included, optional: optional && !included });
+        return;
+      }
+      if (included) {
+        existing.included = true;
+        existing.optional = false;
+      } else if (optional && !existing.included) {
+        existing.optional = true;
+      }
+    });
+  });
+  return byKey;
 }
 
 function buildCompareSection(test) {
@@ -1487,83 +1595,52 @@ function buildCompareSection(test) {
     return { test: column, units, includedKeys, optionalKeys };
   });
 
-  const rowMap = new Map();
-  columnUnits.forEach(({ units }) => {
-    units.forEach((unit) => {
-      if (!rowMap.has(unit.key)) {
-        rowMap.set(unit.key, {
-          key: unit.key,
-          title: unit.title,
-          description: unit.description,
-          markers: unit.markers
-        });
-      } else if ((!rowMap.get(unit.key).description && unit.description) || (!rowMap.get(unit.key).markers?.length && unit.markers?.length)) {
-        const existing = rowMap.get(unit.key);
-        rowMap.set(unit.key, {
-          ...existing,
-          description: existing.description || unit.description,
-          markers: existing.markers?.length ? existing.markers : unit.markers
-        });
+  const columnMarkerMaps = columnUnits.map(getCompareMarkerStatuses);
+  const markerOrder = [];
+  const seenMarkers = new Set();
+  columnMarkerMaps.forEach((map) => {
+    map.forEach((value, key) => {
+      if (seenMarkers.has(key)) {
+        return;
       }
+      seenMarkers.add(key);
+      markerOrder.push(value.name);
     });
   });
 
-  const rows = [...rowMap.values()];
-  if (!rows.length) {
+  if (!markerOrder.length) {
     return "";
   }
 
-  const categoryLabel = String(test.category || "health").replace(/\s+test$/i, "") || "health";
+  const categoryLabel =
+    String(test.eyebrow || "").trim() ||
+    String(test.category || "health").replace(/\s+test$/i, "") ||
+    "health";
   const colTemplate = `minmax(140px, 1.5fr) ${columns.map(() => "minmax(88px, 1fr)").join(" ")}`;
 
-  const rowHtml = rows
-    .map((row, index) => {
-      const markers = Array.isArray(row.markers) ? row.markers : [];
-      const markerCount = markers.length;
-      const markerList = markerCount
-        ? `<div class="labcorp-compare__params">
-            <p class="labcorp-compare__params-label">${markerCount} parameter${markerCount === 1 ? "" : "s"}</p>
-            <ul class="labcorp-compare__markers">${markers
-              .map((marker) => {
-                const name = typeof marker === "string" ? marker : marker?.name || "";
-                const desc = typeof marker === "string" ? "" : marker?.description || "";
-                return `<li><strong>${escapeHtml(name)}</strong>${
-                  desc ? `<span>${escapeHtml(desc)}</span>` : ""
-                }</li>`;
-              })
-              .join("")}</ul>
-          </div>`
-        : "";
+  const rowHtml = markerOrder
+    .map((name) => {
+      const key = name.toLowerCase();
+      const statusCells = columnMarkerMaps
+        .map((map, columnIndex) => {
+          const hit = map.get(key);
+          const currentClass = columnIndex === 0 ? " labcorp-compare__col--current" : "";
+          if (!hit) {
+            return `<span class="labcorp-compare__cell${currentClass}">${compareStatusCell(false, false)}</span>`;
+          }
+          return `<span class="labcorp-compare__cell${currentClass}">${compareStatusCell(hit.included, hit.optional)}</span>`;
+        })
+        .join("");
 
       return `
-        <details class="labcorp-compare__row"${index === 0 ? " open" : ""} style="--compare-cols: ${colTemplate}">
-          <summary>
-            <span class="labcorp-compare__panel">
-              <span class="labcorp-compare__chevron" aria-hidden="true"></span>
-              <span class="labcorp-compare__panel-copy">
-                <span class="labcorp-compare__panel-title">${escapeHtml(row.title)}</span>
-                ${
-                  markerCount
-                    ? `<span class="labcorp-compare__panel-meta">${markerCount} parameter${
-                        markerCount === 1 ? "" : "s"
-                      }</span>`
-                    : ""
-                }
-              </span>
+        <div class="labcorp-compare__row labcorp-compare__row--marker" style="--compare-cols: ${colTemplate}">
+          <span class="labcorp-compare__panel">
+            <span class="labcorp-compare__marker-copy">
+              <strong>${escapeHtml(name)}</strong>
             </span>
-            ${columnUnits
-              .map(({ includedKeys, optionalKeys }) => {
-                const included = includedKeys.has(row.key);
-                const optional = optionalKeys.has(row.key);
-                return `<span class="labcorp-compare__cell">${compareStatusCell(included, optional)}</span>`;
-              })
-              .join("")}
-          </summary>
-          <div class="labcorp-compare__body">
-            <p>${escapeHtml(row.description || "Review what this item covers.")}</p>
-            ${markerList}
-          </div>
-        </details>
+          </span>
+          ${statusCells}
+        </div>
       `;
     })
     .join("");
@@ -1585,7 +1662,7 @@ function buildCompareSection(test) {
                 .map((column, index) => {
                   const price = getTestLivePrice(column);
                   return `
-                    <div class="labcorp-compare__head-product">
+                    <div class="labcorp-compare__head-product${index === 0 ? " labcorp-compare__col--current" : ""}">
                       ${index === 0 ? `<span class="labcorp-compare__you">This test</span>` : ""}
                       <p class="labcorp-compare__product-name">${escapeHtml(column.shortName || column.name)}</p>
                       <p class="labcorp-compare__product-price">${formatPrice(price)}</p>
@@ -1601,6 +1678,18 @@ function buildCompareSection(test) {
             </div>
             <div class="labcorp-compare__list">
               ${rowHtml}
+            </div>
+            <div class="labcorp-compare__foot" role="row" style="--compare-cols: ${colTemplate}">
+              <div class="labcorp-compare__foot-spacer" aria-hidden="true"></div>
+              ${columns
+                .map((column, index) =>
+                  index === 0
+                    ? `<div class="labcorp-compare__foot-cell labcorp-compare__col--current" aria-hidden="true"></div>`
+                    : `<div class="labcorp-compare__foot-cell">
+                        <button class="button primary labcorp-compare__select" type="button" data-add-to-cart="${escapeHtml(column.slug)}">Select This Test</button>
+                      </div>`
+                )
+                .join("")}
             </div>
           </div>
         </div>
@@ -1825,7 +1914,7 @@ function renderTestDetailPage() {
             <span>/</span>
             <span>${escapeHtml(test.name)}</span>
           </nav>
-          <p class="eyebrow">${escapeHtml(test.category)} test</p>
+          <p class="eyebrow">${escapeHtml(detailEyebrow(test))}</p>
           <h1>${escapeHtml(test.name)}</h1>
           <p class="product-headline">${escapeHtml(test.headline)}</p>
         </div>
@@ -1856,7 +1945,6 @@ function renderTestDetailPage() {
           ${buildFact("icon-home", "Collection", test.collection)}
           ${buildFact("icon-family", "Age", test.age)}
           ${buildFact("icon-clock", "Results", test.results)}
-          ${buildFact("icon-shield-check", "HSA/FSA", test.hsa)}
           ${buildFact("icon-document", "Booking", test.purchaser)}
         </ul>
       </div>
@@ -2053,6 +2141,8 @@ function renderCartPage() {
 document.addEventListener("click", (event) => {
   const addButton = event.target.closest("[data-add-to-cart]");
   if (addButton) {
+    event.preventDefault();
+    event.stopPropagation();
     const slug = addButton.getAttribute("data-add-to-cart");
     const test = getTestBySlug(slug);
     if (test) {
@@ -2060,6 +2150,12 @@ document.addEventListener("click", (event) => {
       renderCartPage();
       showCartToast(`${test.name} added to cart.`);
     }
+    return;
+  }
+
+  const catalogCard = event.target.closest(".test-card--catalog[data-detail-url]");
+  if (catalogCard && !event.target.closest("a, button")) {
+    window.location.href = catalogCard.getAttribute("data-detail-url");
     return;
   }
 
