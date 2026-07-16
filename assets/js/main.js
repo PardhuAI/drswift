@@ -805,6 +805,18 @@ filterButtons.forEach((button) => {
   });
 });
 
+document.querySelectorAll("[data-healthy-filter]").forEach((button) => {
+  button.addEventListener("click", () => {
+    const filter = button.getAttribute("data-healthy-filter") || "all";
+    setCatalogFilter(filter);
+    const target =
+      filter === "all"
+        ? document.getElementById("catalog-search")
+        : document.getElementById("catalog");
+    target?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+});
+
 catalogSearch?.addEventListener("input", () => {
   applyCatalogFilter(activeCatalogFilter);
 });
@@ -991,21 +1003,21 @@ function buildCatalogCard(test) {
   const displayPrice = getTestLivePrice(test);
   return `
     <article class="test-card test-card--catalog" data-category="${escapeHtml(filters)}" data-search="${escapeHtml(searchText)}" data-detail-url="${detailUrl(test.slug)}">
-      <a class="test-image photo-thumb photo-thumb--${escapeHtml(test.imageTone || "blood")}" href="${detailUrl(test.slug)}" aria-label="View ${escapeHtml(test.name)} details">
+      <a class="test-card__layer test-card__media test-image photo-thumb photo-thumb--${escapeHtml(test.imageTone || "blood")}" href="${detailUrl(test.slug)}" aria-label="View ${escapeHtml(test.name)} details">
         <img src="${escapeHtml(test.image)}" alt="" loading="lazy" decoding="async">
         ${badge}
         <span class="test-badge test-badge--category">${escapeHtml(test.category)}</span>
       </a>
-      <div class="test-body">
-        <h3><a href="${detailUrl(test.slug)}">${escapeHtml(test.name)}</a></h3>
-        <p>${escapeHtml(test.summary)}</p>
-        <div class="price-row">
-          <span class="price">${formatPrice(displayPrice)}</span>
-          ${formatOldPriceHtml(test, displayPrice)}
-        </div>
-        <div class="test-card-actions">
-          <button class="button primary full" type="button" data-add-to-cart="${escapeHtml(test.slug)}">Add to cart</button>
-        </div>
+      <h3 class="test-card__layer test-card__title">
+        <a href="${detailUrl(test.slug)}">${escapeHtml(test.name)}</a>
+      </h3>
+      <p class="test-card__layer test-card__summary">${escapeHtml(test.summary)}</p>
+      <div class="test-card__layer test-card__price price-row">
+        <span class="price">${formatPrice(displayPrice)}</span>
+        ${formatOldPriceHtml(test, displayPrice)}
+      </div>
+      <div class="test-card__layer test-card__actions test-card-actions">
+        <button class="button primary test-card__book" type="button" data-add-to-cart="${escapeHtml(test.slug)}">Book This Test</button>
       </div>
     </article>
   `;
