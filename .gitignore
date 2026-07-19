@@ -1,3 +1,13 @@
-*.backup
-* copy.*
+node_modules/
+.wrangler/
+.dev.vars
+!.dev.vars.example
+dist/
+coverage/
+*.log
 .DS_Store
+*.backup
+worker-configuration.d.ts
+catalog.json
+reference Image.png
+assets/images/*copy*

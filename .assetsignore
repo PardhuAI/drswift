@@ -1,0 +1,21 @@
+# Exclude non-public build/source from Workers Assets upload
+.git/**
+node_modules/**
+.wrangler/**
+src/**
+tests/**
+docs/**
+scripts/**
+*.md
+package.json
+package-lock.json
+wrangler.jsonc
+tsconfig.json
+vitest.config.ts
+.dev.vars
+.dev.vars.*
+catalog.json
+*.csv
+.DS_Store
+**/*.backup
+campaign advertisement catalog/**

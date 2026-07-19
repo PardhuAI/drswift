@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Tests | Dr.Swift Diagnostics</title>
     <meta name="description" content="Browse at-home lab tests from Dr.Swift Diagnostics — book online, app, or WhatsApp.">
-    <link rel="stylesheet" href="assets/css/styles.css?v=healthy-you-cta-2">
+    <link rel="stylesheet" href="assets/css/styles.css?v=catalog-empty-1">
+    <link rel="stylesheet" href="assets/css/tests.css?v=heading-rotate-1">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
   <body class="tests-page">
@@ -37,41 +38,126 @@
     </header>
 
     <main>
-      <section class="catalog-section catalog-section--first section-pad section-bg-white" id="catalog-search" aria-label="Search and filter tests">
-        <div class="container">
-          <div class="catalog-header">
-            <div class="catalog-header__copy">
-              <p class="overline">Tests catalog</p>
-              <h2>All health tests</h2>
-              <p class="catalog-meta">Search all panels by test name, marker, or health goal.</p>
+      <section class="tests-toolbar" id="catalog-search" aria-label="Search and filter tests" data-group="her">
+        <div class="container tests-toolbar__inner">
+          <h2 class="tests-page-heading" id="tests-page-heading" aria-live="polite">
+            <span class="tests-page-heading__viewport">
+              <span class="tests-page-heading__phrase is-active">Shop All Tests</span>
+            </span>
+          </h2>
+          <div class="tests-filter-bar">
+            <div class="tests-extra-filters-wrap tests-filters-row-1" data-filters-row="1">
+              <button
+                class="scroll-btn inline tests-extra-filters__scroll"
+                type="button"
+                data-extra-filters-scroll-dir="-1"
+                aria-label="Scroll filters left"
+              >
+                <span aria-hidden="true">&lsaquo;</span>
+              </button>
+              <div class="tests-extra-filters" id="tests-extra-filters-scroll" aria-label="Browse filters">
+                <button
+                  class="tests-filter-link tests-row1-all is-active"
+                  type="button"
+                  data-row1="all"
+                  aria-pressed="true"
+                >
+                  All Tests
+                </button>
+                <div class="tests-audience-tabs" role="tablist" aria-label="Choose who you are browsing for">
+                  <button class="tests-filter-link tests-tab" type="button" role="tab" aria-selected="false" data-group="him">For Him</button>
+                  <button class="tests-filter-link tests-tab" type="button" role="tab" aria-selected="false" data-group="her">For Her</button>
+                  <button class="tests-filter-link tests-tab" type="button" role="tab" aria-selected="false" data-group="loved">For Loved Ones (50+)</button>
+                </div>
+                <div class="tests-health-filters" data-extra-filters></div>
+              </div>
+              <button
+                class="scroll-btn inline tests-extra-filters__scroll"
+                type="button"
+                data-extra-filters-scroll-dir="1"
+                aria-label="Scroll filters right"
+              >
+                <span aria-hidden="true">&rsaquo;</span>
+              </button>
             </div>
-            <a class="catalog-help-link" href="#catalog-help">Need help choosing?</a>
-          </div>
-
-          <ul class="catalog-trust-strip" aria-label="Why book with Dr.Swift">
-            <li><svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-home"></use></svg>At-home collection</li>
-            <li><svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-clock"></use></svg>24-48h results</li>
-            <li><svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-family"></use></svg>Family profiles</li>
-            <li><svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-shield-check"></use></svg>Accredited labs</li>
-          </ul>
-
-          <div class="catalog-search">
-            <label class="sr-only" for="catalog-search-input">Search tests</label>
-            <input id="catalog-search-input" type="search" placeholder="Search tests, markers, or health goals" data-catalog-search>
-          </div>
-
-          <div class="catalog-toolbar-wrap">
-            <p class="catalog-toolbar__label">Filter</p>
-            <div class="catalog-toolbar horizontal-scroll" role="tablist" aria-label="Filter tests by category">
-              <button class="filter-pill is-active" type="button" data-filter="all">All tests</button>
-              <button class="filter-pill" type="button" data-filter="heart">Heart health</button>
-              <button class="filter-pill" type="button" data-filter="diabetes">Diabetes</button>
-              <button class="filter-pill" type="button" data-filter="men">Men's health</button>
-              <button class="filter-pill" type="button" data-filter="women">Women's health</button>
-              <button class="filter-pill" type="button" data-filter="thyroid">Thyroid</button>
-              <button class="filter-pill" type="button" data-filter="immunity">Immunity</button>
-              <button class="filter-pill" type="button" data-filter="full-body">Full body</button>
+            <button
+              class="tests-search-toggle scroll-btn inline"
+              type="button"
+              aria-expanded="false"
+              aria-controls="tests-search-panel"
+            >
+              <span class="sr-only">Search tests</span>
+              <svg class="tests-search-toggle__icon" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="11" cy="11" r="7"></circle>
+                <path d="m16.5 16.5 4 4"></path>
+              </svg>
+            </button>
+            <div class="tests-quick-filters">
+              <div class="tests-quick-filters__backdrop" hidden aria-hidden="true" data-quick-filters-backdrop></div>
+              <button
+                class="tests-quick-filters__toggle button secondary"
+                type="button"
+                aria-expanded="false"
+                aria-controls="tests-quick-filters-panel"
+              >
+                Quick filters
+              </button>
+              <div id="tests-quick-filters-panel" class="tests-quick-filters__panel" hidden>
+                <div class="tests-quick-filters__section tests-quick-filters__section--tabs">
+                  <div class="tests-tabs tests-tabs--panel" role="tablist" aria-label="Choose who you are browsing for">
+                    <button class="tests-tab" type="button" role="tab" aria-selected="false" data-group="him">For Him</button>
+                    <button class="tests-tab" type="button" role="tab" aria-selected="false" data-group="her">For Her</button>
+                    <button class="tests-tab" type="button" role="tab" aria-selected="false" data-group="loved">For Loved Ones (50+)</button>
+                  </div>
+                </div>
+                <div class="tests-quick-filters__section">
+                  <p class="tests-quick-filters__label">Quick tests</p>
+                  <div class="tests-quick-filters__list" data-quick-tests></div>
+                </div>
+                <div class="tests-quick-filters__section">
+                  <p class="tests-quick-filters__label">Health categories</p>
+                  <div class="tests-quick-filters__chips" data-health-categories></div>
+                </div>
+              </div>
             </div>
+          </div>
+          <div class="tests-audience-categories-wrap tests-filters-row-2 is-collapsed" data-filters-row="2" data-audience-categories-wrap>
+            <button
+              class="scroll-btn inline tests-audience-categories__scroll"
+              type="button"
+              data-audience-categories-scroll-dir="-1"
+              aria-label="Scroll test categories left"
+            >
+              <span aria-hidden="true">&lsaquo;</span>
+            </button>
+            <nav class="tests-audience-categories" data-audience-quick-links aria-label="Test categories"></nav>
+            <button
+              class="scroll-btn inline tests-audience-categories__scroll"
+              type="button"
+              data-audience-categories-scroll-dir="1"
+              aria-label="Scroll test categories right"
+            >
+              <span aria-hidden="true">&rsaquo;</span>
+            </button>
+          </div>
+          <div class="tests-search-panel" id="tests-search-panel" hidden>
+            <label class="tests-search" for="catalog-search-input">
+              <span class="sr-only">Search tests, markers, or health goals</span>
+              <svg class="tests-search__icon" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="11" cy="11" r="7"></circle>
+                <path d="m16.5 16.5 4 4"></path>
+              </svg>
+              <input
+                id="catalog-search-input"
+                type="search"
+                autocomplete="off"
+                placeholder="Search tests, markers, or health goals"
+                data-catalog-search
+              >
+              <button class="tests-search-clear" type="button" data-clear-search aria-label="Clear search" hidden>
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </label>
           </div>
         </div>
       </section>
@@ -79,7 +165,13 @@
       <section class="catalog-section catalog-section--grid section-pad section-bg-white" id="catalog" aria-label="Test catalog">
         <div class="container">
           <div class="catalog-grid" id="catalog-grid" data-catalog-grid></div>
-          <p class="catalog-empty" id="catalog-empty" hidden>No tests in this category yet. Try another filter or browse all tests.</p>
+          <div class="catalog-empty" id="catalog-empty" hidden>
+            <p class="catalog-empty__message">No tests in this category yet. Try another filter or browse all tests.</p>
+            <div class="catalog-empty__actions">
+              <button class="button secondary" type="button" data-catalog-clear-search>Clear search</button>
+              <button class="button primary" type="button" data-catalog-show-all>All Tests</button>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -247,7 +339,8 @@
 
     <script src="assets/js/panel-catalog.js"></script>
     <script src="assets/js/test-data.js"></script>
-    <script src="assets/js/api.js"></script>
-    <script src="assets/js/main.js?v=healthy-you-cta-1"></script>
+    <script src="assets/js/api.js?v=ssr-1"></script>
+    <script src="assets/js/main.js?v=detail-1"></script>
+    <script src="assets/js/tests-toolbar.js?v=6"></script>
   </body>
 </html>

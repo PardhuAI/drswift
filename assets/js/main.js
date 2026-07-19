@@ -799,6 +799,17 @@ function setCatalogFilter(filter) {
   applyCatalogFilter(filter);
 }
 
+window.setCatalogFilter = setCatalogFilter;
+window.applyCatalogFilter = applyCatalogFilter;
+Object.defineProperty(window, "activeCatalogFilter", {
+  get() {
+    return activeCatalogFilter;
+  },
+  set(value) {
+    activeCatalogFilter = value;
+  },
+});
+
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => {
     setCatalogFilter(button.getAttribute("data-filter") || "all");
@@ -819,6 +830,22 @@ document.querySelectorAll("[data-healthy-filter]").forEach((button) => {
 
 catalogSearch?.addEventListener("input", () => {
   applyCatalogFilter(activeCatalogFilter);
+});
+
+document.querySelector("[data-catalog-clear-search]")?.addEventListener("click", () => {
+  if (catalogSearch) {
+    catalogSearch.value = "";
+  }
+  applyCatalogFilter(activeCatalogFilter);
+  window.dispatchEvent(new CustomEvent("drswift:catalog-clear-search"));
+});
+
+document.querySelector("[data-catalog-show-all]")?.addEventListener("click", () => {
+  if (catalogSearch) {
+    catalogSearch.value = "";
+  }
+  setCatalogFilter("all");
+  window.dispatchEvent(new CustomEvent("drswift:catalog-show-all"));
 });
 
 // Test storefront, detail page, and cart
@@ -863,11 +890,28 @@ function formatOldPriceHtml(test, livePrice, quantity = 1) {
 }
 
 function detailUrl(slug) {
-  return `test-details.html?test=${encodeURIComponent(slug)}`;
+  return `/tests/${encodeURIComponent(slug)}`;
 }
 
 function getTestBySlug(slug) {
   return TESTS.find((test) => test.slug === slug);
+}
+
+function resolveDetailSlug() {
+  const pathMatch = window.location.pathname.match(/^\/tests\/([^/]+)\/?$/);
+  if (pathMatch) {
+    try {
+      return decodeURIComponent(pathMatch[1]);
+    } catch {
+      return pathMatch[1];
+    }
+  }
+  const ssrSlug = window.__DRSWIFT_SSR__ && window.__DRSWIFT_SSR__.detailSlug;
+  if (ssrSlug) {
+    return String(ssrSlug);
+  }
+  const params = new URLSearchParams(window.location.search);
+  return params.get("test") || params.get("slug") || "";
 }
 
 function readCart() {
@@ -1030,7 +1074,8 @@ function renderTestsCatalog() {
   }
 
   grid.innerHTML = TESTS.map(buildCatalogCard).join("");
-  applyCatalogFilter("all");
+  applyCatalogFilter(activeCatalogFilter || "all");
+  window.dispatchEvent(new CustomEvent("drswift:catalog-ready"));
 }
 
 function buildFact(icon, label, value) {
@@ -1861,22 +1906,7 @@ function buildRelatedCard(slug) {
   if (!test) {
     return "";
   }
-  return `
-    <article class="related-test">
-      <a class="related-test__image photo-thumb photo-thumb--${escapeHtml(test.imageTone || "blood")}" href="${detailUrl(test.slug)}">
-        <img src="${escapeHtml(test.image)}" alt="" loading="lazy" decoding="async">
-      </a>
-      <div>
-        <p class="overline">${escapeHtml(test.category)}</p>
-        <h3><a href="${detailUrl(test.slug)}">${escapeHtml(test.name)}</a></h3>
-        <p>${escapeHtml(test.summary)}</p>
-        <div class="price-row">
-          <span class="price">${formatPrice(getTestLivePrice(test))}</span>
-          ${formatOldPriceHtml(test, getTestLivePrice(test))}
-        </div>
-      </div>
-    </article>
-  `;
+  return buildCatalogCard(test);
 }
 
 function renderTestDetailPage() {
@@ -1885,8 +1915,7 @@ function renderTestDetailPage() {
     return;
   }
 
-  const params = new URLSearchParams(window.location.search);
-  const slug = params.get("test") || TESTS[0].slug;
+  const slug = resolveDetailSlug() || TESTS[0].slug;
   const test = getTestBySlug(slug);
 
   if (!test) {
@@ -1897,8 +1926,8 @@ function renderTestDetailPage() {
           <h1>We could not find that test.</h1>
           <p>Browse the full catalog or message the care team for help choosing a panel.</p>
           <div class="hero-actions">
-            <a class="button primary" href="tests.html">Shop tests</a>
-            <a class="button secondary" href="whatsapp.html">WhatsApp us</a>
+            <a class="button primary" href="/tests">Shop tests</a>
+            <a class="button secondary" href="/whatsapp">WhatsApp us</a>
           </div>
         </div>
       </section>
@@ -1953,7 +1982,7 @@ function renderTestDetailPage() {
     <section class="section-pad-sm">
       <div class="container">
         <ul class="detail-facts" aria-label="Test facts">
-          ${buildFact("icon-price", "Sample type", test.sampleType)}
+          ${buildFact("icon-tube", "Sample type", test.sampleType)}
           ${buildFact("icon-home", "Collection", test.collection)}
           ${buildFact("icon-family", "Age", test.age)}
           ${buildFact("icon-clock", "Results", test.results)}

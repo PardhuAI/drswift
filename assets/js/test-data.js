@@ -1,4 +1,7 @@
-window.DRSWIFT_TESTS = [
+/* Offline demo catalog. Skipped when Worker SSR already provided live data. */
+if (window.DRSWIFT_CATALOG_SOURCE === "ssr" || window.__DRSWIFT_SSR__) {
+  /* keep SSR payload */
+} else window.DRSWIFT_TESTS = [
   {
     slug: "cbc",
     name: "Complete Blood Count",

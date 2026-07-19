@@ -5,7 +5,7 @@
  * Static test-data.js remains offline fallback only when CMS is unreachable.
  */
 (function (global) {
-  const API_BASE = String(global.DRSWIFT_API_BASE || "http://localhost:8081").replace(/\/$/, "");
+  const API_BASE = String(global.DRSWIFT_API_BASE || "").replace(/\/$/, "");
   const FETCH_OPTS = { headers: { Accept: "application/json" }, cache: "no-store" };
 
   function asArray(value) {
@@ -189,6 +189,9 @@
   }
 
   async function fetchCatalog() {
+    if (!API_BASE) {
+      throw new Error("Browser catalog API is disabled; use SSR bootstrap");
+    }
     const response = await fetch(`${API_BASE}/api/v1/public/catalog`, FETCH_OPTS);
     if (!response.ok) {
       throw new Error(`Catalog request failed (${response.status})`);
@@ -197,6 +200,9 @@
   }
 
   async function fetchTestBySlug(slug) {
+    if (!API_BASE) {
+      throw new Error("Browser catalog API is disabled; use SSR bootstrap");
+    }
     const response = await fetch(
       `${API_BASE}/api/v1/public/catalog/tests/${encodeURIComponent(slug)}`,
       FETCH_OPTS
@@ -223,8 +229,13 @@
   }
 
   function showCatalogSourceBanner(source) {
-    if (source === "cms") {
+    if (source === "cms" || source === "ssr") {
       document.querySelectorAll("[data-catalog-source-banner]").forEach((el) => el.remove());
+      return;
+    }
+    // Never show localhost/dev banners on the public production site.
+    const host = String(global.location && global.location.hostname || "");
+    if (host === "drswift.in" || host === "www.drswift.in" || host.endsWith(".workers.dev")) {
       return;
     }
     if (document.querySelector("[data-catalog-source-banner]")) {
@@ -242,6 +253,30 @@
     document.body.prepend(banner);
   }
 
+  function useSsrCatalogIfPresent() {
+    const ssr = global.__DRSWIFT_SSR__;
+    if (ssr && Array.isArray(ssr.tests) && ssr.tests.length) {
+      global.DRSWIFT_TESTS = ssr.tests;
+      global.DRSWIFT_PANELS = ssr.panels || {};
+      global.DRSWIFT_PANEL_ORDER = Object.keys(global.DRSWIFT_PANELS);
+      global.DRSWIFT_PROMOTIONS = ssr.promotions || [];
+      global.DRSWIFT_CATALOG_SOURCE = "ssr";
+      return {
+        tests: global.DRSWIFT_TESTS,
+        panels: global.DRSWIFT_PANELS,
+        promotions: global.DRSWIFT_PROMOTIONS,
+      };
+    }
+    if (global.DRSWIFT_CATALOG_SOURCE === "ssr" && Array.isArray(global.DRSWIFT_TESTS) && global.DRSWIFT_TESTS.length) {
+      return {
+        tests: global.DRSWIFT_TESTS,
+        panels: global.DRSWIFT_PANELS || {},
+        promotions: global.DRSWIFT_PROMOTIONS || [],
+      };
+    }
+    return null;
+  }
+
   global.DRSWIFT_API = {
     API_BASE,
     fetchCatalog,
@@ -251,6 +286,25 @@
   };
 
   global.DRSWIFT_BOOTSTRAP_CATALOG = async function bootstrapCatalog() {
+    // Prefer Worker SSR payload — do not call the protected origin from the browser.
+    const ssrCatalog = useSsrCatalogIfPresent();
+    if (ssrCatalog) {
+      showCatalogSourceBanner("ssr");
+      return ssrCatalog;
+    }
+    if (!API_BASE) {
+      // Browser must not hit the origin API; keep any static demo already loaded.
+      global.DRSWIFT_CATALOG_SOURCE = global.DRSWIFT_CATALOG_SOURCE || "static-fallback";
+      if (!Array.isArray(global.DRSWIFT_PROMOTIONS)) {
+        global.DRSWIFT_PROMOTIONS = [];
+      }
+      showCatalogSourceBanner("static-fallback");
+      return {
+        tests: global.DRSWIFT_TESTS || [],
+        panels: global.DRSWIFT_PANELS || {},
+        promotions: global.DRSWIFT_PROMOTIONS || [],
+      };
+    }
     try {
       await bootstrapCatalogFromCms();
       showCatalogSourceBanner("cms");

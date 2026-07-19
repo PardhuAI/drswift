@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Sample report | Dr.Swift Diagnostics</title>
-    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/styles.css?v=report-viewer-3">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
   <body class="reports-page">
@@ -29,17 +29,40 @@
               fasting status, doctor details, and clinical tables in one doctor-ready PDF.
             </p>
             <div class="report-center__actions">
-              <a class="button primary" href="assets/reports/patient-report-drswift-sample.pdf">Download PDF</a>
-              <a class="button secondary" href="login.html">Sign in for real reports</a>
+              <a class="button primary" href="login.html">Download Your Report</a>
+              <a class="button secondary" href="tests.html">See All Health Tests</a>
             </div>
           </article>
           <div class="sample-report-preview">
             <div class="sample-report-preview__toolbar">
               <span>Sample patient report</span>
-              <a href="assets/reports/patient-report-drswift-sample.pdf">Open PDF</a>
+              <div class="sample-report-preview__zoom" role="group" aria-label="Report zoom">
+                <button type="button" class="sample-report-zoom-btn" data-sample-report-zoom="out" aria-label="Zoom out">−</button>
+                <span data-sample-report-zoom-label>115%</span>
+                <button type="button" class="sample-report-zoom-btn" data-sample-report-zoom="in" aria-label="Zoom in">+</button>
+                <button type="button" class="sample-report-zoom-btn sample-report-zoom-btn--fit" data-sample-report-zoom="fit">Fit</button>
+              </div>
             </div>
-            <div class="sample-report-preview__page">
-              <img src="assets/images/reports/patient-report-page-1.png" alt="Sample Dr.Swift patient report preview" loading="eager" decoding="async">
+            <div
+              class="sample-report-viewer"
+              data-sample-report-viewer
+              data-pdf-src="/assets/reports/patient-report-drswift-sample.pdf"
+            >
+              <div class="sample-report-viewer__scroll" tabindex="0" aria-label="Sample report pages">
+                <div class="sample-report-viewer__pages" data-sample-report-pages aria-busy="true">
+                  <img
+                    class="sample-report-viewer__fallback"
+                    src="assets/images/reports/patient-report-page-1.png"
+                    alt="Sample Dr.Swift patient report preview"
+                    loading="eager"
+                    decoding="async"
+                  >
+                </div>
+              </div>
+              <div class="sample-report-viewer__actions">
+                <a class="button primary" href="login.html">Download Your Report</a>
+                <a class="button secondary" href="tests.html">See All Health Tests</a>
+              </div>
             </div>
           </div>
         </div>
@@ -56,6 +79,7 @@
       </section>
     </main>
     <footer class="site-footer"><div class="container footer-bottom footer-bottom--compact"><p>&copy; 2026 Dr.Swift Diagnostics</p></div></footer>
-    <script src="assets/js/main.js"></script>
+    <script src="assets/js/main.js?v=detail-1"></script>
+    <script src="assets/js/sample-report-viewer.js?v=4"></script>
   </body>
 </html>
