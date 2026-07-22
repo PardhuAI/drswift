@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Book a test | Dr.Swift Diagnostics</title>
-    <link rel="stylesheet" href="assets/css/styles.css?v=card-limits-1">
+    <link rel="stylesheet" href="assets/css/styles.css?v=confirm-next-1">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
   <body class="auth-page">
@@ -470,14 +470,84 @@
                     <h2>Booking confirmed</h2>
                   </div>
                 </div>
-                <div class="confirmation-message">
-                  <div class="checkout-confirmation-icon" aria-hidden="true">
-                    <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-shield-check"></use></svg>
+
+                <div class="confirm-page">
+                  <div class="confirm-hero">
+                    <div class="checkout-confirmation-icon" aria-hidden="true">
+                      <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-shield-check"></use></svg>
+                    </div>
+                    <p class="confirm-hero__status">You’re all set</p>
+                    <p class="confirm-hero__lead">
+                      Payment received. We’ll collect your sample at home and send reports when ready.
+                    </p>
+                    <dl class="confirm-meta">
+                      <div>
+                        <dt>Booking ID</dt>
+                        <dd data-confirm-ref>—</dd>
+                      </div>
+                      <div>
+                        <dt>Collection</dt>
+                        <dd data-confirm-slot>—</dd>
+                      </div>
+                    </dl>
                   </div>
-                  <p>Confirmed</p>
-                  <strong>Our phlebo will call you and arrive at your address on or before your selected collection time.</strong>
-                  <span>If you need help anytime, contact customer support at 9848094942.</span>
+
+                  <section class="confirm-block" aria-labelledby="confirm-next-title">
+                    <h3 id="confirm-next-title">What happens next</h3>
+                    <ol class="confirm-timeline">
+                      <li>
+                        <span class="confirm-timeline__step" aria-hidden="true">1</span>
+                        <div>
+                          <strong>Phlebotomist will call you</strong>
+                          <p>Expect a call before arrival to confirm your address and any prep (for example fasting).</p>
+                        </div>
+                      </li>
+                      <li>
+                        <span class="confirm-timeline__step" aria-hidden="true">2</span>
+                        <div>
+                          <strong>Home collection in your booked slot</strong>
+                          <p>A certified phlebo arrives at your address during the selected date and time window.</p>
+                        </div>
+                      </li>
+                      <li>
+                        <span class="confirm-timeline__step" aria-hidden="true">3</span>
+                        <div>
+                          <strong>Reports on WhatsApp &amp; online</strong>
+                          <p>When results are ready, we’ll share a secure link on WhatsApp. You can also view reports anytime on the website or app.</p>
+                        </div>
+                      </li>
+                    </ol>
+                  </section>
+
+                  <section class="confirm-block confirm-block--app" aria-labelledby="confirm-app-title">
+                    <h3 id="confirm-app-title">Track live &amp; see insights</h3>
+                    <p>
+                      Download the Dr.Swift app to follow your booking status live, get result alerts, and explore trends and insights for your whole family.
+                    </p>
+                    <div class="confirm-app-actions">
+                      <a class="button primary" href="app.html">Get the app</a>
+                      <a class="button secondary" href="signup.html">Create account</a>
+                    </div>
+                    <p class="confirm-block__hint">Already have an account? Open <a href="account.html">My Account</a> or <a href="login.html">sign in</a> to manage bookings and reports.</p>
+                  </section>
+
+                  <section class="confirm-block confirm-block--support" aria-labelledby="confirm-support-title">
+                    <h3 id="confirm-support-title">Need help?</h3>
+                    <p>Our care team can help with rescheduling, prep questions, or report access.</p>
+                    <div class="confirm-support-grid">
+                      <a class="confirm-support-card" href="https://wa.me/919000090000" target="_blank" rel="noopener">
+                        <strong>WhatsApp support</strong>
+                        <span>+91 90000 90000</span>
+                      </a>
+                      <a class="confirm-support-card" href="tel:+919848094942">
+                        <strong>Call support</strong>
+                        <span>98480 94942</span>
+                      </a>
+                    </div>
+                    <p class="confirm-block__hint">Prefer email or more FAQs? Visit <a href="help.html">Help</a> or <a href="about.html#contact">Contact</a>.</p>
+                  </section>
                 </div>
+
                 <div class="checkout-wire-actions">
                   <a class="checkout-back-link" href="account.html">My Account</a>
                   <a class="checkout-next-link" href="tests.html">Shop All Tests</a>
@@ -522,7 +592,7 @@
     <script src="assets/js/firebase-config.js?v=3"></script>
     <script src="assets/js/google-auth.js?v=6"></script>
     <script src="assets/js/main.js?v=cart-qty-1"></script>
-    <script src="assets/js/checkout.js?v=otp-local-1"></script>
+    <script src="assets/js/checkout.js?v=confirm-next-1"></script>
     <script>
       async function initBookingPage() {
         if (typeof window.DRSWIFT_BOOTSTRAP_CATALOG === "function") {

@@ -905,6 +905,15 @@
       `;
     }
 
+    const refEl = document.querySelector("[data-confirm-ref]");
+    const slotEl = document.querySelector("[data-confirm-slot]");
+    if (refEl) refEl.textContent = payment.reference || "Pending";
+    if (slotEl) {
+      const day = details.sampleDayLabel || formatSampleDayLabel(details.sampleDay) || "—";
+      const windowLabel = details.sampleWindow || "—";
+      slotEl.textContent = `${day} · ${windowLabel}`;
+    }
+
     activateDeckCard("confirmation");
   }
 

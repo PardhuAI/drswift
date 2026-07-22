@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Prototype — Complete checkout + payment flow | Dr.Swift</title>
-  <link rel="stylesheet" href="../assets/css/styles.css?v=card-limits-1">
+  <link rel="stylesheet" href="../assets/css/styles.css?v=confirm-next-1">
   <link rel="icon" href="../assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   <style>
     html { scrollbar-gutter: stable; }
@@ -694,10 +694,38 @@
                   <h2>Booking confirmed</h2>
                 </div>
               </div>
-              <div class="confirmation-message">
-                <p>Confirmed</p>
-                <strong>Our phlebo will call you and arrive at your address on or before your selected collection time.</strong>
-                <span>Support: 9848094942 · Ref <span data-ref>DRS-PROTO</span></span>
+              <div class="confirm-page">
+                <div class="confirm-hero">
+                  <p class="confirm-hero__status">You’re all set</p>
+                  <p class="confirm-hero__lead">Payment received. We’ll collect your sample at home and send reports when ready.</p>
+                  <dl class="confirm-meta">
+                    <div><dt>Booking ID</dt><dd data-ref>DRS-PROTO</dd></div>
+                    <div><dt>Collection</dt><dd data-confirm-slot>Today · Morning</dd></div>
+                  </dl>
+                </div>
+                <section class="confirm-block">
+                  <h3>What happens next</h3>
+                  <ol class="confirm-timeline">
+                    <li><span class="confirm-timeline__step" aria-hidden="true">1</span><div><strong>Phlebotomist will call you</strong><p>Expect a call before arrival to confirm address and prep.</p></div></li>
+                    <li><span class="confirm-timeline__step" aria-hidden="true">2</span><div><strong>Home collection in your booked slot</strong><p>A certified phlebo arrives during your selected window.</p></div></li>
+                    <li><span class="confirm-timeline__step" aria-hidden="true">3</span><div><strong>Reports on WhatsApp &amp; online</strong><p>Secure report link on WhatsApp, plus website/app access.</p></div></li>
+                  </ol>
+                </section>
+                <section class="confirm-block confirm-block--app">
+                  <h3>Track live &amp; see insights</h3>
+                  <p>Download the app to follow booking status, get alerts, and see trends for your family.</p>
+                  <div class="confirm-app-actions">
+                    <a class="button primary" href="../app.html">Get the app</a>
+                    <a class="button secondary" href="../signup.html">Create account</a>
+                  </div>
+                </section>
+                <section class="confirm-block confirm-block--support">
+                  <h3>Need help?</h3>
+                  <div class="confirm-support-grid">
+                    <a class="confirm-support-card" href="https://wa.me/919000090000" target="_blank" rel="noopener"><strong>WhatsApp support</strong><span>+91 90000 90000</span></a>
+                    <a class="confirm-support-card" href="tel:+919848094942"><strong>Call support</strong><span>98480 94942</span></a>
+                  </div>
+                </section>
               </div>
               <div class="checkout-wire-actions">
                 <a class="checkout-back-link" href="../account.html">My Account</a>
