@@ -12506,6 +12506,14 @@ body.has-checkout-sticky {
   align-items: stretch;
 }
 
+.section-head__lead {
+  max-width: 44rem;
+  margin: 6px 0 0;
+  color: var(--color-muted);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
 @media (min-width: 720px) {
   .account-overview-grid,
   .account-report-list {

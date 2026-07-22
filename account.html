@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Account · Reports &amp; bookings | Dr.Swift Diagnostics</title>
     <meta name="description" content="Sign in to view Dr.Swift Diagnostics bookings, reports, family profiles, and health trends.">
-    <link rel="stylesheet" href="assets/css/styles.css?v=profile-vibe-1">
+    <link rel="stylesheet" href="assets/css/styles.css?v=account-sample-preview-1">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
   <body class="account-page">
@@ -104,10 +104,12 @@
               <article class="account-card account-card--focus">
                 <div class="account-card__head">
                   <h3 class="account-card__title">Latest report</h3>
+                  <span class="account-status account-status--ready">Sample</span>
                 </div>
-                <p class="account-meta"><strong>No reports yet</strong></p>
-                <p class="account-summary">Completed reports will be kept here with their collection and result dates.</p>
+                <p class="account-meta"><strong>Full Body Checkup</strong> · sample preview</p>
+                <p class="account-summary">See how PDF reports, marker ranges, and health trends will appear after your first completed test.</p>
                 <div class="account-action-row">
+                  <a class="button primary" href="sample-report.html">View sample report</a>
                   <a class="button secondary" href="reports.html">How reports work</a>
                 </div>
               </article>
@@ -138,19 +140,73 @@
           <div class="container">
             <div class="section-head section-head--compact">
               <p class="eyebrow">Reports</p>
-              <h2 id="account-reports-title">Recent report history</h2>
+              <h2 id="account-reports-title">Sample report history</h2>
+              <p class="section-head__lead">These previews show how your completed tests will look here. Real reports replace them automatically after processing.</p>
             </div>
             <div class="account-report-list">
               <article class="account-card account-card--report">
-                <h3 class="account-card__title">Your report history is ready when you are</h3>
-                <p class="account-meta">Reports appear here only after your sample has been processed.</p>
-                <p class="account-summary">Each entry will include the test name, collection date, result status, and a secure link to view or share it.</p>
+                <div class="account-card__head">
+                  <h3 class="account-card__title">Full Body Checkup</h3>
+                  <span class="account-status account-status--ready">Sample ready</span>
+                </div>
+                <p class="account-meta">Example booking: 12 Jan 2026 · Result: 14 Jan 2026</p>
+                <ul class="account-test-list">
+                  <li>HbA1c</li>
+                  <li>Fasting glucose</li>
+                  <li>Lipid profile</li>
+                  <li>Vitamin D (25-OH)</li>
+                </ul>
                 <div class="account-action-row">
-                  <a class="button primary" href="tests.html">Book a health test</a>
-                  <a class="button secondary" href="sample-report.html">View sample report</a>
+                  <a class="button primary" href="sample-report.html">View sample</a>
+                  <a class="button secondary" href="mailto:care@drswift.health?subject=Share%20my%20Dr.Swift%20report">Share preview</a>
+                </div>
+              </article>
+
+              <article class="account-card account-card--report">
+                <div class="account-card__head">
+                  <h3 class="account-card__title">Wellness Follow-up</h3>
+                  <span class="account-status account-status--ready">Sample ready</span>
+                </div>
+                <p class="account-meta">Example booking: 18 Nov 2025 · Result: 20 Nov 2025</p>
+                <ul class="account-test-list">
+                  <li>Complete blood count</li>
+                  <li>TSH</li>
+                  <li>Vitamin B12</li>
+                  <li>Creatinine &amp; eGFR</li>
+                </ul>
+                <div class="account-action-row">
+                  <a class="button primary" href="sample-report.html">View sample</a>
+                  <a class="button secondary" href="tests.html">Book similar</a>
+                </div>
+              </article>
+
+              <article class="account-card account-card--report">
+                <div class="account-card__head">
+                  <h3 class="account-card__title">Heart Health Panel</h3>
+                  <span class="account-status account-status--pending">Sample progress</span>
+                </div>
+                <p class="account-meta">Example booking: 08 Jul 2026 · Expected: 10 Jul 2026</p>
+                <ul class="account-test-list">
+                  <li>LDL cholesterol</li>
+                  <li>Triglycerides</li>
+                  <li>Hemoglobin</li>
+                </ul>
+                <div class="account-action-row">
+                  <a class="button secondary" href="whatsapp.html">Ask support</a>
                 </div>
               </article>
             </div>
+          </div>
+        </section>
+
+        <section class="section-pad account-trends-section" aria-labelledby="account-trends-title">
+          <div class="container">
+            <div class="account-trends-intro">
+              <p class="eyebrow">Sample trends</p>
+              <h2 id="account-trends-title">Health trends</h2>
+              <p>Example marker history for product preview. Once you complete tests, this area should show your real values, ranges, and clinician-approved guidance.</p>
+            </div>
+            <div class="account-trends" id="account-trends" data-account-trends></div>
           </div>
         </section>
 
@@ -169,5 +225,6 @@
     <script src="assets/js/google-auth.js?v=6"></script>
     <script src="assets/js/main.js?v=recipient-sync-1"></script>
     <script src="assets/js/account-page.js?v=family-profiles-1"></script>
+    <script src="assets/js/account-trends.js?v=sample-preview-1"></script>
   </body>
 </html>
