@@ -230,6 +230,16 @@ function basicAuthHeader(env: Env): string {
   return `Basic ${token}`;
 }
 
+function isLocalDev(env: Env): boolean {
+  const site = String(env.PUBLIC_SITE_URL || "").toLowerCase();
+  const environment = String(env.ENVIRONMENT || "").toLowerCase();
+  return (
+    environment === "development" ||
+    site.includes("localhost") ||
+    site.includes("127.0.0.1")
+  );
+}
+
 async function fetchCatalogFromOrigin(env: Env): Promise<CatalogPayload> {
   const url = `${originBase(env)}/api/v1/public/catalog`;
   const controller = new AbortController();
@@ -248,16 +258,12 @@ async function fetchCatalogFromOrigin(env: Env): Promise<CatalogPayload> {
     if (user && pass) {
       headers.Authorization = basicAuthHeader(env);
     }
+    // Avoid RequestInit.cf here — it is edge-only and can hang under local workerd.
     const response = await fetch(url, {
       method: "GET",
       headers,
       signal: controller.signal,
       redirect: "manual",
-      // Do not write this origin response into the Cloudflare HTTP cache.
-      cf: {
-        cacheTtl: 0,
-        cacheEverything: false,
-      },
     });
     if (!response.ok) {
       throw new Error(`Catalog upstream status ${response.status}`);
@@ -293,27 +299,48 @@ export function mapCatalog(raw: CatalogPayload): CatalogBundle {
 }
 
 export async function loadCatalog(env: Env): Promise<CatalogBundle> {
-  const cache = caches.default;
+  // Cache API can hang under local `wrangler dev`. Use it only away from localhost.
+  const useCache = !isLocalDev(env);
+  const cache = useCache ? caches.default : null;
   const cacheReq = new Request(CATALOG_CACHE_KEY);
-  const cached = await cache.match(cacheReq);
-  if (cached) {
+
+  if (cache) {
     try {
-      const raw = (await cached.json()) as CatalogPayload;
-      return mapCatalog(raw);
+      const cached = await Promise.race([
+        cache.match(cacheReq),
+        new Promise<undefined>((resolve) => setTimeout(() => resolve(undefined), 250)),
+      ]);
+      if (cached) {
+        const raw = (await cached.json()) as CatalogPayload;
+        return mapCatalog(raw);
+      }
     } catch {
       // fall through to refresh
     }
   }
 
-  const raw = await fetchCatalogFromOrigin(env);
-  const ttl = catalogCacheTtlSeconds(env);
-  const toCache = new Response(JSON.stringify(raw), {
-    headers: {
-      "Content-Type": "application/json",
-      "Cache-Control": `public, max-age=${ttl}`,
-    },
-  });
-  await cache.put(cacheReq, toCache.clone());
+  const raw = await Promise.race([
+    fetchCatalogFromOrigin(env),
+    new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error("Catalog upstream timed out")), 10_000);
+    }),
+  ]);
+
+  if (cache) {
+    try {
+      const ttl = catalogCacheTtlSeconds(env);
+      const toCache = new Response(JSON.stringify(raw), {
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": `public, max-age=${ttl}`,
+        },
+      });
+      void cache.put(cacheReq, toCache.clone()).catch(() => undefined);
+    } catch {
+      /* ignore cache write failures */
+    }
+  }
+
   return mapCatalog(raw);
 }
 

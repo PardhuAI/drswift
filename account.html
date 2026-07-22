@@ -2,10 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Account · History &amp; Reports | Dr.Swift Diagnostics</title>
-    <meta name="description" content="Account settings, test history, and health trends for Dr.Swift Diagnostics.">
-    <link rel="stylesheet" href="assets/css/styles.css?v=account-mvp-4">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Account · Reports &amp; bookings | Dr.Swift Diagnostics</title>
+    <meta name="description" content="Sign in to view Dr.Swift Diagnostics bookings, reports, family profiles, and health trends.">
+    <link rel="stylesheet" href="assets/css/styles.css?v=mobile-lag-1">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
   <body class="account-page">
@@ -37,125 +37,185 @@
     </header>
 
     <main>
-      <section class="account-hero section-pad-sm">
-        <div class="container">
-          <p class="eyebrow">My account</p>
-          <h1>Account settings, history and reports</h1>
-          <p class="account-hero__lede">Review your profile, past bookings, and long-term marker trends. This page is a static MVP mock with sample data.</p>
-
-          <div class="account-user-bar">
-            <button type="button" class="account-user-chip" aria-current="true">
-              <img src="https://i.pravatar.cc/80?img=12" alt="" width="28" height="28">
-              Madhu Karnati
-            </button>
-            <button type="button" class="button secondary account-add-family" disabled title="Coming soon">
-              + Add family &amp; friends
-            </button>
+      <section class="account-gate section-pad" data-account-gate>
+        <div class="container account-gate__grid">
+          <div class="account-gate__copy">
+            <p class="eyebrow">Secure account</p>
+            <h1>Sign in to view reports and bookings</h1>
+            <p>
+              Your reports, family profiles, booking history, addresses, and health trends should only appear after verified account access.
+            </p>
+            <div class="hero-actions">
+              <a class="button primary" href="login.html">Sign in</a>
+              <a class="button secondary" href="signup.html">Create account</a>
+            </div>
           </div>
+          <aside class="account-gate__panel" aria-label="Account features">
+            <h2>What your account includes</h2>
+            <ul>
+              <li>Secure report access after phone verification</li>
+              <li>Booking status, collection slot, and support links</li>
+              <li>Family profiles with separate health timelines</li>
+            </ul>
+            <button class="account-preview-link" type="button" data-account-preview>Preview sample dashboard</button>
+          </aside>
         </div>
       </section>
 
-      <!-- Top row: profile + test history cards -->
-      <section class="section-pad-sm section-bg-white">
-        <div class="container account-top-grid">
-          <article class="account-card account-card--profile">
-            <h2 class="account-card__title">Personal info</h2>
-            <dl class="account-profile-dl">
-              <div><dt>Name</dt><dd>Madhu Karnati</dd></div>
-              <div><dt>Email</dt><dd>madhureddy480@gmail.com</dd></div>
-              <div>
-                <dt>Phone</dt>
-                <dd>+91 98765 43210 <span class="account-verified">verified</span></dd>
-              </div>
-              <div><dt>Address</dt><dd>12 Residency Road, Bengaluru 560025</dd></div>
-            </dl>
-            <div class="account-profile-actions">
-              <button type="button" class="account-link-btn" disabled>Add phone</button>
-              <button type="button" class="account-link-btn" disabled>Update phone</button>
-              <button type="button" class="account-link-btn" disabled>Add address</button>
+      <div data-account-dashboard hidden>
+        <section class="account-hero section-pad-sm">
+          <div class="container account-hero__grid">
+            <div>
+              <p class="eyebrow" data-account-mode>Sample dashboard preview</p>
+              <h1>Welcome back<span data-account-name-prefix>,</span> <span data-account-name>Demo customer</span></h1>
+              <p class="account-hero__lede" data-account-intro>
+                This is sample account data for the website demo. Real customer reports should load only after backend authentication.
+              </p>
             </div>
-          </article>
-
-          <article class="account-card account-card--history">
-            <div class="account-card__head">
-              <h2 class="account-card__title">Test history</h2>
-              <span class="account-status account-status--ready">Results ready</span>
+            <div class="account-user-bar" aria-label="Account shortcuts">
+              <a class="account-user-chip" href="sample-report.html">
+                <span class="account-avatar" aria-hidden="true">DS</span>
+                Latest report
+              </a>
+              <a class="button secondary account-add-family" href="signup.html?mode=family">Add family member</a>
+              <button class="button secondary account-logout" type="button" data-account-logout>Logout</button>
             </div>
-            <p class="account-meta"><strong>Booking:</strong> 12 Jan 2026 · <strong>Result:</strong> 14 Jan 2026</p>
-            <p class="account-subtitle">Tests ordered</p>
-            <ul class="account-test-list">
-              <li>HbA1c</li>
-              <li>Fasting glucose</li>
-              <li>Lipid profile</li>
-              <li>Vitamin D (25-OH)</li>
-            </ul>
-            <div class="account-report-actions">
-              <a class="button secondary" href="sample-report.html">View report</a>
-              <button type="button" class="button secondary" disabled>Download report</button>
-              <button type="button" class="button secondary" disabled>WhatsApp</button>
-              <button type="button" class="button secondary" disabled>Text message</button>
-              <button type="button" class="button secondary" disabled>Email report</button>
-              <button type="button" class="button secondary" disabled>Email to doctor</button>
-              <button type="button" class="button secondary" disabled>Email to friend</button>
-            </div>
-          </article>
-
-          <article class="account-card account-card--history">
-            <div class="account-card__head">
-              <h2 class="account-card__title">Test history</h2>
-              <span class="account-status account-status--ready">Results ready</span>
-            </div>
-            <p class="account-meta"><strong>Booking:</strong> 18 Nov 2025 · <strong>Result:</strong> 20 Nov 2025</p>
-            <p class="account-subtitle">Tests ordered</p>
-            <ul class="account-test-list">
-              <li>Complete blood count</li>
-              <li>TSH</li>
-              <li>Vitamin B12</li>
-              <li>Creatinine &amp; eGFR</li>
-            </ul>
-            <div class="account-report-actions">
-              <a class="button secondary" href="sample-report.html">View report</a>
-              <button type="button" class="button secondary" disabled>Download report</button>
-              <button type="button" class="button secondary" disabled>WhatsApp</button>
-              <button type="button" class="button secondary" disabled>Email report</button>
-            </div>
-          </article>
-
-          <article class="account-card account-card--history">
-            <div class="account-card__head">
-              <h2 class="account-card__title">Test history</h2>
-              <span class="account-status account-status--pending">In progress</span>
-            </div>
-            <p class="account-meta"><strong>Booking:</strong> 08 Jul 2026 · Expected: 10 Jul 2026</p>
-            <p class="account-subtitle">Tests ordered</p>
-            <ul class="account-test-list">
-              <li>LDL cholesterol</li>
-              <li>Triglycerides</li>
-              <li>Hemoglobin</li>
-            </ul>
-            <div class="account-report-actions">
-              <button type="button" class="button secondary" disabled>Awaiting results</button>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <!-- Health trends -->
-      <section class="section-pad account-trends-section">
-        <div class="container">
-          <div class="account-trends-intro">
-            <p class="eyebrow">Longitudinal view</p>
-            <h2>Health trends</h2>
-            <p>Ten common lab markers with sample history. Charts are SVG with motion — values are demo only, not medical advice.</p>
           </div>
-          <div class="account-trends" id="account-trends" data-account-trends></div>
-        </div>
-      </section>
+        </section>
+
+        <section class="section-pad-sm section-bg-white" aria-labelledby="account-overview-title">
+          <div class="container">
+            <div class="section-head section-head--compact">
+              <p class="eyebrow">Overview</p>
+              <h2 id="account-overview-title">Your health workspace</h2>
+            </div>
+            <div class="account-overview-grid">
+              <article class="account-card account-card--focus">
+                <div class="account-card__head">
+                  <h3 class="account-card__title">Upcoming collection</h3>
+                  <span class="account-status account-status--pending">Scheduled</span>
+                </div>
+                <p class="account-meta"><strong>Tomorrow</strong> · Morning window</p>
+                <p class="account-summary">Complete Blood Count at your saved home address.</p>
+                <div class="account-action-row">
+                  <a class="button secondary" href="book.html?cart=checkout">Reschedule</a>
+                  <a class="button secondary" href="whatsapp.html">Support</a>
+                </div>
+              </article>
+
+              <article class="account-card account-card--focus">
+                <div class="account-card__head">
+                  <h3 class="account-card__title">Latest report</h3>
+                  <span class="account-status account-status--ready">Ready</span>
+                </div>
+                <p class="account-meta"><strong>Full Body Checkup</strong> · 14 Jan 2026</p>
+                <p class="account-summary">PDF report and trend insights are available for review.</p>
+                <div class="account-action-row">
+                  <a class="button primary" href="sample-report.html">View report</a>
+                  <a class="button secondary" href="reports.html">Reports</a>
+                </div>
+              </article>
+
+              <article class="account-card account-card--focus">
+                <h3 class="account-card__title">Family profiles</h3>
+                <p class="account-meta" data-family-summary>Demo customer · Parent · Partner</p>
+                <p class="account-summary">Keep each person's reports, trends, and reminders separate.</p>
+                <div class="account-family-list" data-family-members></div>
+                <div class="account-action-row">
+                  <a class="button secondary" href="signup.html?mode=family">Add profile</a>
+                </div>
+              </article>
+
+              <article class="account-card account-card--focus">
+                <h3 class="account-card__title">Profile security</h3>
+                <p class="account-meta" data-account-security>Phone verified · Email optional</p>
+                <p class="account-summary">Use phone OTP as the primary access method for reports and booking updates.</p>
+                <div class="account-action-row">
+                  <a class="button secondary" href="login.html">Manage access</a>
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="section-pad-sm section-bg-soft" aria-labelledby="account-reports-title">
+          <div class="container">
+            <div class="section-head section-head--compact">
+              <p class="eyebrow">Reports</p>
+              <h2 id="account-reports-title">Recent report history</h2>
+            </div>
+            <div class="account-report-list">
+              <article class="account-card account-card--report">
+                <div class="account-card__head">
+                  <h3 class="account-card__title">Full Body Checkup</h3>
+                  <span class="account-status account-status--ready">Results ready</span>
+                </div>
+                <p class="account-meta">Booking: 12 Jan 2026 · Result: 14 Jan 2026</p>
+                <ul class="account-test-list">
+                  <li>HbA1c</li>
+                  <li>Fasting glucose</li>
+                  <li>Lipid profile</li>
+                  <li>Vitamin D (25-OH)</li>
+                </ul>
+                <div class="account-action-row">
+                  <a class="button primary" href="sample-report.html">View report</a>
+                  <a class="button secondary" href="mailto:care@drswift.health?subject=Share%20my%20Dr.Swift%20report">Share securely</a>
+                </div>
+              </article>
+
+              <article class="account-card account-card--report">
+                <div class="account-card__head">
+                  <h3 class="account-card__title">Wellness Follow-up</h3>
+                  <span class="account-status account-status--ready">Results ready</span>
+                </div>
+                <p class="account-meta">Booking: 18 Nov 2025 · Result: 20 Nov 2025</p>
+                <ul class="account-test-list">
+                  <li>Complete blood count</li>
+                  <li>TSH</li>
+                  <li>Vitamin B12</li>
+                  <li>Creatinine &amp; eGFR</li>
+                </ul>
+                <div class="account-action-row">
+                  <a class="button primary" href="sample-report.html">View report</a>
+                  <a class="button secondary" href="tests.html">Book again</a>
+                </div>
+              </article>
+
+              <article class="account-card account-card--report">
+                <div class="account-card__head">
+                  <h3 class="account-card__title">Heart Health Panel</h3>
+                  <span class="account-status account-status--pending">In progress</span>
+                </div>
+                <p class="account-meta">Booking: 08 Jul 2026 · Expected: 10 Jul 2026</p>
+                <ul class="account-test-list">
+                  <li>LDL cholesterol</li>
+                  <li>Triglycerides</li>
+                  <li>Hemoglobin</li>
+                </ul>
+                <div class="account-action-row">
+                  <a class="button secondary" href="whatsapp.html">Ask support</a>
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="section-pad account-trends-section" aria-labelledby="account-trends-title">
+          <div class="container">
+            <div class="account-trends-intro">
+              <p class="eyebrow">Sample trends</p>
+              <h2 id="account-trends-title">Health trends</h2>
+              <p>Demo marker history for product preview only. Real ranges, values, and guidance should come from verified reports and clinician-approved content.</p>
+            </div>
+            <div class="account-trends" id="account-trends" data-account-trends></div>
+          </div>
+        </section>
+      </div>
     </main>
 
     <footer class="site-footer">
       <div class="container footer-bottom footer-bottom--plain">
-        <p>&copy; 2026 Dr.Swift Diagnostics · <a href="privacy.html">Privacy</a> · MVP mock data</p>
+        <p>&copy; 2026 Dr.Swift Diagnostics · <a href="privacy.html">Privacy</a></p>
       </div>
     </footer>
 
@@ -163,7 +223,8 @@
     <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
     <script src="assets/js/firebase-config.js?v=3"></script>
     <script src="assets/js/google-auth.js?v=6"></script>
-    <script src="assets/js/main.js?v=fix-dup-prm-1"></script>
-    <script src="assets/js/account-trends.js?v=4"></script>
+    <script src="assets/js/main.js?v=session-flow-1"></script>
+    <script src="assets/js/account-page.js?v=session-flow-1"></script>
+    <script src="assets/js/account-trends.js?v=account-ux-1"></script>
   </body>
 </html>

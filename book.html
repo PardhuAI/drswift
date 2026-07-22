@@ -2,9 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Book a test | Dr.Swift Diagnostics</title>
-    <link rel="stylesheet" href="assets/css/styles.css?v=confirm-peace-1">
+    <link rel="stylesheet" href="assets/css/styles.css?v=checkout-flow-1">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
   <body class="auth-page">
@@ -21,11 +21,35 @@
     <main class="auth-shell">
       <div class="checkout-frame">
         <div class="checkout-wire-shell">
-          <div class="auth-card__header">
+          <div class="auth-card__header checkout-hero-copy">
             <p class="eyebrow">Checkout</p>
             <h1>Complete your booking</h1>
-            <p>Confirm collection details, pay securely, and receive booking confirmation.</p>
+            <p>Review the order, choose who needs the test, verify the phone number, and confirm a home collection slot.</p>
+            <div class="checkout-trust-strip" aria-label="Booking assurances">
+              <span>At-home collection</span>
+              <span>Phone verified updates</span>
+              <span>Secure online payment</span>
+            </div>
           </div>
+
+          <ol class="checkout-progress" aria-label="Checkout progress">
+            <li class="is-complete" data-progress-step="cart">
+              <span>1</span>
+              <strong>Cart</strong>
+            </li>
+            <li class="is-active" data-progress-step="details">
+              <span>2</span>
+              <strong>Details</strong>
+            </li>
+            <li data-progress-step="payment">
+              <span>3</span>
+              <strong>Payment</strong>
+            </li>
+            <li data-progress-step="confirmation">
+              <span>4</span>
+              <strong>Done</strong>
+            </li>
+          </ol>
 
           <div class="checkout-wire-layout" data-checkout-flow>
             <div class="checkout-wire-main">
@@ -34,11 +58,17 @@
                   <span class="checkout-step-badge">2</span>
                   <div>
                     <p class="checkout-step-kicker">Step 2</p>
-                    <h2>Who is this booking for?</h2>
+                    <h2>Collection and patient details</h2>
+                    <p class="checkout-wire-subtitle">Keep the patient, phone, and address accurate so the phlebotomist can reach the right person.</p>
                   </div>
                 </div>
                 <form class="checkout-wire-form" data-checkout-form id="book-form" novalidate>
-                  <div class="checkout-time-row">
+                  <section class="checkout-form-section checkout-form-section--schedule" aria-labelledby="checkout-slot-title">
+                    <div class="checkout-form-section__head">
+                      <p>Collection slot</p>
+                      <h3 id="checkout-slot-title">Pick a convenient home visit time</h3>
+                    </div>
+                    <div class="checkout-time-row">
                     <strong>Sample Collection Date/Time</strong>
                     <div class="checkout-segments" role="group" aria-label="Sample collection day">
                       <input id="book-day-today" type="radio" name="sampleDay" value="Today" checked>
@@ -102,13 +132,19 @@
                       <span class="checkout-when-confirm__tick" aria-hidden="true">✓</span>
                       <strong data-when-confirm-value>Today · Morning</strong>
                     </p>
-                  </div>
+                    </div>
+                  </section>
 
-                  <div class="checkout-wire-field checkout-wire-field--wide">
+                  <section class="checkout-form-section checkout-form-section--patient" aria-labelledby="checkout-patient-title">
+                    <div class="checkout-form-section__head">
+                      <p>Patient profile</p>
+                      <h3 id="checkout-patient-title">Who should we collect the sample from?</h3>
+                    </div>
+                    <div class="checkout-wire-field checkout-wire-field--wide">
                     <label for="book-name">Name</label>
                     <input id="book-name" type="text" name="name" autocomplete="name" required>
-                  </div>
-                  <div class="checkout-gender-age-row">
+                    </div>
+                    <div class="checkout-gender-age-row">
                     <span class="checkout-gender-age-row__label" id="book-gender-label">Gender</span>
                     <div class="checkout-segments" role="radiogroup" aria-labelledby="book-gender-label">
                       <input id="book-gender-male" type="radio" name="gender" value="Male" checked required>
@@ -118,8 +154,8 @@
                     </div>
                     <label for="book-age">Age</label>
                     <input id="book-age" type="number" name="age" inputmode="numeric" min="0" max="120">
-                  </div>
-                  <div class="checkout-wire-field checkout-wire-field--phone">
+                    </div>
+                    <div class="checkout-wire-field checkout-wire-field--phone">
                     <label for="book-phone">Phone</label>
                     <div class="phone-verify-row">
                       <input id="book-phone" type="tel" name="phone" autocomplete="tel" inputmode="numeric" placeholder="10-digit mobile" maxlength="10" pattern="[0-9]{10}" required>
@@ -133,9 +169,16 @@
                       <input id="book-otp" type="text" name="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code">
                       <button class="button secondary" type="button" data-otp-verify>Verify</button>
                     </div>
-                  </div>
+                    </div>
                   <p class="checkout-status" data-checkout-status hidden aria-live="polite"></p>
-                  <div class="checkout-wire-field">
+                  </section>
+
+                  <section class="checkout-form-section checkout-form-section--address" aria-labelledby="checkout-address-title">
+                    <div class="checkout-form-section__head">
+                      <p>Collection address</p>
+                      <h3 id="checkout-address-title">Where should the sample be collected?</h3>
+                    </div>
+                    <div class="checkout-wire-field">
                     <label for="book-city">City/Town/Village</label>
                     <input
                       id="book-city"
@@ -148,11 +191,13 @@
                       title="Must start with a letter, include at least 3 letters, and be under 100 characters"
                       required
                     >
-                  </div>
-                  <div class="checkout-wire-field checkout-wire-field--address">
+                    </div>
+                    <div class="checkout-wire-field checkout-wire-field--address">
                     <label for="book-address">Address</label>
                     <textarea id="book-address" name="address" autocomplete="street-address" required></textarea>
-                  </div>
+                    </div>
+                    <p class="checkout-address-note">Add house number, landmark, and area so the collector does not need repeated calls.</p>
+                  </section>
                   <div class="checkout-wire-actions">
                     <a class="checkout-back-link" href="cart.html" aria-label="View cart">
                       <span aria-hidden="true">←</span> View Cart
@@ -167,7 +212,8 @@
                   <span class="checkout-step-badge">3</span>
                   <div>
                     <p class="checkout-step-kicker">Step 3</p>
-                    <h2>Choose Payment option</h2>
+                    <h2>Choose payment option</h2>
+                    <p class="checkout-wire-subtitle">Payment is collected after patient details are locked. You can still go back and edit before paying.</p>
                   </div>
                 </div>
                 <div class="pay-method-list">
@@ -219,6 +265,7 @@
                     <span aria-hidden="true">←</span> Customer details
                   </button>
                 </div>
+                <p class="pay-status" data-pay-status hidden></p>
               </section>
 
               <section class="checkout-wire-panel" data-checkout-stage="pay-card" hidden>
@@ -229,162 +276,26 @@
                     <h2>Debit / Credit Card</h2>
                   </div>
                 </div>
-                <div class="pay-tabs" role="tablist">
-                  <button type="button" class="is-on" data-card-tab>Debit Card</button>
-                  <button type="button" data-card-tab>Credit Card</button>
+                <div class="pay-gateway">
+                  <p class="pay-gateway__amount" data-pay-total>₹0</p>
+                  <p class="pay-gateway__lead">
+                    You’ll continue on a secure payment page. Card numbers and CVV are never entered on Dr.Swift.
+                  </p>
+                  <ul class="pay-gateway__list">
+                    <li>Amount is locked from your cart</li>
+                    <li>Return here automatically after payment</li>
+                    <li>Booking confirms only when payment succeeds</li>
+                  </ul>
+                  <p class="pay-status" data-pay-status hidden></p>
                 </div>
-                <form class="pay-card-form" id="checkout-card-form" data-card-pay-form novalidate>
-                  <div class="field">
-                    <label for="cc-number">Card Number</label>
-                    <input
-                      id="cc-number"
-                      name="cardNumber"
-                      inputmode="numeric"
-                      autocomplete="cc-number"
-                      placeholder="XXXX XXXX XXXX XXXX"
-                      maxlength="19"
-                      pattern="[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}"
-                      title="Enter a 16-digit card number"
-                      required
-                      data-card-number
-                    >
-                  </div>
-                  <div class="pay-card-row">
-                    <div class="field">
-                      <label>Expiry date</label>
-                      <div class="pay-exp-row">
-                        <select name="expMonth" required aria-label="Month" data-card-exp-month>
-                          <option value="">Month</option>
-                          <option value="01">01</option><option value="02">02</option><option value="03">03</option><option value="04">04</option>
-                          <option value="05">05</option><option value="06">06</option><option value="07">07</option><option value="08">08</option>
-                          <option value="09">09</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
-                        </select>
-                        <select name="expYear" required aria-label="Year" data-card-exp-year>
-                          <option value="">Year</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div class="field">
-                      <label for="cc-cvv">CVV</label>
-                      <input
-                        id="cc-cvv"
-                        name="cvv"
-                        inputmode="numeric"
-                        autocomplete="cc-csc"
-                        maxlength="4"
-                        minlength="3"
-                        pattern="[0-9]{3,4}"
-                        placeholder="XXX"
-                        title="Enter 3 or 4 digit CVV"
-                        required
-                        data-card-cvv
-                      >
-                    </div>
-                  </div>
-                  <div class="field">
-                    <label for="cc-name">Name</label>
-                    <input
-                      id="cc-name"
-                      name="cardName"
-                      autocomplete="cc-name"
-                      placeholder="Name on card"
-                      maxlength="60"
-                      minlength="2"
-                      pattern="[A-Za-z][A-Za-z .'-]{1,59}"
-                      title="Enter the name printed on the card"
-                      required
-                      data-card-name
-                    >
-                  </div>
-                  <fieldset class="pay-billing">
-                    <legend>Billing address</legend>
-                    <div class="pay-address-list" role="radiogroup" aria-label="Billing address">
-                      <label class="pay-address-card is-selected">
-                        <input
-                          type="radio"
-                          name="billingAddress"
-                          value="customer"
-                          checked
-                          data-billing-choice="customer"
-                        >
-                        <span class="pay-address-card__body">
-                          <span class="pay-address-card__top">
-                            <span class="pay-address-card__title">Collection address</span>
-                            <span class="pay-address-card__badge">Default</span>
-                          </span>
-                          <span class="pay-address-card__line" data-billing-customer-address>—</span>
-                          <span class="pay-address-card__meta" data-billing-customer-city>—</span>
-                        </span>
-                      </label>
-
-                      <label class="pay-address-card">
-                        <input
-                          type="radio"
-                          name="billingAddress"
-                          value="new"
-                          data-billing-choice="new"
-                        >
-                        <span class="pay-address-card__body">
-                          <span class="pay-address-card__top">
-                            <span class="pay-address-card__title">Use a different address</span>
-                          </span>
-                          <span class="pay-address-card__hint">Enter a billing address that differs from collection</span>
-                        </span>
-                      </label>
-                    </div>
-
-                    <div class="pay-address-form" data-billing-new hidden>
-                      <div class="pay-address-form__row">
-                        <label for="billing-street">Street address</label>
-                        <input
-                          id="billing-street"
-                          type="text"
-                          name="billingStreet"
-                          autocomplete="street-address"
-                          placeholder="House no., street, landmark"
-                          data-billing-street
-                        >
-                      </div>
-                      <div class="pay-address-form__grid">
-                        <div class="pay-address-form__row">
-                          <label for="billing-city">City / Town / Village</label>
-                          <input
-                            id="billing-city"
-                            type="text"
-                            name="billingCity"
-                            autocomplete="address-level2"
-                            maxlength="99"
-                            minlength="3"
-                            pattern="[A-Za-z].{2,98}"
-                            placeholder="Hyderabad"
-                            data-billing-city
-                          >
-                        </div>
-                        <div class="pay-address-form__row">
-                          <label for="billing-pin">PIN code</label>
-                          <input
-                            id="billing-pin"
-                            type="text"
-                            name="billingPin"
-                            inputmode="numeric"
-                            maxlength="6"
-                            pattern="[0-9]{6}"
-                            placeholder="500001"
-                            data-billing-pin
-                          >
-                        </div>
-                      </div>
-                    </div>
-                  </fieldset>
-                </form>
                 <div class="checkout-wire-actions">
                   <button class="checkout-back-link checkout-change-pay" type="button" data-checkout-back="pay-choose">
                     <svg class="checkout-change-pay__icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
                       <path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M19 12H5M11 6l-6 6 6 6"/>
                     </svg>
-                    Select Different Payment Method
+                    Change method
                   </button>
-                  <button class="checkout-next-link" type="submit" form="checkout-card-form">Pay Now</button>
+                  <button class="checkout-next-link" type="button" data-pay-start="card">Continue to secure pay</button>
                 </div>
               </section>
 
@@ -396,43 +307,33 @@
                     <h2 data-qr-title>Scan &amp; Pay</h2>
                   </div>
                 </div>
-                <div class="pay-qr">
+                <div class="pay-gateway" data-upi-pending>
+                  <p class="pay-gateway__amount" data-pay-total>₹0</p>
+                  <p class="pay-gateway__lead">Starting UPI payment…</p>
+                  <p class="pay-status" data-pay-status hidden></p>
+                </div>
+                <div class="pay-qr" data-upi-ready hidden>
                   <div class="pay-qr__brand" data-qr-brand>G Pay · UPI</div>
                   <p class="pay-qr__amount" data-pay-total>₹0</p>
                   <div class="pay-qr__card" aria-label="Payment QR code">
-                    <svg viewBox="0 0 120 120" aria-hidden="true">
-                      <rect width="120" height="120" fill="#fff"/>
-                      <g fill="#162033">
-                        <rect x="8" y="8" width="34" height="34" rx="3"/>
-                        <rect x="14" y="14" width="22" height="22" fill="#fff"/>
-                        <rect x="18" y="18" width="14" height="14"/>
-                        <rect x="78" y="8" width="34" height="34" rx="3"/>
-                        <rect x="84" y="14" width="22" height="22" fill="#fff"/>
-                        <rect x="88" y="18" width="14" height="14"/>
-                        <rect x="8" y="78" width="34" height="34" rx="3"/>
-                        <rect x="14" y="84" width="22" height="22" fill="#fff"/>
-                        <rect x="18" y="88" width="14" height="14"/>
-                        <rect x="50" y="8" width="8" height="8"/><rect x="62" y="20" width="8" height="8"/>
-                        <rect x="50" y="32" width="8" height="8"/><rect x="8" y="50" width="8" height="8"/>
-                        <rect x="20" y="50" width="8" height="8"/><rect x="44" y="50" width="8" height="8"/>
-                        <rect x="68" y="50" width="8" height="8"/><rect x="92" y="50" width="8" height="8"/>
-                        <rect x="52" y="52" width="16" height="16" rx="2"/>
-                        <rect x="74" y="74" width="8" height="8"/><rect x="98" y="74" width="8" height="8"/>
-                        <rect x="50" y="98" width="8" height="8"/><rect x="74" y="98" width="8" height="8"/>
-                      </g>
-                    </svg>
+                    <img class="pay-qr__img" data-upi-qr alt="UPI QR code" hidden>
+                    <div class="pay-qr__placeholder" data-upi-qr-placeholder>
+                      <p>QR appears when the payment API returns <code>qrDataUrl</code>. Use Open UPI app if a deep link is available.</p>
+                    </div>
                   </div>
-                  <p class="pay-qr__upi">drswift@okaxis</p>
-                  <p class="pay-qr__help" data-qr-help>Open your UPI app and scan this QR to complete payment.</p>
+                  <p class="pay-qr__upi" data-upi-id hidden></p>
+                  <a class="button secondary" data-upi-intent hidden>Open UPI app</a>
+                  <p class="pay-qr__help" data-qr-help>Complete payment in your UPI app. We’ll confirm automatically.</p>
+                  <p class="pay-status" data-pay-status hidden></p>
                 </div>
                 <div class="checkout-wire-actions">
                   <button class="checkout-back-link checkout-change-pay" type="button" data-checkout-back="pay-choose">
                     <svg class="checkout-change-pay__icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
                       <path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M19 12H5M11 6l-6 6 6 6"/>
                     </svg>
-                    Select Different Payment Method
+                    Change method
                   </button>
-                  <button class="checkout-next-link" type="button" data-complete-pay="UPI">I’ve paid</button>
+                  <button class="checkout-next-link" type="button" data-pay-check>Check payment status</button>
                 </div>
               </section>
 
@@ -444,6 +345,8 @@
                     <h2>Internet Banking</h2>
                   </div>
                 </div>
+                <p class="pay-gateway__amount" data-pay-total>₹0</p>
+                <p class="pay-gateway__lead">Select your bank. You’ll continue on the bank’s secure page — booking confirms only after payment succeeds.</p>
                 <div class="bank-list">
                   <button type="button" data-bank>HDFC Bank</button>
                   <button type="button" data-bank>ICICI Bank</button>
@@ -451,14 +354,36 @@
                   <button type="button" data-bank>Axis Bank</button>
                   <button type="button" data-bank>Kotak Mahindra</button>
                 </div>
+                <p class="pay-status" data-pay-status hidden></p>
                 <div class="checkout-wire-actions">
                   <button class="checkout-back-link checkout-change-pay" type="button" data-checkout-back="pay-choose">
                     <svg class="checkout-change-pay__icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
                       <path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M19 12H5M11 6l-6 6 6 6"/>
                     </svg>
-                    Select Different Payment Method
+                    Change method
                   </button>
-                  <button class="checkout-next-link" type="button" data-bank-continue disabled>Continue</button>
+                  <button class="checkout-next-link" type="button" data-bank-continue disabled>Continue to bank</button>
+                </div>
+              </section>
+
+              <section class="checkout-wire-panel" data-checkout-stage="pay-processing" hidden>
+                <div class="checkout-wire-head">
+                  <span class="checkout-step-badge">3</span>
+                  <div>
+                    <p class="checkout-step-kicker">Payment</p>
+                    <h2>Confirming payment</h2>
+                  </div>
+                </div>
+                <div class="pay-processing">
+                  <div class="pay-processing__spinner" aria-hidden="true"></div>
+                  <p class="pay-processing__message" data-processing-message>Please wait…</p>
+                  <p class="pay-gateway__amount" data-pay-total>₹0</p>
+                  <p class="pay-status" data-pay-status hidden></p>
+                </div>
+                <div class="checkout-wire-actions">
+                  <button class="checkout-back-link" type="button" data-pay-cancel-wait>
+                    <span aria-hidden="true">←</span> Choose another method
+                  </button>
                 </div>
               </section>
 
@@ -478,7 +403,7 @@
                         <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-shield-check"></use></svg>
                       </div>
                       <p class="confirm-hero__status">You’re all set</p>
-                      <p class="confirm-hero__lead">
+                      <p class="confirm-hero__lead" data-confirm-lead>
                         Payment received. We’ll collect your sample at home and send reports when ready.
                       </p>
                       <dl class="confirm-meta">
@@ -571,9 +496,18 @@
               <section class="checkout-summary-panel">
                 <div class="checkout-summary-title">
                   <span class="checkout-step-badge">1</span>
-                  <h2>Selected Tests</h2>
+                  <h2>Order summary</h2>
                 </div>
                 <div class="booking-cart-summary" data-booking-cart hidden></div>
+                <div class="checkout-summary-empty" data-booking-cart-empty>
+                  <p>No tests found in this checkout.</p>
+                  <a href="tests.html">Browse tests</a>
+                </div>
+                <div class="checkout-care-card">
+                  <strong>Need help choosing or booking?</strong>
+                  <p>Our care team can confirm prep, timing, and the right profile before payment.</p>
+                  <a href="whatsapp.html">Chat on WhatsApp</a>
+                </div>
               </section>
               <section class="checkout-summary-panel" data-summary-customer hidden>
                 <div class="checkout-summary-title">
@@ -595,6 +529,19 @@
         </div>
       </div>
     </main>
+
+    <div class="checkout-sticky-bar" data-checkout-sticky hidden>
+      <div class="checkout-sticky-bar__inner">
+        <div class="checkout-sticky-bar__total">
+          <span class="checkout-sticky-bar__label">Total</span>
+          <strong data-pay-total>₹0</strong>
+        </div>
+        <button type="button" class="button primary checkout-sticky-bar__cta" data-checkout-sticky-cta>
+          Continue
+        </button>
+      </div>
+    </div>
+
     <footer class="site-footer"><div class="container footer-bottom footer-bottom--plain"><p>&copy; 2026 Dr.Swift Diagnostics</p></div></footer>
     <script src="assets/js/panel-catalog.js"></script>
     <script src="assets/js/test-data.js"></script>
@@ -603,8 +550,9 @@
     <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
     <script src="assets/js/firebase-config.js?v=3"></script>
     <script src="assets/js/google-auth.js?v=6"></script>
-    <script src="assets/js/main.js?v=fix-dup-prm-1"></script>
-    <script src="assets/js/checkout.js?v=confirm-next-1"></script>
+    <script src="assets/js/main.js?v=session-flow-1"></script>
+    <script src="assets/js/checkout-api.js?v=pay-flow-1"></script>
+    <script src="assets/js/checkout.js?v=checkout-flow-1"></script>
     <script>
       async function initBookingPage() {
         if (typeof window.DRSWIFT_BOOTSTRAP_CATALOG === "function") {
@@ -635,6 +583,7 @@
                 return sum + unit * item.quantity;
               }, 0);
               cartSummary.hidden = false;
+              document.querySelector("[data-booking-cart-empty]")?.setAttribute("hidden", "");
               cartSummary.innerHTML = `<strong>Order summary</strong><ul>${items
                 .map((item) => `<li>${item.test.name}</li>`)
                 .join("")}</ul><p class="booking-cart-summary__total">Estimated total: ₹${total.toLocaleString("en-IN")}</p>`;

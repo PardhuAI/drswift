@@ -770,6 +770,44 @@
   .tests-extra-filters {
     -webkit-overflow-scrolling: touch;
     touch-action: pan-x;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 12px;
+    padding-inline: 2px 16px;
+    mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 28px), transparent 100%);
+  }
+
+  .tests-audience-categories {
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 12px;
+    padding-inline: 2px 16px;
+    mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 28px), transparent 100%);
+  }
+
+  .tests-filter-link,
+  .tests-audience-categories .tests-quick-link,
+  .tests-filter-chip {
+    scroll-snap-align: start;
+  }
+
+  .tests-filter-link,
+  .tests-quick-link {
+    min-height: 40px;
+    padding-inline: 12px;
+    font-size: 0.84rem;
+  }
+
+  .tests-toolbar__inner {
+    row-gap: 14px;
+  }
+
+  .tests-page-heading {
+    font-size: clamp(1.25rem, 5.5vw, 1.55rem);
+  }
+
+  .tests-quick-filters__panel.is-mobile-sheet {
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   }
   .tests-search-toggle {
     display: none;

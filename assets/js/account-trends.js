@@ -263,9 +263,9 @@
         (t) => `
       <li class="trend-tip">
         <span>${t.text}</span>
-        <button type="button" class="trend-tip__btn ${t.enabled ? "is-on" : ""}" disabled>
+        <span class="trend-tip__btn ${t.enabled ? "is-on" : ""}">
           ${t.enabled ? "✓ " : ""}${t.action}
-        </button>
+        </span>
       </li>`
       )
       .join("");

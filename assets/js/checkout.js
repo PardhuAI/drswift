@@ -155,45 +155,503 @@
     return Number(item.test.price || 0);
   }
 
-  function initPaymentFlow() {
-    const brandCopy = {
-      gpay: {
-        title: "G Pay",
-        brand: "G Pay · UPI",
-        help: "Open Google Pay and scan this QR, or pay to the UPI ID below.",
-        method: "G Pay",
+  const brandCopy = {
+    gpay: {
+      title: "G Pay",
+      label: "G Pay · UPI",
+      help: "Open Google Pay with the intent below, or scan the QR when it appears.",
+      method: "G Pay",
+      apiMethod: "upi",
+    },
+    phonepe: {
+      title: "PhonePe",
+      label: "PhonePe · RuPay UPI",
+      help: "Open PhonePe to pay. Keep this screen open until we confirm payment.",
+      method: "PhonePe",
+      apiMethod: "upi",
+    },
+    upi: {
+      title: "UPI",
+      label: "Any UPI app",
+      help: "Pay with GPay, PhonePe, Paytm, or BHIM using the QR or UPI intent.",
+      method: "UPI",
+      apiMethod: "upi",
+    },
+  };
+
+  let selectedBank = "";
+  let selectedUpiBrand = "upi";
+  let paymentPollTimer = null;
+  let paymentInFlight = false;
+
+  function checkoutApi() {
+    return window.DrSwiftCheckoutApi || null;
+  }
+
+  function cartTotalAmount() {
+    return cartItemsWithTests().reduce((sum, item) => sum + itemPrice(item), 0);
+  }
+
+  function syncPayTotals() {
+    const label = formatPrice(cartTotalAmount());
+    document.querySelectorAll("[data-pay-total]").forEach((el) => {
+      el.textContent = label;
+    });
+  }
+
+  function syncStickyCheckoutBar(stageName) {
+    const bar = document.querySelector("[data-checkout-sticky]");
+    const cta = document.querySelector("[data-checkout-sticky-cta]");
+    if (!bar || !cta) return;
+
+    const isNarrow = window.matchMedia("(max-width: 879px)").matches;
+    const hideStages = new Set(["confirmation", "pay-processing"]);
+    const show = isNarrow && stageName && !hideStages.has(stageName);
+    bar.hidden = !show;
+    document.body.classList.toggle("has-checkout-sticky", show);
+    if (!show) return;
+
+    syncPayTotals();
+
+    const configs = {
+      details: {
+        label: "Continue to payment",
+        disabled: false,
+        run() {
+          document.querySelector("[data-checkout-form]")?.requestSubmit?.();
+        },
       },
-      phonepe: {
-        title: "PhonePe",
-        brand: "PhonePe · RuPay UPI",
-        help: "Open PhonePe and scan this QR. Keep this screen open until confirmation.",
-        method: "PhonePe",
+      "pay-choose": {
+        label: "Select a method above",
+        disabled: true,
+        run: null,
       },
-      upi: {
-        title: "UPI",
-        brand: "Any UPI app",
-        help: "Scan with GPay, PhonePe, Paytm, or BHIM.",
-        method: "UPI",
+      "pay-card": {
+        label: "Pay securely",
+        disabled: false,
+        run() {
+          document.querySelector("[data-pay-start='card']")?.click();
+        },
+      },
+      "pay-qr": {
+        label: "Check payment status",
+        disabled: false,
+        run() {
+          document.querySelector("[data-pay-check]")?.click();
+        },
+      },
+      "pay-bank": {
+        label: "Continue to bank",
+        disabled: !!document.querySelector("[data-bank-continue]")?.disabled,
+        run() {
+          document.querySelector("[data-bank-continue]")?.click();
+        },
       },
     };
 
-    let selectedBank = "";
-    let selectedUpiBrand = "upi";
+    const config = configs[stageName] || configs["pay-choose"];
+    cta.textContent = config.label;
+    cta.disabled = !!config.disabled;
+    cta.onclick = (event) => {
+      event.preventDefault();
+      if (config.disabled || typeof config.run !== "function") return;
+      config.run();
+    };
+  }
 
-    function cartTotalLabel() {
-      const total = cartItemsWithTests().reduce((sum, item) => sum + itemPrice(item), 0);
-      return formatPrice(total);
+  function initStickyCheckoutBar() {
+    const cta = document.querySelector("[data-checkout-sticky-cta]");
+    if (!cta) return;
+    window.addEventListener("resize", () => {
+      const active = document.querySelector("[data-checkout-stage].is-active");
+      syncStickyCheckoutBar(active?.getAttribute("data-checkout-stage") || "details");
+    });
+  }
+
+  function setPayStatus(message, isError) {
+    document.querySelectorAll("[data-pay-status]").forEach((el) => {
+      el.hidden = !message;
+      el.textContent = message || "";
+      el.classList.toggle("is-error", !!isError);
+    });
+  }
+
+  function setProcessingMessage(message) {
+    const el = document.querySelector("[data-processing-message]");
+    if (el) el.textContent = message || "Confirming your payment…";
+  }
+
+  function stopPaymentPoll() {
+    if (paymentPollTimer) {
+      window.clearInterval(paymentPollTimer);
+      paymentPollTimer = null;
     }
+  }
 
-    function syncPayTotals() {
-      document.querySelectorAll("[data-pay-total]").forEach((el) => {
-        el.textContent = cartTotalLabel();
-      });
+  function buildOrderPayload(details, methodMeta) {
+    const items = cartItemsWithTests().map((item) => ({
+      slug: item.test.slug,
+      name: item.test.name,
+      price: itemPrice(item),
+      customPanels: item.customPanels || null,
+    }));
+    const amount = cartTotalAmount();
+    return {
+      amount,
+      currency: "INR",
+      patient: {
+        name: details.name,
+        firstName: details.firstName || "",
+        lastName: details.lastName || "",
+        gender: details.gender,
+        age: details.age,
+        phone: details.phone,
+        firebaseUid: details.firebaseUid || window.DRSWIFT_USER?.uid || null,
+      },
+      address: {
+        city: details.city,
+        line1: details.address,
+      },
+      schedule: {
+        sampleDay: details.sampleDay,
+        sampleDayLabel: details.sampleDayLabel || formatSampleDayLabel(details.sampleDay),
+        sampleWindow: details.sampleWindow,
+      },
+      lineItems: items,
+      paymentMethod: methodMeta?.apiMethod || methodMeta?.method || null,
+      paymentBrand: methodMeta?.brand || null,
+      bank: methodMeta?.bank || null,
+    };
+  }
+
+  function methodLabelFromMeta(meta) {
+    if (!meta) return "Online";
+    if (meta.apiMethod === "netbanking" && meta.bank) return `Net Banking · ${meta.bank}`;
+    if (meta.apiMethod === "card") return "Credit / Debit card";
+    return meta.method || "Online";
+  }
+
+  function showUpiPending(isPending) {
+    const pending = document.querySelector("[data-upi-pending]");
+    const ready = document.querySelector("[data-upi-ready]");
+    if (pending) pending.hidden = !isPending;
+    if (ready) ready.hidden = !!isPending;
+  }
+
+  function renderUpiPayment(payment, copy) {
+    showUpiPending(false);
+    const brand = document.querySelector("[data-qr-brand]");
+    const help = document.querySelector("[data-qr-help]");
+    const title = document.querySelector("[data-qr-title]");
+    const upiId = document.querySelector("[data-upi-id]");
+    const intent = document.querySelector("[data-upi-intent]");
+    const qrImg = document.querySelector("[data-upi-qr]");
+    const qrPlaceholder = document.querySelector("[data-upi-qr-placeholder]");
+
+    if (title) title.textContent = copy?.title || "Scan & Pay";
+    if (brand) brand.textContent = copy?.label || "UPI";
+    if (help) {
+      help.textContent =
+        copy?.help ||
+        "Open your UPI app to complete payment. We’ll confirm automatically.";
     }
+    if (upiId) {
+      upiId.textContent = payment.upiId || "UPI ID will appear when payment starts";
+      upiId.hidden = !payment.upiId;
+    }
+    if (intent) {
+      if (payment.upiIntent) {
+        intent.href = payment.upiIntent;
+        intent.hidden = false;
+      } else {
+        intent.removeAttribute("href");
+        intent.hidden = true;
+      }
+    }
+    if (qrImg && qrPlaceholder) {
+      if (payment.qrDataUrl) {
+        qrImg.src = payment.qrDataUrl;
+        qrImg.hidden = false;
+        qrPlaceholder.hidden = true;
+      } else {
+        qrImg.removeAttribute("src");
+        qrImg.hidden = true;
+        qrPlaceholder.hidden = false;
+      }
+    }
+    syncPayTotals();
+  }
 
+  async function ensureOrder(details, methodMeta) {
+    const api = checkoutApi();
+    if (!api) throw new Error("Checkout API client failed to load.");
+    const existing = api.getStoredOrder();
+    const amount = cartTotalAmount();
+    if (
+      existing?.orderId &&
+      Number(existing.amount) === amount &&
+      existing.status !== "cancelled"
+    ) {
+      return existing;
+    }
+    return api.createOrder(buildOrderPayload(details, methodMeta));
+  }
+
+  async function startPaymentSession(methodMeta) {
+    const details = readCheckoutDetails();
+    if (!details) {
+      activateDeckCard("details");
+      throw new Error("Complete customer details before paying.");
+    }
+    if (!cartItemsWithTests().length) {
+      throw new Error("Your cart is empty. Add tests before paying.");
+    }
+    const api = checkoutApi();
+    if (!api) throw new Error("Checkout API client failed to load.");
+
+    const order = await ensureOrder(details, methodMeta);
+    const payment = await api.createPayment({
+      orderId: order.orderId,
+      amount: order.amount ?? cartTotalAmount(),
+      currency: order.currency || "INR",
+      method: methodMeta.apiMethod,
+      brand: methodMeta.brand || null,
+      bank: methodMeta.bank || null,
+      returnUrl: `${location.origin}${location.pathname}?payment=return`,
+    });
+    return { details, order, payment };
+  }
+
+  function finalizePaidBooking(details, paymentResult, methodMeta) {
+    stopPaymentPoll();
+    const payment = {
+      amount: Number(paymentResult.amount || cartTotalAmount()),
+      method: paymentResult.method || methodLabelFromMeta(methodMeta),
+      reference:
+        paymentResult.reference ||
+        paymentResult.paymentId ||
+        `DS-${Date.now().toString(36).toUpperCase()}`,
+      orderId: paymentResult.orderId || null,
+      paymentId: paymentResult.paymentId || null,
+      paidAt: paymentResult.paidAt || new Date().toISOString(),
+      stub: !!paymentResult.stub,
+    };
+    sessionStorage.setItem(PAYMENT_STORAGE_KEY, JSON.stringify(payment));
+    try {
+      localStorage.removeItem("drswift.cart.v1");
+      window.dispatchEvent(new CustomEvent("drswift:cart-updated"));
+    } catch {
+      /* ignore */
+    }
+    checkoutApi()?.clearCheckoutSessions?.();
+    renderInlineConfirmation(details, payment);
+  }
+
+  async function pollPaymentUntilPaid(paymentId, methodMeta, options = {}) {
+    const api = checkoutApi();
+    if (!api) throw new Error("Checkout API client failed to load.");
+    const details = readCheckoutDetails();
+    const maxAttempts = options.maxAttempts || 40;
+    let attempts = 0;
+
+    const tick = async () => {
+      attempts += 1;
+      try {
+        const status = await api.getPaymentStatus(paymentId);
+        if (status.status === "paid" || status.status === "captured" || status.status === "success") {
+          stopPaymentPoll();
+          finalizePaidBooking(details, status, methodMeta);
+          return true;
+        }
+        if (status.status === "failed" || status.status === "cancelled") {
+          stopPaymentPoll();
+          setPayStatus("Payment failed or was cancelled. Choose another method and try again.", true);
+          activateDeckCard("pay-choose");
+          return true;
+        }
+      } catch (err) {
+        if (attempts >= maxAttempts) {
+          stopPaymentPoll();
+          setPayStatus(err.message || "Could not confirm payment.", true);
+          activateDeckCard("pay-choose");
+          return true;
+        }
+      }
+      if (attempts >= maxAttempts) {
+        stopPaymentPoll();
+        setPayStatus(
+          "Still waiting for payment confirmation. Tap “Check payment status” after completing payment in your app.",
+          true
+        );
+        return true;
+      }
+      return false;
+    };
+
+    if (await tick()) return;
+    stopPaymentPoll();
+    paymentPollTimer = window.setInterval(() => {
+      tick();
+    }, options.intervalMs || 3000);
+  }
+
+  async function beginRedirectPayment(methodMeta, stageName) {
+    if (paymentInFlight) return;
+    paymentInFlight = true;
+    setPayStatus("", false);
+    activateDeckCard("pay-processing");
+    setProcessingMessage(
+      methodMeta.apiMethod === "card"
+        ? "Opening secure card payment…"
+        : "Opening your bank’s secure payment page…"
+    );
+
+    try {
+      const { details, payment } = await startPaymentSession(methodMeta);
+      if (payment.checkoutUrl) {
+        setProcessingMessage("Redirecting to payment partner…");
+        window.location.assign(payment.checkoutUrl);
+        return;
+      }
+      // Stub / API without redirect URL: treat as pending and confirm via status check.
+      if (payment.status === "paid") {
+        finalizePaidBooking(details, payment, methodMeta);
+        return;
+      }
+      if (checkoutApi()?.stubEnabled?.()) {
+        setProcessingMessage("Confirming stub payment…");
+        const paid = await checkoutApi().getPaymentStatus(payment.paymentId);
+        finalizePaidBooking(details, { ...payment, ...paid }, methodMeta);
+        return;
+      }
+      setPayStatus(
+        "Payment session created, but no checkout URL was returned. Wire checkoutUrl on POST /payments.",
+        true
+      );
+      activateDeckCard(stageName || "pay-choose");
+    } catch (err) {
+      setPayStatus(err.message || "Could not start payment.", true);
+      activateDeckCard(stageName || "pay-choose");
+    } finally {
+      paymentInFlight = false;
+    }
+  }
+
+  async function beginUpiPayment() {
+    if (paymentInFlight) return;
+    paymentInFlight = true;
+    const copy = brandCopy[selectedUpiBrand] || brandCopy.upi;
+    const methodMeta = {
+      apiMethod: "upi",
+      brand: selectedUpiBrand,
+      method: copy.method,
+    };
+    setPayStatus("", false);
+    showUpiPending(true);
+    activateDeckCard("pay-qr");
+    syncPayTotals();
+
+    try {
+      const { payment } = await startPaymentSession(methodMeta);
+      renderUpiPayment(payment, copy);
+      if (payment.status === "paid") {
+        const details = readCheckoutDetails();
+        finalizePaidBooking(details, payment, methodMeta);
+        return;
+      }
+      pollPaymentUntilPaid(payment.paymentId, methodMeta, { maxAttempts: 60, intervalMs: 3000 });
+    } catch (err) {
+      showUpiPending(false);
+      setPayStatus(err.message || "Could not start UPI payment.", true);
+      activateDeckCard("pay-choose");
+    } finally {
+      paymentInFlight = false;
+    }
+  }
+
+  async function checkUpiPaymentStatus() {
+    const api = checkoutApi();
+    const payment = api?.getStoredPayment?.();
+    const details = readCheckoutDetails();
+    const copy = brandCopy[selectedUpiBrand] || brandCopy.upi;
+    if (!payment?.paymentId) {
+      setPayStatus("Start UPI payment first, then check status.", true);
+      return;
+    }
+    setPayStatus("Checking payment status…", false);
+    try {
+      const status = await api.getPaymentStatus(payment.paymentId);
+      if (status.status === "paid" || status.status === "captured" || status.status === "success") {
+        finalizePaidBooking(details, status, {
+          apiMethod: "upi",
+          brand: selectedUpiBrand,
+          method: copy.method,
+        });
+        return;
+      }
+      setPayStatus("Payment not confirmed yet. Complete it in your UPI app, then check again.", true);
+    } catch (err) {
+      setPayStatus(err.message || "Could not check payment status.", true);
+    }
+  }
+
+  async function resumePaymentReturn() {
+    const params = new URLSearchParams(location.search);
+    if (params.get("payment") !== "return") return false;
+    const api = checkoutApi();
+    const stored = api?.getStoredPayment?.();
+    const paymentId =
+      params.get("paymentId") ||
+      params.get("payment_id") ||
+      stored?.paymentId ||
+      null;
+    if (!paymentId) {
+      setPayStatus("Missing payment reference after redirect. Start payment again.", true);
+      activateDeckCard("pay-choose");
+      return true;
+    }
+    activateDeckCard("pay-processing");
+    setProcessingMessage("Confirming payment from your bank / card…");
+    try {
+      const status = await api.getPaymentStatus(paymentId);
+      const details = readCheckoutDetails();
+      if (!details) {
+        setPayStatus("Checkout details expired. Please enter details again.", true);
+        activateDeckCard("details");
+        return true;
+      }
+      if (status.status === "paid" || status.status === "captured" || status.status === "success") {
+        finalizePaidBooking(details, status, {
+          apiMethod: stored?.method || "card",
+          method: stored?.method || "Online",
+        });
+      } else if (status.status === "failed" || status.status === "cancelled") {
+        setPayStatus("Payment was not completed. Choose a method and try again.", true);
+        activateDeckCard("pay-choose");
+      } else {
+        setPayStatus("Payment is still pending. You can check again in a moment.", true);
+        activateDeckCard("pay-choose");
+      }
+    } catch (err) {
+      setPayStatus(err.message || "Could not confirm payment after redirect.", true);
+      activateDeckCard("pay-choose");
+    }
+    const clean = new URL(location.href);
+    clean.searchParams.delete("payment");
+    clean.searchParams.delete("paymentId");
+    clean.searchParams.delete("payment_id");
+    if (clean.searchParams.get("cart") !== "checkout") {
+      clean.searchParams.set("cart", "checkout");
+    }
+    window.history.replaceState({}, "", clean.toString());
+    return true;
+  }
+
+  function initPaymentFlow() {
     document.querySelectorAll("[data-pay-go]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const target = btn.getAttribute("data-pay-go");
+        setPayStatus("", false);
         if (target === "pay-qr") {
           selectedUpiBrand = btn.getAttribute("data-brand") || "upi";
           const copy = brandCopy[selectedUpiBrand] || brandCopy.upi;
@@ -201,18 +659,16 @@
           const brand = document.querySelector("[data-qr-brand]");
           const help = document.querySelector("[data-qr-help]");
           if (title) title.textContent = copy.title;
-          if (brand) brand.textContent = copy.brand;
+          if (brand) brand.textContent = copy.label;
           if (help) help.textContent = copy.help;
+          syncPayTotals();
+          beginUpiPayment();
+          return;
+        }
+        if (target === "pay-card" || target === "pay-bank") {
           syncPayTotals();
         }
         activateDeckCard(target);
-      });
-    });
-
-    document.querySelectorAll("[data-card-tab]").forEach((tab) => {
-      tab.addEventListener("click", () => {
-        document.querySelectorAll("[data-card-tab]").forEach((t) => t.classList.remove("is-on"));
-        tab.classList.add("is-on");
       });
     });
 
@@ -223,67 +679,41 @@
         selectedBank = btn.textContent.trim();
         const cont = document.querySelector("[data-bank-continue]");
         if (cont) cont.disabled = false;
+        syncStickyCheckoutBar("pay-bank");
       });
     });
 
-    const cardForm = document.querySelector("[data-card-pay-form]");
-    initCardFieldGuards(cardForm || document);
-    initBillingAddressUi(cardForm || document);
-    cardForm?.addEventListener("submit", (event) => {
-      event.preventDefault();
-      if (!validateCardFields(cardForm)) return;
-      const choice = cardForm.querySelector("[data-billing-choice]:checked")?.value;
-      if (choice === "new") {
-        const cityInput = cardForm.querySelector("[data-billing-city]");
-        if (cityInput && !isValidCityVillage(cityInput.value)) {
-          cityInput.setCustomValidity(
-            "City/Town/Village must start with a letter, include at least 3 letters, and be under 100 characters."
-          );
-          cityInput.reportValidity();
-          return;
-        }
-        cityInput?.setCustomValidity("");
-      }
-      if (!cardForm.reportValidity()) return;
-      completePayment("Credit / Debit card");
+    document.querySelector("[data-pay-start='card']")?.addEventListener("click", () => {
+      beginRedirectPayment(
+        { apiMethod: "card", method: "Credit / Debit card", brand: "card" },
+        "pay-card"
+      );
     });
 
     document.querySelector("[data-bank-continue]")?.addEventListener("click", () => {
       if (!selectedBank) return;
-      completePayment(`Net Banking · ${selectedBank}`);
+      beginRedirectPayment(
+        {
+          apiMethod: "netbanking",
+          method: `Net Banking · ${selectedBank}`,
+          brand: "netbanking",
+          bank: selectedBank,
+        },
+        "pay-bank"
+      );
     });
 
-    document.querySelectorAll("[data-complete-pay]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const copy = brandCopy[selectedUpiBrand] || brandCopy.upi;
-        completePayment(btn.getAttribute("data-complete-pay") || copy.method);
-      });
+    document.querySelector("[data-pay-check]")?.addEventListener("click", () => {
+      checkUpiPaymentStatus();
+    });
+
+    document.querySelector("[data-pay-cancel-wait]")?.addEventListener("click", () => {
+      stopPaymentPoll();
+      setPayStatus("", false);
+      activateDeckCard("pay-choose");
     });
 
     syncPayTotals();
-  }
-
-  function completePayment(methodLabel) {
-    const details = readCheckoutDetails();
-    if (!details) {
-      activateDeckCard("details");
-      return;
-    }
-    const amount = cartItemsWithTests().reduce((sum, item) => sum + itemPrice(item), 0);
-    const payment = {
-      amount,
-      method: methodLabel || "Online",
-      reference: `DS-${Date.now().toString(36).toUpperCase()}`,
-      paidAt: new Date().toISOString(),
-    };
-    sessionStorage.setItem(PAYMENT_STORAGE_KEY, JSON.stringify(payment));
-    renderInlineConfirmation(details, payment);
-    try {
-      localStorage.removeItem("drswift.cart.v1");
-      window.dispatchEvent(new CustomEvent("drswift:cart-updated"));
-    } catch {
-      /* ignore */
-    }
   }
 
   function formatSampleDayLabel(value) {
@@ -661,8 +1091,37 @@
     syncSampleWindows(form);
   }
 
+  function syncCheckoutProgress(stageName) {
+    const steps = {
+      details: "details",
+      "pay-choose": "payment",
+      "pay-card": "payment",
+      "pay-qr": "payment",
+      "pay-bank": "payment",
+      "pay-processing": "payment",
+      confirmation: "confirmation",
+    };
+    const order = ["cart", "details", "payment", "confirmation"];
+    const activeKey = steps[stageName] || "details";
+    const activeIndex = order.indexOf(activeKey);
+
+    document.querySelectorAll("[data-progress-step]").forEach((step) => {
+      const key = step.getAttribute("data-progress-step");
+      const index = order.indexOf(key);
+      const complete = index >= 0 && activeIndex >= 0 && index < activeIndex;
+      const active = key === activeKey;
+      step.classList.toggle("is-complete", complete);
+      step.classList.toggle("is-active", active);
+      if (active) step.setAttribute("aria-current", "step");
+      else step.removeAttribute("aria-current");
+    });
+  }
+
   function activateDeckCard(name) {
-    const paymentStages = ["pay-choose", "pay-card", "pay-qr", "pay-bank"];
+    const paymentStages = ["pay-choose", "pay-card", "pay-qr", "pay-bank", "pay-processing"];
+    if (name !== "pay-qr" && name !== "pay-processing" && name !== "confirmation") {
+      stopPaymentPoll();
+    }
     document.querySelectorAll("[data-checkout-stage]").forEach((stage) => {
       const stageName = stage.getAttribute("data-checkout-stage");
       const isCurrent = stageName === name;
@@ -677,10 +1136,6 @@
     }
     if (paymentSummary) {
       paymentSummary.hidden = name !== "confirmation";
-    }
-
-    if (name === "pay-card") {
-      syncBillingAddress(readCheckoutDetails());
     }
 
     /* Scroll the stable frame, not the stage node — avoids left/right jumps
@@ -698,11 +1153,10 @@
     }
 
     if (paymentStages.includes(name)) {
-      const total = cartItemsWithTests().reduce((sum, item) => sum + itemPrice(item), 0);
-      document.querySelectorAll("[data-pay-total]").forEach((el) => {
-        el.textContent = formatPrice(total);
-      });
+      syncPayTotals();
     }
+    syncCheckoutProgress(name);
+    syncStickyCheckoutBar(name);
   }
 
   function renderInlinePayment(details) {
@@ -727,168 +1181,8 @@
         .join("");
     }
 
-    const cardName = document.querySelector("#cc-name");
-    if (cardName && !cardName.value) {
-      cardName.value = details.name || "";
-    }
-
-    syncBillingAddress(details);
+    setPayStatus("", false);
     activateDeckCard("pay-choose");
-  }
-
-  function syncBillingAddress(details) {
-    const addressEl = document.querySelector("[data-billing-customer-address]");
-    const cityEl = document.querySelector("[data-billing-customer-city]");
-    if (addressEl) addressEl.textContent = details?.address || "—";
-    if (cityEl) cityEl.textContent = details?.city || "—";
-  }
-
-  function digitsOnly(value) {
-    return String(value || "").replace(/\D/g, "");
-  }
-
-  function formatCardNumber(value) {
-    const digits = digitsOnly(value).slice(0, 16);
-    return digits.replace(/(\d{4})(?=\d)/g, "$1 ").trim();
-  }
-
-  function fillCardExpiryYears(select) {
-    if (!select || select.dataset.filled === "1") return;
-    const now = new Date();
-    const start = now.getFullYear();
-    for (let year = start; year <= start + 15; year += 1) {
-      const opt = document.createElement("option");
-      opt.value = String(year);
-      opt.textContent = String(year);
-      select.appendChild(opt);
-    }
-    select.dataset.filled = "1";
-  }
-
-  function initCardFieldGuards(root) {
-    const scope = root || document;
-    const number = scope.querySelector("[data-card-number]");
-    const cvv = scope.querySelector("[data-card-cvv]");
-    const name = scope.querySelector("[data-card-name]");
-    const expYear = scope.querySelector("[data-card-exp-year]");
-    const pin = scope.querySelector("[data-billing-pin]");
-
-    fillCardExpiryYears(expYear);
-
-    number?.addEventListener("input", () => {
-      number.value = formatCardNumber(number.value);
-      number.setCustomValidity("");
-    });
-    number?.addEventListener("blur", () => {
-      const digits = digitsOnly(number.value);
-      if (digits && digits.length !== 16) {
-        number.setCustomValidity("Enter a valid 16-digit card number.");
-      } else {
-        number.setCustomValidity("");
-      }
-    });
-
-    cvv?.addEventListener("input", () => {
-      cvv.value = digitsOnly(cvv.value).slice(0, 4);
-      cvv.setCustomValidity("");
-    });
-    cvv?.addEventListener("blur", () => {
-      const digits = digitsOnly(cvv.value);
-      if (digits && (digits.length < 3 || digits.length > 4)) {
-        cvv.setCustomValidity("CVV must be 3 or 4 digits.");
-      } else {
-        cvv.setCustomValidity("");
-      }
-    });
-
-    name?.addEventListener("input", () => {
-      name.value = name.value.replace(/[^A-Za-z .'-]/g, "").slice(0, 60);
-      name.setCustomValidity("");
-    });
-
-    pin?.addEventListener("input", () => {
-      pin.value = digitsOnly(pin.value).slice(0, 6);
-    });
-  }
-
-  function validateCardFields(form) {
-    if (!form) return true;
-    const number = form.querySelector("[data-card-number]");
-    const cvv = form.querySelector("[data-card-cvv]");
-    const month = form.querySelector("[data-card-exp-month]");
-    const year = form.querySelector("[data-card-exp-year]");
-
-    if (number) {
-      const digits = digitsOnly(number.value);
-      if (digits.length !== 16) {
-        number.setCustomValidity("Enter a valid 16-digit card number.");
-        number.reportValidity();
-        return false;
-      }
-      number.value = formatCardNumber(digits);
-      number.setCustomValidity("");
-    }
-
-    if (cvv) {
-      const digits = digitsOnly(cvv.value);
-      if (digits.length < 3 || digits.length > 4) {
-        cvv.setCustomValidity("CVV must be 3 or 4 digits.");
-        cvv.reportValidity();
-        return false;
-      }
-      cvv.setCustomValidity("");
-    }
-
-    if (month?.value && year?.value) {
-      const expMonth = Number(month.value);
-      const expYear = Number(year.value);
-      const now = new Date();
-      const expEnd = new Date(expYear, expMonth, 0, 23, 59, 59);
-      if (expEnd < now) {
-        month.setCustomValidity("Card expiry cannot be in the past.");
-        month.reportValidity();
-        return false;
-      }
-      month.setCustomValidity("");
-    }
-
-    return true;
-  }
-
-  function initBillingAddressUi(root) {
-    const scope = root || document;
-    const cards = scope.querySelectorAll(".pay-address-card");
-    const choices = scope.querySelectorAll("[data-billing-choice]");
-    const newForm = scope.querySelector("[data-billing-new]");
-    const street = scope.querySelector("[data-billing-street]");
-    const city = scope.querySelector("[data-billing-city]");
-    const pin = scope.querySelector("[data-billing-pin]");
-    if (!choices.length || !newForm) return;
-
-    function sync() {
-      const selected = scope.querySelector("[data-billing-choice]:checked");
-      const isNew = selected?.value === "new";
-      newForm.hidden = !isNew;
-      cards.forEach((card) => {
-        const input = card.querySelector("[data-billing-choice]");
-        card.classList.toggle("is-selected", !!input?.checked);
-      });
-      if (street) {
-        street.required = isNew;
-        if (!isNew) street.value = "";
-      }
-      if (city) {
-        city.required = isNew;
-        if (!isNew) city.value = "";
-      }
-      if (pin) {
-        pin.required = isNew;
-        if (!isNew) pin.value = "";
-      }
-    }
-
-    choices.forEach((input) => input.addEventListener("change", sync));
-    sync();
   }
 
   function renderInlineConfirmation(details, payment) {
@@ -907,11 +1201,17 @@
 
     const refEl = document.querySelector("[data-confirm-ref]");
     const slotEl = document.querySelector("[data-confirm-slot]");
+    const leadEl = document.querySelector("[data-confirm-lead]");
     if (refEl) refEl.textContent = payment.reference || "Pending";
     if (slotEl) {
       const day = details.sampleDayLabel || formatSampleDayLabel(details.sampleDay) || "—";
       const windowLabel = details.sampleWindow || "—";
       slotEl.textContent = `${day} · ${windowLabel}`;
+    }
+    if (leadEl) {
+      leadEl.textContent = payment.stub
+        ? "Stub payment confirmed for UI testing. Wire live payment APIs before taking real orders."
+        : "Payment received. We’ll collect your sample at home and send reports when ready.";
     }
 
     activateDeckCard("confirmation");
@@ -1017,12 +1317,34 @@
     const form = document.querySelector("[data-checkout-form]");
     if (!form) return;
 
+    const params = new URLSearchParams(location.search);
+    const fromCart = params.get("cart") === "checkout";
+    if (fromCart && !cartItemsWithTests().length) {
+      const paid = (() => {
+        try {
+          return JSON.parse(sessionStorage.getItem(PAYMENT_STORAGE_KEY) || "null");
+        } catch {
+          return null;
+        }
+      })();
+      if (!paid?.reference) {
+        window.location.replace("cart.html");
+        return;
+      }
+    }
+
     initCollectionCalendar(form);
     restoreDraft(form);
     initPaymentFlow();
+    initStickyCheckoutBar();
     syncSampleWindows(form);
     updateWhenConfirm(form);
     window.setInterval(() => syncSampleWindows(form), 60 * 1000);
+    resumePaymentReturn();
+    syncStickyCheckoutBar(
+      document.querySelector("[data-checkout-stage].is-active")?.getAttribute("data-checkout-stage") ||
+        "details"
+    );
 
     form.querySelectorAll("input[name='sampleWindow']").forEach((input) => {
       input.addEventListener("change", () => {

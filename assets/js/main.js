@@ -25,6 +25,35 @@ if (navToggle && navMenu) {
   });
 }
 
+/** Keep cart icon visible in the sticky header on mobile (outside the hamburger). */
+function ensureMobileHeaderCart() {
+  const navbar = document.querySelector(".navbar");
+  const toggle = document.querySelector(".nav-toggle");
+  const menuCart = document.querySelector(".nav-menu .cart-link");
+  if (!navbar || !toggle || !menuCart) return;
+  if (navbar.querySelector(".cart-link--header")) return;
+
+  let tools = navbar.querySelector(".nav-bar-tools");
+  if (!tools) {
+    tools = document.createElement("div");
+    tools.className = "nav-bar-tools";
+    toggle.replaceWith(tools);
+    tools.appendChild(toggle);
+  }
+
+  const headerCart = menuCart.cloneNode(true);
+  headerCart.classList.add("cart-link--header");
+  headerCart.removeAttribute("id");
+  const label = headerCart.querySelector("span:not(.cart-count)");
+  if (label) {
+    label.classList.add("sr-only");
+  }
+  tools.insertBefore(headerCart, toggle);
+}
+
+ensureMobileHeaderCart();
+
+
 const prefersReducedMotion = window.matchMedia(
   "(prefers-reduced-motion: reduce)"
 ).matches;
@@ -958,6 +987,89 @@ function updateCartBadges() {
     badge.textContent = String(count);
     badge.hidden = count === 0;
   });
+}
+
+function readStoredJson(key) {
+  try {
+    return (
+      JSON.parse(localStorage.getItem(key) || "null") ||
+      JSON.parse(sessionStorage.getItem(key) || "null")
+    );
+  } catch {
+    return null;
+  }
+}
+
+function clearStoredAccountSession() {
+  [
+    "drswift.demoSession.v1",
+    "drswift.demoAccount.v1",
+    "drswift.checkout.phoneVerified.v1",
+  ].forEach((key) => {
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      /* ignore local storage */
+    }
+    try {
+      sessionStorage.removeItem(key);
+    } catch {
+      /* ignore session storage */
+    }
+  });
+  window.DRSWIFT_USER = null;
+}
+
+function hasLocalAccountSession() {
+  return Boolean(
+    window.DRSWIFT_USER ||
+      readStoredJson("drswift.demoSession.v1") ||
+      readStoredJson("drswift.demoAccount.v1")
+  );
+}
+
+function syncAccountNav() {
+  const isSignedIn = hasLocalAccountSession();
+  document.querySelectorAll(".nav-cta").forEach((link) => {
+    link.href = isSignedIn ? "account.html" : "login.html";
+    link.textContent = isSignedIn ? "My Account" : "Sign in";
+    link.setAttribute(
+      "aria-label",
+      isSignedIn ? "Open My Account" : "Sign in to My Account"
+    );
+
+    const actions = link.closest(".nav-actions");
+    if (!actions) return;
+
+    let logout = actions.querySelector("[data-account-logout]");
+    if (isSignedIn) {
+      if (!logout) {
+        logout = document.createElement("button");
+        logout.type = "button";
+        logout.className = "nav-logout";
+        logout.setAttribute("data-account-logout", "");
+        actions.appendChild(logout);
+      }
+      logout.textContent = "Logout";
+      logout.hidden = false;
+    } else if (logout) {
+      logout.remove();
+    }
+  });
+}
+
+async function logoutAccountSession() {
+  clearStoredAccountSession();
+  try {
+    if (window.firebase?.auth) {
+      await window.firebase.auth().signOut();
+    }
+  } catch {
+    /* Firebase may be unavailable in local demo mode. */
+  }
+  syncAccountNav();
+  window.dispatchEvent(new CustomEvent("drswift:auth-changed", { detail: { user: null } }));
+  window.dispatchEvent(new CustomEvent("drswift:account-signed-out"));
 }
 
 function getTestLivePrice(test, customPanels) {
@@ -2109,12 +2221,42 @@ function cartTotals(items) {
   );
 }
 
+function cartHousehold() {
+  if (!hasLocalAccountSession()) {
+    return null;
+  }
+  try {
+    return (
+      JSON.parse(localStorage.getItem("drswift.demoHousehold.v1") || "null") ||
+      JSON.parse(sessionStorage.getItem("drswift.demoHousehold.v1") || "null")
+    );
+  } catch {
+    return null;
+  }
+}
+
 function cartUserName() {
   const name = String(window.DRSWIFT_USER?.displayName || "").trim();
-  return name || "Me";
+  const household = cartHousehold();
+  const ownerName = String(household?.owner?.name || "").trim();
+  return name || ownerName || "Me";
 }
 
 function cartRecipientOptions() {
+  const household = cartHousehold();
+  if (household?.owner || Array.isArray(household?.members)) {
+    const people = [
+      household.owner ? { ...household.owner, relation: "Self" } : { name: cartUserName(), relation: "Self" },
+      ...(Array.isArray(household.members) ? household.members : []),
+    ];
+    return people
+      .filter((person) => String(person.name || "").trim())
+      .map((person) => {
+        const name = String(person.name || "").trim();
+        const relation = String(person.relation || "").trim();
+        return relation && relation !== "Self" ? `${name} (${relation})` : name;
+      });
+  }
   return [cartUserName(), "Parent", "Partner", "Child"];
 }
 
@@ -2209,8 +2351,8 @@ function scheduleCartBodyReveal() {
 }
 
 function cartRecipientControlHtml(item) {
-  const isSignedIn = Boolean(window.DRSWIFT_USER);
-  if (!isSignedIn) {
+  const hasAccountProfiles = Boolean(window.DRSWIFT_USER) || Boolean(cartHousehold());
+  if (!hasAccountProfiles) {
     return "";
   }
 
@@ -2227,7 +2369,7 @@ function cartRecipientControlHtml(item) {
           )
           .join("")}
       </select>
-      <a href="account.html">Add family member</a>
+      <a href="signup.html?mode=family">Add family member</a>
     </div>
   `;
 }
@@ -2334,10 +2476,18 @@ document.addEventListener("change", (event) => {
 });
 
 window.addEventListener("drswift:auth-changed", () => {
+  syncAccountNav();
   renderCartPage();
 });
 
 document.addEventListener("click", (event) => {
+  const logoutButton = event.target.closest("[data-account-logout]");
+  if (logoutButton) {
+    event.preventDefault();
+    logoutAccountSession();
+    return;
+  }
+
   const addButton = event.target.closest("[data-add-to-cart]");
   if (addButton) {
     event.preventDefault();
@@ -2393,6 +2543,7 @@ async function bootStorefront() {
   renderCartPage();
   renderPromotionsPage();
   updateCartBadges();
+  syncAccountNav();
 }
 
 function renderPromotionsPage() {

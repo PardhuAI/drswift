@@ -4,6 +4,9 @@
  */
 (function () {
   const RESEND_SECONDS = 30;
+  const DEMO_ACCOUNT_KEY = "drswift.demoAccount.v1";
+  const DEMO_SESSION_KEY = "drswift.demoSession.v1";
+  const HOUSEHOLD_KEY = "drswift.demoHousehold.v1";
   const card = document.querySelector("[data-login-card]");
   if (!card) return;
 
@@ -191,6 +194,35 @@
     if (success) {
       success.hidden = false;
       success.textContent = "Phone verified. Redirecting to your account…";
+    }
+    try {
+      const storedHousehold =
+        JSON.parse(localStorage.getItem(HOUSEHOLD_KEY) || "null") ||
+        JSON.parse(sessionStorage.getItem(HOUSEHOLD_KEY) || "null");
+      const storedAccount =
+        storedHousehold?.owner ||
+        JSON.parse(localStorage.getItem(DEMO_ACCOUNT_KEY) || "null") ||
+        JSON.parse(sessionStorage.getItem(DEMO_ACCOUNT_KEY) || "null") ||
+        null;
+      const account = {
+        name: storedAccount?.name || "Demo customer",
+        email: storedAccount?.email || "",
+        phone: phoneInput.value || storedAccount?.phone || "",
+        method: "phone",
+        createdAt: new Date().toISOString(),
+      };
+      const payload = JSON.stringify(account);
+      sessionStorage.setItem(DEMO_ACCOUNT_KEY, payload);
+      localStorage.setItem(DEMO_ACCOUNT_KEY, payload);
+      const session = JSON.stringify({
+        ownerId: storedHousehold?.owner?.id || "",
+        method: "phone",
+        signedInAt: new Date().toISOString(),
+      });
+      sessionStorage.setItem(DEMO_SESSION_KEY, session);
+      localStorage.setItem(DEMO_SESSION_KEY, session);
+    } catch {
+      /* ignore demo session storage errors */
     }
     clearCooldown();
     if (sendBtn) sendBtn.disabled = true;

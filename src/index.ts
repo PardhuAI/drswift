@@ -166,7 +166,7 @@ export default {
       return proxyFirebaseAuthHelper(request, url);
     }
 
-    // Checkout BFF (OTP + booking) → SwiftCMS with Worker Basic Auth.
+    // Checkout BFF (orders + payments) → SwiftCMS with Worker Basic Auth.
     // Use /_drswift/* so custom-domain /api/* routes to CMS do not bypass this Worker.
     if (
       pathname === "/_drswift/checkout" ||
@@ -179,13 +179,20 @@ export default {
           status: 204,
           headers: {
             "Access-Control-Allow-Origin": url.origin,
-            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
             "Access-Control-Allow-Headers": "Content-Type",
             "Access-Control-Max-Age": "86400",
           },
         });
       }
-      if (request.method !== "POST") {
+      if (request.method !== "POST" && request.method !== "GET") {
+        return new Response(JSON.stringify({ ok: false, message: "Method not allowed" }), {
+          status: 405,
+          headers: { "Content-Type": "application/json", "Cache-Control": "private, no-store" },
+        });
+      }
+      // Payment status polling is GET; order/payment creation is POST.
+      if (request.method === "GET" && !/\/payments\/[^/]+\/?$/.test(pathname)) {
         return new Response(JSON.stringify({ ok: false, message: "Method not allowed" }), {
           status: 405,
           headers: { "Content-Type": "application/json", "Cache-Control": "private, no-store" },
