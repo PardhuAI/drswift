@@ -83,29 +83,6 @@
     sendBtn.disabled = digits.length !== 10 || !!readVerified();
   }
 
-  async function postJson(path, body) {
-    const res = await fetch(path, {
-      method: "POST",
-      headers: { Accept: "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-      credentials: "same-origin",
-    });
-    let data = null;
-    try {
-      data = await res.json();
-    } catch {
-      data = null;
-    }
-    if (!res.ok || data?.ok === false) {
-      throw new Error(data?.message || `Request failed (${res.status})`);
-    }
-    return data;
-  }
-
-  function canUseLocalOtpFallback() {
-    return location.hostname === "localhost" || location.hostname === "127.0.0.1";
-  }
-
   function normalizedPhone(value) {
     return String(value || "").replace(/\D/g, "").slice(-10);
   }
@@ -1095,7 +1072,7 @@
     syncOtpSendEnabled(form);
     saveDraft(form);
 
-    sendBtn?.addEventListener("click", async () => {
+    sendBtn?.addEventListener("click", () => {
       setStatus(statusEl, "", false);
       const digits = normalizedPhone(phoneInput?.value);
       if (digits.length !== 10) {
@@ -1104,52 +1081,35 @@
         return;
       }
       if (phoneInput) phoneInput.value = digits;
-      sendBtn.disabled = true;
-      try {
-        await postJson("/_drswift/checkout/otp/send", { phone: phoneInput?.value || "" });
-        setPhoneVerifiedUi(form, false, true);
-        setStatus(statusEl, "OTP sent. Enter the 6-digit code below.", false);
-        otpInput?.focus();
-      } catch (err) {
-        if (canUseLocalOtpFallback()) {
-          setPhoneVerifiedUi(form, false, true);
-          setStatus(statusEl, `Demo OTP sent. Enter ${LOCAL_DEMO_OTP}.`, false);
-          otpInput?.focus();
-          return;
-        }
-        setStatus(statusEl, err.message || "Could not send OTP.", true);
-      } finally {
-        syncOtpSendEnabled(form);
+      // Local demo only — no backend OTP API call.
+      setPhoneVerifiedUi(form, false, true);
+      setStatus(statusEl, `Enter OTP ${LOCAL_DEMO_OTP} to verify.`, false);
+      if (otpInput) {
+        otpInput.value = "";
+        otpInput.focus();
       }
+      syncOtpSendEnabled(form);
     });
 
-    verifyBtn?.addEventListener("click", async () => {
+    verifyBtn?.addEventListener("click", () => {
       setStatus(statusEl, "", false);
-      verifyBtn.disabled = true;
-      try {
-        if (canUseLocalOtpFallback() && otpInput?.value === LOCAL_DEMO_OTP) {
-          const phone = normalizedPhone(phoneInput?.value);
-          writeVerified(phone);
-          if (phoneInput) phoneInput.value = phone;
-          setPhoneVerifiedUi(form, true);
-          setStatus(statusEl, "", false);
-          return;
-        }
-        const data = await postJson("/_drswift/checkout/otp/verify", {
-          phone: phoneInput?.value || "",
-          otp: otpInput?.value || "",
-        });
-        writeVerified(data.phone);
-        if (phoneInput) phoneInput.value = data.phone;
-        setPhoneVerifiedUi(form, true);
-        setStatus(statusEl, "", false);
-      } catch (err) {
-        clearVerified();
-        setPhoneVerifiedUi(form, false, true);
-        setStatus(statusEl, err.message || "OTP verification failed.", true);
-      } finally {
-        verifyBtn.disabled = false;
+      const digits = normalizedPhone(phoneInput?.value);
+      if (digits.length !== 10) {
+        setStatus(statusEl, "Enter a valid 10-digit mobile number.", true);
+        phoneInput?.focus();
+        return;
       }
+      const code = String(otpInput?.value || "").replace(/\D/g, "");
+      if (code !== LOCAL_DEMO_OTP) {
+        setStatus(statusEl, `Invalid OTP. Enter ${LOCAL_DEMO_OTP}.`, true);
+        otpInput?.focus();
+        return;
+      }
+      if (phoneInput) phoneInput.value = digits;
+      writeVerified(digits);
+      setPhoneVerifiedUi(form, true);
+      setStatus(statusEl, "", false);
+      saveDraft(form);
     });
 
     form.addEventListener("submit", async (event) => {
