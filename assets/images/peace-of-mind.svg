@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 200" fill="none" role="img" aria-label="Peace of mind — relaxed at home after booking">
+  <!-- Brand palette: blue #1e5bd7, green #4e8c73, ink #162033, soft #edf4ff / #d8ebe2 -->
+  <rect x="54" y="86" width="252" height="9" rx="2.5" fill="#b9d0f4"/>
+  <g fill="#4e8c73">
+    <ellipse cx="86" cy="128" rx="16" ry="9"/>
+    <path d="M78 128c3-18 12-34 20-40 1 10 3 24 0 40h-20Z"/>
+    <path d="M92 112c6-4 12-2 14 4-4 2-8 4-14 2v-6Z"/>
+  </g>
+  <path d="M68 156c0-11 9-20 20-20h14c5 0 9 4 9 9v21H68v-10Z" fill="#d8ebe2"/>
+  <g fill="#4e8c73">
+    <path d="M268 106c-1 12 2 26 6 40h10c2-14 3-28-1-40-5-3-12-3-15 0Z"/>
+    <path d="M278 94c8 6 12 16 10 28" stroke="#4e8c73" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <ellipse cx="292" cy="118" rx="7" ry="4" transform="rotate(-20 292 118)"/>
+  </g>
+  <path d="M258 164c0-18 11-30 24-30 5 0 9 3 11 8v34h-35v-12Z" fill="#d8ebe2"/>
+  <rect x="74" y="76" width="22" height="14" rx="3" fill="#7ecdc0"/>
+  <path d="M82 70c2-5 7-7 10-4" stroke="#7ecdc0" stroke-width="2.2" stroke-linecap="round"/>
+  <g>
+    <rect x="250" y="72" width="32" height="18" rx="2" fill="#edf4ff" stroke="#1e5bd7" stroke-width="1.6"/>
+    <path d="M256 78h20M256 83h16" stroke="#1e5bd7" stroke-width="1.6" stroke-linecap="round"/>
+  </g>
+  <ellipse cx="180" cy="172" rx="52" ry="11" fill="#162033" opacity=".1"/>
+  <ellipse cx="180" cy="170" rx="42" ry="8" fill="#162033"/>
+  <g>
+    <path d="M132 128c10 20 32 32 48 32s38-12 48-32c-12 7-28 12-48 12s-36-5-48-12Z" fill="#1e5bd7"/>
+    <path d="M142 98c-2 20 8 38 38 38s40-18 38-38c-10 9-24 14-38 14s-28-5-38-14Z" fill="#162033"/>
+    <path d="M166 82h28c4 0 6 3 6 6v12c-10 5-22 5-34 0V88c0-3 2-6 6-6Z" fill="#edf4ff"/>
+    <circle cx="180" cy="60" r="20" fill="#e8b4a0"/>
+    <path d="M164 56c3-14 12-20 26-18 4 12 1 22-6 26-9-2-18-4-20-8Z" fill="#162033"/>
+    <path d="M171 62c3 1.5 5 2 7 1.2M183 63c3 1.2 5 1.2 7 0" stroke="#162033" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M176 71c2.5 2.5 7 2.5 9 0" stroke="#c47a6a" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M118 102c10 5 20 16 22 28 7-2 14-2 20 0-4-16-1-32 8-40-16-3-32 2-50 12Z" fill="#e8b4a0"/>
+    <path d="M242 102c-10 5-20 16-22 28-7-2-14-2-20 0 4-16 1-32-8-40 16-3 32 2 50 12Z" fill="#e8b4a0"/>
+    <circle cx="122" cy="132" r="5.5" fill="#e8b4a0"/>
+    <circle cx="238" cy="132" r="5.5" fill="#e8b4a0"/>
+  </g>
+</svg>

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Prototype — Complete checkout + payment flow | Dr.Swift</title>
-  <link rel="stylesheet" href="../assets/css/styles.css?v=confirm-next-1">
+  <link rel="stylesheet" href="../assets/css/styles.css?v=confirm-anim-1">
   <link rel="icon" href="../assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   <style>
     html { scrollbar-gutter: stable; }
@@ -696,12 +696,17 @@
               </div>
               <div class="confirm-page">
                 <div class="confirm-hero">
-                  <p class="confirm-hero__status">You’re all set</p>
-                  <p class="confirm-hero__lead">Payment received. We’ll collect your sample at home and send reports when ready.</p>
-                  <dl class="confirm-meta">
-                    <div><dt>Booking ID</dt><dd data-ref>DRS-PROTO</dd></div>
-                    <div><dt>Collection</dt><dd data-confirm-slot>Today · Morning</dd></div>
-                  </dl>
+                  <div class="confirm-hero__copy">
+                    <p class="confirm-hero__status">You’re all set</p>
+                    <p class="confirm-hero__lead">Payment received. We’ll collect your sample at home and send reports when ready.</p>
+                    <dl class="confirm-meta">
+                      <div><dt>Booking ID</dt><dd data-ref>DRS-PROTO</dd></div>
+                      <div><dt>Collection</dt><dd data-confirm-slot>Today · Morning</dd></div>
+                    </dl>
+                  </div>
+                  <div class="confirm-hero__art" aria-hidden="true">
+                    <img class="confirm-hero__illustration" src="../assets/images/peace-of-mind.svg" alt="" width="320" height="190" decoding="async">
+                  </div>
                 </div>
                 <section class="confirm-block">
                   <h3>What happens next</h3>

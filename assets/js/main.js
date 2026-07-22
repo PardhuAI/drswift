@@ -2170,6 +2170,44 @@ function cartFamilyBannerHtml(cartTotal = 0) {
   `;
 }
 
+let cartRevealTimer = null;
+let cartBodyRevealed = false;
+
+function prefersReducedMotion() {
+  return window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+}
+
+function setCartBodyVisible(visible, animate = false) {
+  const hero = document.querySelector(".cart-hero");
+  const cartSection = document.querySelector(".cart-section");
+  if (hero) {
+    hero.hidden = !visible;
+    if (animate) hero.classList.add("is-cart-revealed");
+  }
+  if (cartSection) {
+    cartSection.hidden = !visible;
+    if (animate) cartSection.classList.add("is-cart-revealed");
+  }
+}
+
+function scheduleCartBodyReveal() {
+  if (cartBodyRevealed) {
+    setCartBodyVisible(true);
+    return;
+  }
+  if (prefersReducedMotion()) {
+    cartBodyRevealed = true;
+    setCartBodyVisible(true);
+    return;
+  }
+  setCartBodyVisible(false);
+  window.clearTimeout(cartRevealTimer);
+  cartRevealTimer = window.setTimeout(() => {
+    cartBodyRevealed = true;
+    setCartBodyVisible(true, true);
+  }, 3000);
+}
+
 function cartRecipientControlHtml(item) {
   const isSignedIn = Boolean(window.DRSWIFT_USER);
   if (!isSignedIn) {
@@ -2196,12 +2234,19 @@ function cartRecipientControlHtml(item) {
 
 function renderCartPage() {
   const container = document.querySelector("[data-cart-page]");
+  const familySection = document.querySelector("[data-cart-family-section]");
+  const familyBanner = document.querySelector("[data-cart-family-banner]");
   if (!container || !TESTS.length) {
     return;
   }
 
   const items = cartLineItems();
   if (!items.length) {
+    window.clearTimeout(cartRevealTimer);
+    cartBodyRevealed = false;
+    if (familySection) familySection.hidden = true;
+    if (familyBanner) familyBanner.innerHTML = "";
+    setCartBodyVisible(true);
     container.innerHTML = `
       <div class="empty-cart">
         <p class="eyebrow">Empty cart</p>
@@ -2219,8 +2264,14 @@ function renderCartPage() {
   const totals = cartTotals(items);
   const savings = Math.max(0, totals.original - totals.subtotal);
 
+  if (familyBanner) {
+    familyBanner.innerHTML = cartFamilyBannerHtml(totals.subtotal);
+  }
+  if (familySection) {
+    familySection.hidden = false;
+  }
+
   container.innerHTML = `
-    ${cartFamilyBannerHtml(totals.subtotal)}
     <div class="cart-items" aria-label="Selected tests">
       ${items
         .map((item) => {
@@ -2266,6 +2317,8 @@ function renderCartPage() {
       </ul>
     </aside>
   `;
+
+  scheduleCartBodyReveal();
 }
 
 document.addEventListener("change", (event) => {
