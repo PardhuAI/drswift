@@ -1,13 +1,15 @@
 /**
  * Booking / checkout form — guest allowed.
- * Required: name, gender, phone (OTP verified), address. Age optional.
+ * Required: name, gender, phone (10-digit mobile), address. Age optional.
+ * OTP verification is optional and can be completed later for faster updates.
  */
 (function () {
   const VERIFY_STORAGE_KEY = "drswift.checkout.phoneVerified.v1";
   const CHECKOUT_STORAGE_KEY = "drswift.checkout.details.v1";
   const DRAFT_STORAGE_KEY = "drswift.checkout.draft.v1";
+  const HOUSEHOLD_STORAGE_KEY = "drswift.demoHousehold.v1";
   const PAYMENT_STORAGE_KEY = "drswift.checkout.payment.v1";
-  const LOCAL_DEMO_OTP = "123456";
+  const SERVICE_AREA_STORAGE_KEY = "drswift.serviceArea.v1";
 
   function $(sel, root) {
     return (root || document).querySelector(sel);
@@ -57,22 +59,68 @@
     return letterCount >= 3;
   }
 
+  function syncContinueEnabled(form) {
+    const phoneInput = form.querySelector("#book-phone");
+    const consent = form.querySelector("#book-consent");
+    const submit = form.querySelector("[type='submit']");
+    if (!submit) return;
+    const digits = normalizedPhone(phoneInput?.value);
+    const consentOk = !consent || consent.checked;
+    submit.disabled = digits.length !== 10 || !consentOk;
+  }
+
+  function otpCopy() {
+    return window.DRSWIFT_SITE_CONTENT?.otp || {};
+  }
+
+  function mapOtpRequestError(response, fallback) {
+    const otp = otpCopy();
+    if (response?.status === 429) {
+      return otp.rateLimitCopy || "Too many OTP requests. Please wait a few minutes and try again.";
+    }
+    if (response && response.status >= 500) {
+      return otp.deliveryFailCopy || "We could not deliver the OTP. Check the number or try again in a moment.";
+    }
+    return fallback || otp.deliveryFailCopy || "We could not send a verification code.";
+  }
+
+  async function requestPhoneOtp(phone) {
+    const response = await fetch("/_drswift/auth/otp/request", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      credentials: "same-origin",
+      cache: "no-store",
+      body: JSON.stringify({ phone }),
+    });
+    if (!response.ok) {
+      throw new Error(
+        mapOtpRequestError(
+          response,
+          "We could not send a verification code. Please try again or book with our care team."
+        )
+      );
+    }
+  }
+
   function setPhoneVerifiedUi(form, verified, otpVisible = false) {
     const badge = form.querySelector("[data-phone-verified-badge]");
     const otpBlock = form.querySelector("[data-otp-block]");
-    const submit = form.querySelector("[type='submit']");
     const sendBtn = form.querySelector("[data-otp-send]");
     const phoneRow = form.querySelector(".checkout-wire-field--phone .phone-verify-row");
     if (badge) badge.hidden = !verified;
     if (otpBlock) otpBlock.hidden = verified || !otpVisible;
-    if (submit) submit.disabled = !verified;
     if (phoneRow) phoneRow.classList.toggle("is-verified", !!verified);
     if (sendBtn) {
       sendBtn.hidden = !!verified;
       sendBtn.setAttribute("aria-hidden", verified ? "true" : "false");
       if (verified) sendBtn.setAttribute("tabindex", "-1");
       else sendBtn.removeAttribute("tabindex");
+      sendBtn.textContent = otpVisible && !verified ? "Resend OTP" : "Verify OTP";
     }
+    syncContinueEnabled(form);
   }
 
   function syncOtpSendEnabled(form) {
@@ -81,6 +129,7 @@
     if (!phoneInput || !sendBtn) return;
     const digits = normalizedPhone(phoneInput.value);
     sendBtn.disabled = digits.length !== 10 || !!readVerified();
+    syncContinueEnabled(form);
   }
 
   function normalizedPhone(value) {
@@ -135,6 +184,148 @@
     }
   }
 
+  function readHousehold() {
+    try {
+      return (
+        JSON.parse(localStorage.getItem(HOUSEHOLD_STORAGE_KEY) || "null") ||
+        JSON.parse(sessionStorage.getItem(HOUSEHOLD_STORAGE_KEY) || "null")
+      );
+    } catch {
+      return null;
+    }
+  }
+
+  function normalizedRecipient(value) {
+    return String(value || "")
+      .trim()
+      .replace(/\s+/g, " ")
+      .toLowerCase();
+  }
+
+  function parseRecipientLabel(label) {
+    const text = String(label || "").trim();
+    const match = text.match(/^(.*?)\s*\((.*?)\)\s*$/);
+    if (!match) {
+      return { name: text, relation: "" };
+    }
+    return {
+      name: match[1].trim(),
+      relation: match[2].trim(),
+    };
+  }
+
+  function recipientLabel(person) {
+    const name = String(person?.name || "").trim();
+    const relation = String(person?.relation || "").trim();
+    return relation && relation !== "Self" ? `${name} (${relation})` : name;
+  }
+
+  function householdPeople() {
+    const household = readHousehold();
+    const ownerName =
+      String(household?.owner?.name || window.DRSWIFT_USER?.displayName || "").trim() || "Me";
+    const owner = household?.owner
+      ? { ...household.owner, relation: "Self" }
+      : { name: ownerName, relation: "Self" };
+    return [
+      owner,
+      ...(Array.isArray(household?.members) ? household.members : []),
+    ].filter((person) => String(person?.name || "").trim());
+  }
+
+  function selectedCartRecipientLabel() {
+    const recipients = cartLineItems()
+      .map((item) => String(item?.recipient || "").trim())
+      .filter(Boolean);
+    return recipients[0] || "";
+  }
+
+  function selectedCartRecipientProfile() {
+    const label = selectedCartRecipientLabel();
+    if (!label) return null;
+    const parsed = parseRecipientLabel(label);
+    const normalizedLabel = normalizedRecipient(label);
+    const normalizedName = normalizedRecipient(parsed.name);
+    const matched = householdPeople().find((person) => {
+      return (
+        normalizedRecipient(recipientLabel(person)) === normalizedLabel ||
+        normalizedRecipient(person.name) === normalizedName
+      );
+    });
+    return {
+      ...(matched || {}),
+      ...parsed,
+      name: String(matched?.name || parsed.name || label).trim(),
+      relation: String(matched?.relation || parsed.relation || "").trim(),
+      label,
+    };
+  }
+
+  function inferRecipientGender(profile) {
+    const source = normalizedRecipient(`${profile?.gender || ""} ${profile?.relation || ""}`);
+    if (/\b(male|father|grandfather|husband|brother|son)\b/.test(source)) return "Male";
+    if (/\b(female|mother|grandmother|wife|sister|daughter)\b/.test(source)) return "Female";
+    return "";
+  }
+
+  function renderRecipientSyncNote(form, profile) {
+    const patientSection = form?.querySelector(".checkout-form-section--patient");
+    if (!patientSection) return;
+    let note = patientSection.querySelector("[data-checkout-recipient-note]");
+    if (!profile?.name) {
+      note?.remove();
+      return;
+    }
+    if (!note) {
+      note = document.createElement("p");
+      note.className = "checkout-profile-sync";
+      note.setAttribute("data-checkout-recipient-note", "");
+      patientSection
+        .querySelector(".checkout-form-section__head")
+        ?.insertAdjacentElement("afterend", note);
+    }
+    const relation =
+      profile.relation && profile.relation !== "Self"
+        ? `<span>${escapeHtml(profile.relation)}</span>`
+        : "<span>Self</span>";
+    note.innerHTML = `Booking for <strong>${escapeHtml(profile.name)}</strong>${relation}`;
+  }
+
+  function applyCartRecipientToForm(form, { force = false } = {}) {
+    const profile = selectedCartRecipientProfile();
+    renderRecipientSyncNote(form, profile);
+    if (!profile?.name) return null;
+
+    const name = form.querySelector("#book-name");
+    const age = form.querySelector("#book-age");
+    const phone = form.querySelector("#book-phone");
+    const gender = inferRecipientGender(profile);
+    const profilePhone = normalizedPhone(profile.phone || profile.mobile || "");
+
+    if (name && (force || !name.value.trim() || name.dataset.syncedRecipient !== profile.label)) {
+      name.value = profile.name;
+      name.dataset.syncedRecipient = profile.label;
+    }
+    if (age && (force || !age.value.trim())) {
+      age.value = profile.age || profile.years || "";
+    }
+    if (phone && profilePhone && (force || !phone.value.trim())) {
+      phone.value = profilePhone;
+    }
+    if (gender) {
+      const input = form.querySelector(`input[name='gender'][value="${gender}"]`);
+      if (input && (force || !form.querySelector("input[name='gender']:checked"))) {
+        input.checked = true;
+      }
+    } else if (force) {
+      form.querySelectorAll("input[name='gender']").forEach((input) => {
+        input.checked = false;
+      });
+    }
+
+    return profile;
+  }
+
   function cartItemsWithTests() {
     const tests = Array.isArray(window.DRSWIFT_TESTS) ? window.DRSWIFT_TESTS : [];
     return cartLineItems()
@@ -186,6 +377,26 @@
 
   function checkoutApi() {
     return window.DrSwiftCheckoutApi || null;
+  }
+
+  async function verifyPhoneOtp(phone, code) {
+    const response = await fetch("/_drswift/auth/otp/verify", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      credentials: "same-origin",
+      cache: "no-store",
+      body: JSON.stringify({ phone, code }),
+    });
+    if (!response.ok) {
+      const otp = otpCopy();
+      if (response.status === 429) {
+        throw new Error(otp.rateLimitCopy || "Too many verification attempts. Please wait and try again.");
+      }
+      throw new Error("That verification code could not be confirmed. Check the code and try again.");
+    }
   }
 
   function cartTotalAmount() {
@@ -303,6 +514,8 @@
         name: details.name,
         firstName: details.firstName || "",
         lastName: details.lastName || "",
+        relation: details.recipientRelation || "",
+        recipientLabel: details.recipientLabel || "",
         gender: details.gender,
         age: details.age,
         phone: details.phone,
@@ -519,13 +732,13 @@
         return;
       }
       if (checkoutApi()?.stubEnabled?.()) {
-        setProcessingMessage("Confirming stub payment…");
+        setProcessingMessage("Confirming your payment…");
         const paid = await checkoutApi().getPaymentStatus(payment.paymentId);
         finalizePaidBooking(details, { ...payment, ...paid }, methodMeta);
         return;
       }
       setPayStatus(
-        "Payment session created, but no checkout URL was returned. Wire checkoutUrl on POST /payments.",
+        "We could not open the secure payment page. Please try another method or contact the care team.",
         true
       );
       activateDeckCard(stageName || "pay-choose");
@@ -1209,9 +1422,7 @@
       slotEl.textContent = `${day} · ${windowLabel}`;
     }
     if (leadEl) {
-      leadEl.textContent = payment.stub
-        ? "Stub payment confirmed for UI testing. Wire live payment APIs before taking real orders."
-        : "Payment received. We’ll collect your sample at home and send reports when ready.";
+      leadEl.textContent = "Payment received. We’ll collect your sample at home and send reports when ready.";
     }
 
     activateDeckCard("confirmation");
@@ -1256,8 +1467,15 @@
   }
 
   function restoreDraft(form) {
-    const draft = readDraft();
-    if (!draft || typeof draft !== "object") return;
+    const storedDraft = readDraft();
+    const draft = storedDraft && typeof storedDraft === "object" ? storedDraft : {};
+    let serviceArea = null;
+    try {
+      serviceArea = JSON.parse(localStorage.getItem(SERVICE_AREA_STORAGE_KEY) || "null");
+    } catch {
+      serviceArea = null;
+    }
+    if (!storedDraft && !serviceArea) return;
 
     const name = form.querySelector("#book-name");
     const age = form.querySelector("#book-age");
@@ -1267,7 +1485,7 @@
     if (name && draft.name) name.value = draft.name;
     if (age && draft.age !== undefined && draft.age !== null) age.value = draft.age;
     if (phone && draft.phone) phone.value = String(draft.phone).replace(/\D/g, "").slice(0, 10);
-    if (city && draft.city) city.value = draft.city;
+    if (city && (draft.city || serviceArea?.city)) city.value = draft.city || serviceArea.city;
     if (address && draft.address) address.value = draft.address;
 
     if (draft.gender) {
@@ -1335,6 +1553,7 @@
 
     initCollectionCalendar(form);
     restoreDraft(form);
+    applyCartRecipientToForm(form, { force: fromCart });
     initPaymentFlow();
     initStickyCheckoutBar();
     syncSampleWindows(form);
@@ -1377,6 +1596,7 @@
     prefillFromGoogle(form, window.DRSWIFT_USER);
     window.addEventListener("drswift:auth-changed", (event) => {
       prefillFromGoogle(form, event.detail?.user);
+      applyCartRecipientToForm(form, { force: fromCart });
       saveDraft(form);
     });
 
@@ -1403,7 +1623,12 @@
     syncOtpSendEnabled(form);
     saveDraft(form);
 
-    sendBtn?.addEventListener("click", () => {
+    form.querySelector("#book-consent")?.addEventListener("change", () => {
+      syncContinueEnabled(form);
+      saveDraft(form);
+    });
+
+    sendBtn?.addEventListener("click", async () => {
       setStatus(statusEl, "", false);
       const digits = normalizedPhone(phoneInput?.value);
       if (digits.length !== 10) {
@@ -1412,17 +1637,25 @@
         return;
       }
       if (phoneInput) phoneInput.value = digits;
-      // Local demo only — no backend OTP API call.
-      setPhoneVerifiedUi(form, false, true);
-      setStatus(statusEl, `Enter OTP ${LOCAL_DEMO_OTP} to verify.`, false);
-      if (otpInput) {
-        otpInput.value = "";
-        otpInput.focus();
+      sendBtn.disabled = true;
+      try {
+        await requestPhoneOtp(digits);
+        setPhoneVerifiedUi(form, false, true);
+        const hint = otpCopy().hint || "Enter the 6-digit code sent to this mobile number.";
+        setStatus(statusEl, hint, false);
+        if (otpInput) {
+          otpInput.value = "";
+          otpInput.focus();
+        }
+      } catch (error) {
+        setPhoneVerifiedUi(form, false, false);
+        setStatus(statusEl, error.message || "We could not send a verification code.", true);
+      } finally {
+        syncOtpSendEnabled(form);
       }
-      syncOtpSendEnabled(form);
     });
 
-    verifyBtn?.addEventListener("click", () => {
+    verifyBtn?.addEventListener("click", async () => {
       setStatus(statusEl, "", false);
       const digits = normalizedPhone(phoneInput?.value);
       if (digits.length !== 10) {
@@ -1431,16 +1664,25 @@
         return;
       }
       const code = String(otpInput?.value || "").replace(/\D/g, "");
-      if (code !== LOCAL_DEMO_OTP) {
-        setStatus(statusEl, `Invalid OTP. Enter ${LOCAL_DEMO_OTP}.`, true);
+      if (!/^\d{6}$/.test(code)) {
+        setStatus(statusEl, "Enter the 6-digit code sent to your mobile number.", true);
         otpInput?.focus();
         return;
       }
-      if (phoneInput) phoneInput.value = digits;
-      writeVerified(digits);
-      setPhoneVerifiedUi(form, true);
-      setStatus(statusEl, "", false);
-      saveDraft(form);
+      verifyBtn.disabled = true;
+      try {
+        await verifyPhoneOtp(digits, code);
+        if (phoneInput) phoneInput.value = digits;
+        writeVerified(digits);
+        setPhoneVerifiedUi(form, true);
+        setStatus(statusEl, "", false);
+        saveDraft(form);
+      } catch (error) {
+        setStatus(statusEl, error.message || "That verification code could not be confirmed.", true);
+        otpInput?.focus();
+      } finally {
+        verifyBtn.disabled = false;
+      }
     });
 
     form.addEventListener("submit", async (event) => {
@@ -1448,12 +1690,15 @@
       setStatus(statusEl, "", false);
       if (successEl) successEl.hidden = true;
 
-      const verified = readVerified();
-      if (!verified) {
-        setStatus(statusEl, "Verify your phone number to continue to payment.", true);
+      const digits = normalizedPhone(phoneInput?.value);
+      if (digits.length !== 10) {
+        setStatus(statusEl, "Enter a valid 10-digit mobile number to continue.", true);
         phoneInput?.focus();
         return;
       }
+
+      const verified = readVerified();
+      const phone = verified?.phone || digits;
 
       if (!form.checkValidity()) {
         form.reportValidity();
@@ -1465,14 +1710,18 @@
 
       const name = form.querySelector("#book-name")?.value || "";
       const names = splitName(name);
+      const recipientProfile = selectedCartRecipientProfile();
       const payload = {
         name,
         ...names,
+        recipientLabel: recipientProfile?.label || name,
+        recipientRelation: recipientProfile?.relation || "",
         gender: form.querySelector("input[name='gender']:checked")?.value
           || form.querySelector("#book-gender")?.value
           || "",
         age: form.querySelector("#book-age")?.value || "",
-        phone: verified.phone,
+        phone,
+        phoneVerified: Boolean(verified),
         firebaseUid: window.DRSWIFT_USER?.uid || null,
         sampleDay: form.querySelector("input[name='sampleDay']:checked")?.value || "",
         sampleDayLabel: formatSampleDayLabel(

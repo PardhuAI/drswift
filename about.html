@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>About | Dr.Swift Diagnostics</title>
     <meta name="description" content="Learn about Dr.Swift Diagnostics — at-home lab testing with clear reports and family health insights.">
-    <link rel="stylesheet" href="assets/css/styles.css?v=session-flow-2">
+    <link rel="stylesheet" href="assets/css/styles.css?v=profile-vibe-1">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
   <body class="about-page">
@@ -30,7 +30,7 @@
               <span>Cart</span>
               <span class="cart-count" data-cart-count hidden>0</span>
             </a>
-            <a class="button primary nav-cta" href="login.html">My Account</a>
+            <a class="button primary nav-cta" href="tests.html">Book a test</a>
           </div>
         </div>
       </nav>
@@ -47,13 +47,13 @@
               reports into one calmer experience for families.
             </p>
             <div class="about-hero__actions">
-              <a class="button primary" href="tests.html">Shop tests</a>
+              <a class="button primary" href="tests.html">Book a test</a>
               <a class="button secondary" href="#contact">Contact us</a>
             </div>
             <ul class="about-proof-list" aria-label="Dr.Swift care standards">
               <li>
                 <svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-shield-check"></use></svg>
-                Accredited partner labs
+                NABL-accredited partner labs
               </li>
               <li>
                 <svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-home"></use></svg>
@@ -150,6 +150,27 @@
         </div>
       </section>
 
+      <section class="page-section section-bg-white" id="lab-partners" aria-labelledby="lab-partners-title">
+        <div class="container">
+          <div class="section-heading section-heading--center">
+            <p class="overline">Accreditation</p>
+            <h2 id="lab-partners-title">Partner laboratories</h2>
+            <p>Named partner labs, accreditation, certificate numbers, and validity dates used in the design system.</p>
+          </div>
+          <div data-site-content="lab-partners"></div>
+        </div>
+      </section>
+
+      <section class="page-section section-bg-soft" id="collection-quality" aria-labelledby="collection-quality-title">
+        <div class="container">
+          <div class="section-heading section-heading--center">
+            <p class="overline">Collection quality</p>
+            <h2 id="collection-quality-title">How samples are handled</h2>
+          </div>
+          <div data-site-content="collection-quality"></div>
+        </div>
+      </section>
+
       <section class="page-section section-bg-white how-it-works-section" aria-label="How it works">
         <div class="container">
           <div class="section-heading section-heading--center">
@@ -186,24 +207,7 @@
             <p class="overline">Contact</p>
             <h2>We are here to help</h2>
             <p>Questions about a panel, booking, or your report? Reach our care team anytime.</p>
-            <ul class="contact-list">
-              <li>
-                <strong>Email</strong>
-                <span>care@drswift.health</span>
-              </li>
-              <li>
-                <strong>Phone / WhatsApp</strong>
-                <span>+91 90000 90000</span>
-              </li>
-              <li>
-                <strong>Hours</strong>
-                <span>Mon – Sat, 7:00 AM – 9:00 PM</span>
-              </li>
-              <li>
-                <strong>Service areas</strong>
-                <span>Home collection in select cities — expanding soon.</span>
-              </li>
-            </ul>
+            <div data-site-content="contact-extras"></div>
             <div class="contact-actions">
               <a class="button primary" href="whatsapp.html">WhatsApp us</a>
               <a class="button secondary" href="mailto:care@drswift.health">Email care</a>
@@ -230,7 +234,7 @@
           <h2>Join families who test smarter</h2>
           <p>Book your first panel or download the app to explore health insights built for everyday life.</p>
           <div class="cta-band__actions">
-            <a class="button secondary" href="tests.html">Shop tests</a>
+            <a class="button secondary" href="tests.html">Book a test</a>
             <a class="button primary" href="app.html">Get the app</a>
           </div>
         </div>
@@ -254,7 +258,7 @@
         </div>
         <div>
           <h2 class="footer-col-title">Our Tests</h2>
-          <a href="tests.html">Shop tests</a>
+          <a href="tests.html">Book a test</a>
           <a href="tests.html#catalog">By category</a>
           <a href="index.html#audience-tests-heading">For Him / Her / Family</a>
           <a href="promotions.html">Promotions</a>
@@ -276,7 +280,9 @@
         <div>
           <h2 class="footer-col-title">Company</h2>
           <a href="about.html">About us</a>
+          <a href="about.html#lab-partners">Lab partners</a>
           <a href="about.html#contact">Contact</a>
+          <a href="policies.html">Policies</a>
           <a href="privacy.html">Privacy policy</a>
           <a href="terms.html">Terms of service</a>
         </div>
@@ -287,10 +293,11 @@
       </div>
     </footer>
 
+    <script src="assets/js/site-content.js?v=design-content-1"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
     <script src="assets/js/firebase-config.js?v=3"></script>
     <script src="assets/js/google-auth.js?v=6"></script>
-    <script src="assets/js/main.js?v=session-flow-1"></script>
+    <script src="assets/js/main.js?v=nav-account-menu-1"></script>
   </body>
 </html>

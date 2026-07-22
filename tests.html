@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Tests | Dr.Swift Diagnostics</title>
     <meta name="description" content="Browse at-home lab tests from Dr.Swift Diagnostics — book online, app, or WhatsApp.">
-    <link rel="stylesheet" href="assets/css/styles.css?v=mobile-lag-1">
-    <link rel="stylesheet" href="assets/css/tests.css?v=mobile-lag-1">
+    <link rel="stylesheet" href="assets/css/styles.css?v=profile-vibe-1">
+    <link rel="stylesheet" href="assets/css/tests.css?v=production-ready-1">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
   <body class="tests-page">
@@ -40,11 +40,11 @@
     <main>
       <section class="tests-toolbar" id="catalog-search" aria-label="Search and filter tests" data-group="her">
         <div class="container tests-toolbar__inner">
-          <h2 class="tests-page-heading" id="tests-page-heading" aria-live="polite">
+          <h1 class="tests-page-heading" id="tests-page-heading" aria-label="Browse health tests">
             <span class="tests-page-heading__viewport">
-              <span class="tests-page-heading__phrase is-active">Shop All Tests</span>
+              <span class="tests-page-heading__phrase is-active">Browse All Tests</span>
             </span>
-          </h2>
+          </h1>
           <div class="tests-filter-bar">
             <div class="tests-extra-filters-wrap tests-filters-row-1" data-filters-row="1">
               <button
@@ -83,7 +83,7 @@
             <button
               class="tests-search-toggle scroll-btn inline"
               type="button"
-              aria-expanded="false"
+              aria-expanded="true"
               aria-controls="tests-search-panel"
             >
               <span class="sr-only">Search tests</span>
@@ -140,7 +140,7 @@
               <span aria-hidden="true">&rsaquo;</span>
             </button>
           </div>
-          <div class="tests-search-panel" id="tests-search-panel" hidden>
+          <div class="tests-search-panel" id="tests-search-panel">
             <label class="tests-search" for="catalog-search-input">
               <span class="sr-only">Search tests, markers, or health goals</span>
               <svg class="tests-search__icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -162,8 +162,9 @@
         </div>
       </section>
 
-      <section class="catalog-section catalog-section--grid section-pad section-bg-white" id="catalog" aria-label="Test catalog">
+      <section class="catalog-section catalog-section--grid section-pad section-bg-white" id="catalog" aria-labelledby="catalog-title">
         <div class="container">
+          <h2 class="sr-only" id="catalog-title">Health test catalog</h2>
           <div class="catalog-grid" id="catalog-grid" data-catalog-grid></div>
           <div class="catalog-empty" id="catalog-empty" hidden>
             <p class="catalog-empty__message">No tests in this category yet. Try another filter or browse all tests.</p>
@@ -257,7 +258,7 @@
                     </span>
                     <span class="healthy-you-goal__arrow" aria-hidden="true">→</span>
                   </span>
-                  <span class="healthy-you-goal__title">Oldage Care</span>
+                  <span class="healthy-you-goal__title">Senior Care</span>
                   <span class="healthy-you-goal__desc">Senior wellness and routine monitoring</span>
                 </button>
               </div>
@@ -326,7 +327,9 @@
         <div>
           <h2 class="footer-col-title">Company</h2>
           <a href="about.html">About us</a>
+          <a href="about.html#lab-partners">Lab partners</a>
           <a href="about.html#contact">Contact</a>
+          <a href="policies.html">Policies</a>
           <a href="privacy.html">Privacy policy</a>
           <a href="terms.html">Terms of service</a>
         </div>
@@ -344,7 +347,7 @@
     <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
     <script src="assets/js/firebase-config.js?v=3"></script>
     <script src="assets/js/google-auth.js?v=6"></script>
-    <script src="assets/js/main.js?v=mobile-cart-1"></script>
+    <script src="assets/js/main.js?v=nav-account-menu-1"></script>
     <script src="assets/js/tests-toolbar.js?v=cat-exact-1"></script>
   </body>
 </html>

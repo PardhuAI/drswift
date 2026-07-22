@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Booking &amp; payment policies | Dr.Swift Diagnostics</title>
+    <meta name="description" content="Payment, refund, cancellation, and rescheduling policies for Dr.Swift Diagnostics home collection.">
+    <link rel="stylesheet" href="assets/css/styles.css?v=profile-vibe-1">
+    <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
+  </head>
+  <body>
+    <header class="site-header" id="site-header">
+      <nav class="navbar container" aria-label="Primary navigation">
+        <a class="brand" href="index.html" aria-label="Dr.Swift Diagnostics home">
+          <img class="brand-mark" src="assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="40" height="40">
+          <span>Dr.Swift Diagnostics</span>
+        </a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu">
+          <span class="sr-only">Menu</span><span></span><span></span><span></span>
+        </button>
+        <div class="nav-menu" id="primary-menu">
+          <div class="nav-links">
+            <a href="tests.html">Tests</a>
+            <a href="reports.html">Reports</a>
+            <a href="about.html">About</a>
+          </div>
+          <div class="nav-actions">
+            <a class="cart-link" href="cart.html" aria-label="View cart">
+              <svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-cart"></use></svg>
+              <span>Cart</span>
+              <span class="cart-count" data-cart-count hidden>0</span>
+            </a>
+            <a class="button primary nav-cta" href="tests.html">Book a test</a>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="legal-shell">
+      <div class="container legal-card">
+        <p class="eyebrow">Policies</p>
+        <h1>Booking &amp; payment policies</h1>
+        <p class="legal-updated">Design content for Phase 1 — replace with legal-approved copy before launch</p>
+        <p>
+          These sections complete the checkout and support flow. Phase 2 replaces the wording with
+          operations- and legal-approved policy text from
+          <code>assets/js/site-content.js</code>.
+        </p>
+
+        <div data-site-content="policy-summary"></div>
+
+        <h2 id="payment">Payment</h2>
+        <p data-policy-field="payment">
+          Pay online by UPI, card, or netbanking through our secure payment partner after patient details are locked.
+        </p>
+
+        <h2 id="refunds">Refunds</h2>
+        <p data-policy-field="refund">
+          Refunds apply when a collection could not be completed due to Dr.Swift or lab failure. Processed tests are non-refundable unless required by law.
+        </p>
+
+        <h2 id="cancellation">Cancellation</h2>
+        <p data-policy-field="cancellation">
+          Cancel free of charge until the collection window starts. Late cancellations may retain a visit fee.
+        </p>
+
+        <h2 id="reschedule">Rescheduling</h2>
+        <p data-policy-field="reschedule">
+          Reschedule once online or via WhatsApp care at least 2 hours before the slot, subject to availability.
+        </p>
+
+        <h2>Need help?</h2>
+        <p>
+          Care team: <a href="about.html#contact">Contact</a> ·
+          <a href="whatsapp.html">WhatsApp booking</a> ·
+          <a href="terms.html">Terms of service</a>
+        </p>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-bottom footer-bottom--compact">
+        <p>&copy; 2026 Dr.Swift Diagnostics · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></p>
+      </div>
+    </footer>
+
+    <script src="assets/js/site-content.js?v=design-content-1"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const policies = window.DRSWIFT_SITE_CONTENT?.policies;
+        if (!policies) return;
+        document.querySelectorAll("[data-policy-field]").forEach((node) => {
+          const key = node.getAttribute("data-policy-field");
+          if (policies[key]) node.textContent = policies[key];
+        });
+      });
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
+    <script src="assets/js/firebase-config.js?v=3"></script>
+    <script src="assets/js/google-auth.js?v=6"></script>
+    <script src="assets/js/main.js?v=nav-account-menu-1"></script>
+  </body>
+</html>

@@ -1,32 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
   <!-- Footer & contact -->
-  <symbol id="icon-email" viewBox="0 0 24 24" fill="none">
-    <rect x="2.5" y="5.5" width="19" height="13" rx="2.5" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round"/>
-    <path d="M3.5 7.5 12 13.2l8.5-5.7" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M8.2 12.2 3.8 16.2M15.8 12.2l4.4 4" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/>
+  <symbol id="icon-email" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M4.75 5.5h14.5A2.75 2.75 0 0 1 22 8.25v7.5a2.75 2.75 0 0 1-2.75 2.75H4.75A2.75 2.75 0 0 1 2 15.75v-7.5A2.75 2.75 0 0 1 4.75 5.5Zm.12 2.25 6.03 4.9a1.72 1.72 0 0 0 2.2 0l6.03-4.9H4.87Zm14.88 1.64-5.46 4.43a3.58 3.58 0 0 1-4.58 0L4.25 9.39v6.36c0 .28.22.5.5.5h14.5c.28 0 .5-.22.5-.5V9.39Z"/>
   </symbol>
 
-  <symbol id="icon-whatsapp" viewBox="0 0 24 24" fill="none">
-    <path d="M12 2.5c-5.25 0-9.5 4.1-9.5 9.15 0 1.62.43 3.2 1.25 4.58L2.5 21.5l5.55-1.12a9.6 9.6 0 0 0 3.95.84c5.25 0 9.5-4.1 9.5-9.15S17.25 2.5 12 2.5Z" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round"/>
-    <path d="M9.1 9.4c.2-.45.42-.46.68-.47.18 0 .37 0 .56.02.18.02.42.05.64.5.22.45.75 1.82.82 1.95.07.13.12.28.02.45-.1.17-.15.28-.3.43-.15.15-.32.34-.46.45-.15.12-.3.25-.13.5.18.25.78 1.28 1.68 2.07 1.16 1.02 2.14 1.34 2.48 1.48.34.15.54.13.74-.08.2-.2.85-.98 1.08-1.32.22-.33.45-.28.76-.17.3.12 1.92.9 2.25 1.07.33.17.55.25.63.38.08.13.08.75-.18 1.48-.25.72-1.48 1.38-2.05 1.47-.52.08-1.17.12-1.9-.12-.52-.18-1.18-.42-2.03-1.02-1.58-1.08-2.58-2.68-2.66-2.8-.08-.12-.7-.92-.7-1.76 0-.83.43-1.24.58-1.42Z" fill="currentColor"/>
+  <symbol id="icon-whatsapp" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M12.02 2.25a9.68 9.68 0 0 0-8.24 14.78L2.5 21.75l4.84-1.23A9.68 9.68 0 1 0 12.02 2.25Zm0 2.06a7.62 7.62 0 1 1-3.82 14.2l-.36-.21-2.44.62.65-2.35-.23-.38a7.62 7.62 0 0 1 6.2-11.88Zm-3.2 3.9c-.18 0-.48.06-.73.34-.25.28-.96.94-.96 2.28 0 1.35.98 2.66 1.12 2.84.14.18 1.9 3.05 4.72 4.14 2.34.91 2.82.73 3.33.68.51-.05 1.65-.67 1.88-1.32.23-.65.23-1.2.16-1.32-.07-.12-.25-.18-.53-.32-.28-.14-1.66-.82-1.92-.91-.26-.1-.45-.14-.64.14-.19.28-.73.91-.9 1.1-.17.18-.33.21-.61.07-.28-.14-1.18-.43-2.25-1.38-.83-.74-1.4-1.66-1.56-1.94-.16-.28-.02-.43.12-.57.13-.13.28-.33.42-.49.14-.16.19-.28.28-.46.09-.18.05-.35-.02-.49-.07-.14-.62-1.5-.86-2.05-.23-.53-.46-.45-.64-.46h-.43Z"/>
   </symbol>
 
-  <symbol id="icon-app" viewBox="0 0 24 24" fill="none">
-    <rect x="6.5" y="2.5" width="11" height="19" rx="2.5" stroke="currentColor" stroke-width="1.65"/>
-    <path d="M10 5.5h4" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/>
-    <rect x="8.5" y="8.5" width="7" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
-    <path d="M10.2 14.2h3.6M10.2 11.8h2.4" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
-    <circle cx="12" cy="19.2" r=".85" fill="currentColor"/>
+  <symbol id="icon-app" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M8.25 2.5h7.5A2.75 2.75 0 0 1 18.5 5.25v13.5a2.75 2.75 0 0 1-2.75 2.75h-7.5a2.75 2.75 0 0 1-2.75-2.75V5.25A2.75 2.75 0 0 1 8.25 2.5Zm0 2.1a.65.65 0 0 0-.65.65v13.5c0 .36.29.65.65.65h7.5c.36 0 .65-.29.65-.65V5.25a.65.65 0 0 0-.65-.65h-.95a.78.78 0 0 1-.72.5h-4.16a.78.78 0 0 1-.72-.5h-.95Zm1.25 5.3h1.75v1.75H9.5V9.9Zm3.25 0h1.75v1.75h-1.75V9.9ZM9.5 13.15h1.75v1.75H9.5v-1.75Zm3.25 0h1.75v1.75h-1.75v-1.75ZM12 17.2a.85.85 0 1 1 0 1.7.85.85 0 0 1 0-1.7Z"/>
   </symbol>
 
-  <symbol id="icon-doctors" viewBox="0 0 24 24" fill="none">
-    <path d="M8.5 4.5a3.5 3.5 0 0 1 7 0v3.2" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/>
-    <path d="M9.2 7.7h5.6v2.2a2.8 2.8 0 0 1-5.6 0V7.7Z" stroke="currentColor" stroke-width="1.55" stroke-linejoin="round"/>
-    <path d="M12 12.2v2.2" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/>
-    <path d="M12 14.4c-2.8 0-5 1.6-5 4.2v1.4h10v-1.4c0-2.6-2.2-4.2-5-4.2Z" stroke="currentColor" stroke-width="1.55" stroke-linejoin="round"/>
-    <circle cx="17.8" cy="16.2" r="2.2" stroke="currentColor" stroke-width="1.45"/>
-    <circle cx="17.8" cy="16.2" r=".9" fill="currentColor"/>
-    <path d="M15.6 16.2H12" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+  <symbol id="icon-doctors" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M8.95 2.75a3.7 3.7 0 0 0-3.7 3.7v3.02a4.28 4.28 0 0 0 3.35 4.18v1.12c-2.83.36-5.1 2.34-5.1 5.03 0 .58.47 1.05 1.05 1.05h8.2a1.05 1.05 0 0 0 0-2.1H5.9c.46-1.2 1.82-1.98 3.72-1.98.85 0 1.57.15 2.17.43a1.05 1.05 0 0 0 .9-1.9 6.5 6.5 0 0 0-1.99-.55v-1.1a4.28 4.28 0 0 0 3.35-4.18V6.45a3.7 3.7 0 0 0-3.7-3.7h-1.4Zm0 2.1h1.4c.88 0 1.6.72 1.6 1.6v.27a5.2 5.2 0 0 1-5.53.02v-.29c0-.88.72-1.6 1.6-1.6h.93Zm-1.6 4.22a7.1 7.1 0 0 0 4.6-.02v.42a2.3 2.3 0 0 1-4.6 0v-.4Zm10.85 1.68c.58 0 1.05.47 1.05 1.05v1.45h1.45a1.05 1.05 0 1 1 0 2.1h-1.45v1.45a1.05 1.05 0 1 1-2.1 0v-1.45H15.7a1.05 1.05 0 1 1 0-2.1h1.45V11.8c0-.58.47-1.05 1.05-1.05Z"/>
   </symbol>
 
   <!-- Filter tabs -->

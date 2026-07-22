@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Terms of service | Dr.Swift Diagnostics</title>
-    <link rel="stylesheet" href="assets/css/styles.css?v=session-flow-2">
+    <link rel="stylesheet" href="assets/css/styles.css?v=profile-vibe-1">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
   <body>
@@ -12,31 +12,45 @@
       <nav class="navbar container"><a class="brand" href="index.html"><img class="brand-mark" src="assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="40" height="40"><span>Dr.Swift Diagnostics</span></a>
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu"><span class="sr-only">Menu</span><span></span><span></span><span></span></button>
         <div class="nav-menu" id="primary-menu"><div class="nav-links"><a href="tests.html">Tests</a><a href="reports.html">Reports</a><a href="about.html">About</a></div>
-          <div class="nav-actions"><a class="cart-link" href="cart.html" aria-label="View cart"><svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-cart"></use></svg><span>Cart</span><span class="cart-count" data-cart-count hidden>0</span></a><a class="button primary nav-cta" href="login.html">My Account</a></div></div></nav>
+          <div class="nav-actions"><a class="cart-link" href="cart.html" aria-label="View cart"><svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-cart"></use></svg><span>Cart</span><span class="cart-count" data-cart-count hidden>0</span></a><a class="button primary nav-cta" href="tests.html">Book a test</a></div></div></nav>
     </header>
     <main class="legal-shell">
       <div class="container legal-card">
         <p class="eyebrow">Legal</p>
         <h1>Terms of service</h1>
-        <p class="legal-updated">Last updated: July 5, 2026 · Placeholder for legal review</p>
+        <p class="legal-updated">Last updated: July 5, 2026 · Design content pending legal review</p>
         <p>By using Dr.Swift Diagnostics services you agree to these terms. Our services include at-home sample collection, laboratory testing through partner labs, and digital delivery of results.</p>
         <h2>Medical disclaimer</h2>
         <p>Dr.Swift provides laboratory testing and informational insights. Our reports are not a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider.</p>
-        <h2>Bookings &amp; cancellation</h2>
-        <p>Collection slots may be rescheduled per our cancellation policy. Fees for completed collections and processed tests are non-refundable unless required by law.</p>
+        <h2>Urgent care</h2>
+        <p data-clinical-field="urgentCare">If you have severe or urgent symptoms, seek emergency care immediately. Do not wait for lab results.</p>
+        <h2>Bookings, payment, refunds &amp; rescheduling</h2>
+        <p>Detailed payment, refund, cancellation, and reschedule rules live on our <a href="policies.html">booking &amp; payment policies</a> page.</p>
+        <div data-site-content="policy-summary"></div>
         <h2>Accounts</h2>
         <p>You are responsible for maintaining the confidentiality of your login credentials and for activity under your account, including family profiles you manage.</p>
         <h2>Promotions</h2>
         <p>Offers on our <a href="promotions.html">promotions page</a> may have additional terms and expiry dates.</p>
         <h2>Contact</h2>
-        <p>care@drswift.health</p>
+        <p>care@drswift.health · <a href="about.html#contact">Contact details</a></p>
       </div>
     </main>
-    <footer class="site-footer"><div class="container footer-bottom footer-bottom--compact"><p>&copy; 2026 Dr.Swift Diagnostics · <a href="privacy.html">Privacy</a></p></div></footer>
+    <footer class="site-footer"><div class="container footer-bottom footer-bottom--compact"><p>&copy; 2026 Dr.Swift Diagnostics · <a href="privacy.html">Privacy</a> · <a href="policies.html">Policies</a></p></div></footer>
+    <script src="assets/js/site-content.js?v=design-content-1"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const clinical = window.DRSWIFT_SITE_CONTENT?.clinical;
+        if (!clinical) return;
+        document.querySelectorAll("[data-clinical-field]").forEach((node) => {
+          const key = node.getAttribute("data-clinical-field");
+          if (clinical[key]) node.textContent = clinical[key];
+        });
+      });
+    </script>
     <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
     <script src="assets/js/firebase-config.js?v=3"></script>
     <script src="assets/js/google-auth.js?v=6"></script>
-    <script src="assets/js/main.js?v=session-flow-1"></script>
+    <script src="assets/js/main.js?v=nav-account-menu-1"></script>
   </body>
 </html>

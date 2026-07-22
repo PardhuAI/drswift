@@ -314,28 +314,8 @@
   }
 
   function showCatalogSourceBanner(source) {
-    if (source === "cms" || source === "ssr") {
-      document.querySelectorAll("[data-catalog-source-banner]").forEach((el) => el.remove());
-      return;
-    }
-    // Never show localhost/dev banners on the public production site.
-    const host = String(global.location && global.location.hostname || "");
-    if (host === "drswift.in" || host === "www.drswift.in" || host.endsWith(".workers.dev")) {
-      return;
-    }
-    if (document.querySelector("[data-catalog-source-banner]")) {
-      return;
-    }
-    const banner = document.createElement("div");
-    banner.setAttribute("data-catalog-source-banner", source);
-    banner.setAttribute("role", "status");
-    banner.style.cssText =
-      "position:sticky;top:0;z-index:9999;background:#7c2d12;color:#fff;padding:8px 16px;font:14px/1.4 system-ui,sans-serif;text-align:center";
-    banner.textContent =
-      source === "static-fallback"
-        ? "CMS catalog unavailable — showing offline demo catalog. Start CMS on localhost:8081 and refresh."
-        : `Catalog source: ${source}`;
-    document.body.prepend(banner);
+    // Catalog source is useful for diagnostics, but should never be patient-facing.
+    document.querySelectorAll("[data-catalog-source-banner]").forEach((el) => el.remove());
   }
 
   function useSsrCatalogIfPresent() {

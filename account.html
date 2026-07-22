@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Account · Reports &amp; bookings | Dr.Swift Diagnostics</title>
     <meta name="description" content="Sign in to view Dr.Swift Diagnostics bookings, reports, family profiles, and health trends.">
-    <link rel="stylesheet" href="assets/css/styles.css?v=mobile-lag-1">
+    <link rel="stylesheet" href="assets/css/styles.css?v=profile-vibe-1">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
   <body class="account-page">
@@ -30,7 +30,7 @@
               <span>Cart</span>
               <span class="cart-count" data-cart-count hidden>0</span>
             </a>
-            <a class="button primary nav-cta" href="login.html">My Account</a>
+            <a class="button primary nav-cta" href="tests.html">Book a test</a>
           </div>
         </div>
       </nav>
@@ -57,25 +57,24 @@
               <li>Booking status, collection slot, and support links</li>
               <li>Family profiles with separate health timelines</li>
             </ul>
-            <button class="account-preview-link" type="button" data-account-preview>Preview sample dashboard</button>
           </aside>
         </div>
       </section>
 
-      <div data-account-dashboard hidden>
+      <div data-account-dashboard hidden inert>
         <section class="account-hero section-pad-sm">
           <div class="container account-hero__grid">
             <div>
-              <p class="eyebrow" data-account-mode>Sample dashboard preview</p>
-              <h1>Welcome back<span data-account-name-prefix>,</span> <span data-account-name>Demo customer</span></h1>
+              <p class="eyebrow" data-account-mode>My account</p>
+              <h1>Welcome back<span data-account-name-prefix>,</span> <span data-account-name>Your account</span></h1>
               <p class="account-hero__lede" data-account-intro>
-                This is sample account data for the website demo. Real customer reports should load only after backend authentication.
+                Keep bookings, reports, family profiles, and health trends together in one secure workspace.
               </p>
             </div>
             <div class="account-user-bar" aria-label="Account shortcuts">
-              <a class="account-user-chip" href="sample-report.html">
-                <span class="account-avatar" aria-hidden="true">DS</span>
-                Latest report
+              <a class="account-user-chip" href="reports.html">
+                <span class="account-avatar" aria-hidden="true">AC</span>
+                Report guide
               </a>
               <a class="button secondary account-add-family" href="signup.html?mode=family">Add family member</a>
               <button class="button secondary account-logout" type="button" data-account-logout>Logout</button>
@@ -93,12 +92,11 @@
               <article class="account-card account-card--focus">
                 <div class="account-card__head">
                   <h3 class="account-card__title">Upcoming collection</h3>
-                  <span class="account-status account-status--pending">Scheduled</span>
                 </div>
-                <p class="account-meta"><strong>Tomorrow</strong> · Morning window</p>
-                <p class="account-summary">Complete Blood Count at your saved home address.</p>
+                <p class="account-meta"><strong>No collection scheduled</strong></p>
+                <p class="account-summary">Choose a test when you are ready. Your collection slot will appear here once booked.</p>
                 <div class="account-action-row">
-                  <a class="button secondary" href="book.html?cart=checkout">Reschedule</a>
+                  <a class="button primary" href="tests.html">Browse tests</a>
                   <a class="button secondary" href="whatsapp.html">Support</a>
                 </div>
               </article>
@@ -106,20 +104,18 @@
               <article class="account-card account-card--focus">
                 <div class="account-card__head">
                   <h3 class="account-card__title">Latest report</h3>
-                  <span class="account-status account-status--ready">Ready</span>
                 </div>
-                <p class="account-meta"><strong>Full Body Checkup</strong> · 14 Jan 2026</p>
-                <p class="account-summary">PDF report and trend insights are available for review.</p>
+                <p class="account-meta"><strong>No reports yet</strong></p>
+                <p class="account-summary">Completed reports will be kept here with their collection and result dates.</p>
                 <div class="account-action-row">
-                  <a class="button primary" href="sample-report.html">View report</a>
-                  <a class="button secondary" href="reports.html">Reports</a>
+                  <a class="button secondary" href="reports.html">How reports work</a>
                 </div>
               </article>
 
-              <article class="account-card account-card--focus">
+              <article class="account-card account-card--focus account-card--family">
                 <h3 class="account-card__title">Family profiles</h3>
-                <p class="account-meta" data-family-summary>Demo customer · Parent · Partner</p>
-                <p class="account-summary">Keep each person's reports, trends, and reminders separate.</p>
+                <p class="account-meta" data-family-summary>Your profile · Add loved ones anytime</p>
+                <p class="account-summary">Keep each person's bookings, reports, trends, and reminders separate.</p>
                 <div class="account-family-list" data-family-members></div>
                 <div class="account-action-row">
                   <a class="button secondary" href="signup.html?mode=family">Add profile</a>
@@ -128,10 +124,10 @@
 
               <article class="account-card account-card--focus">
                 <h3 class="account-card__title">Profile security</h3>
-                <p class="account-meta" data-account-security>Phone verified · Email optional</p>
+                <p class="account-meta" data-account-security>Account details ready</p>
                 <p class="account-summary">Use phone OTP as the primary access method for reports and booking updates.</p>
                 <div class="account-action-row">
-                  <a class="button secondary" href="login.html">Manage access</a>
+                  <a class="button secondary" href="privacy-choices.html">Notification preferences</a>
                 </div>
               </article>
             </div>
@@ -146,70 +142,18 @@
             </div>
             <div class="account-report-list">
               <article class="account-card account-card--report">
-                <div class="account-card__head">
-                  <h3 class="account-card__title">Full Body Checkup</h3>
-                  <span class="account-status account-status--ready">Results ready</span>
-                </div>
-                <p class="account-meta">Booking: 12 Jan 2026 · Result: 14 Jan 2026</p>
-                <ul class="account-test-list">
-                  <li>HbA1c</li>
-                  <li>Fasting glucose</li>
-                  <li>Lipid profile</li>
-                  <li>Vitamin D (25-OH)</li>
-                </ul>
+                <h3 class="account-card__title">Your report history is ready when you are</h3>
+                <p class="account-meta">Reports appear here only after your sample has been processed.</p>
+                <p class="account-summary">Each entry will include the test name, collection date, result status, and a secure link to view or share it.</p>
                 <div class="account-action-row">
-                  <a class="button primary" href="sample-report.html">View report</a>
-                  <a class="button secondary" href="mailto:care@drswift.health?subject=Share%20my%20Dr.Swift%20report">Share securely</a>
-                </div>
-              </article>
-
-              <article class="account-card account-card--report">
-                <div class="account-card__head">
-                  <h3 class="account-card__title">Wellness Follow-up</h3>
-                  <span class="account-status account-status--ready">Results ready</span>
-                </div>
-                <p class="account-meta">Booking: 18 Nov 2025 · Result: 20 Nov 2025</p>
-                <ul class="account-test-list">
-                  <li>Complete blood count</li>
-                  <li>TSH</li>
-                  <li>Vitamin B12</li>
-                  <li>Creatinine &amp; eGFR</li>
-                </ul>
-                <div class="account-action-row">
-                  <a class="button primary" href="sample-report.html">View report</a>
-                  <a class="button secondary" href="tests.html">Book again</a>
-                </div>
-              </article>
-
-              <article class="account-card account-card--report">
-                <div class="account-card__head">
-                  <h3 class="account-card__title">Heart Health Panel</h3>
-                  <span class="account-status account-status--pending">In progress</span>
-                </div>
-                <p class="account-meta">Booking: 08 Jul 2026 · Expected: 10 Jul 2026</p>
-                <ul class="account-test-list">
-                  <li>LDL cholesterol</li>
-                  <li>Triglycerides</li>
-                  <li>Hemoglobin</li>
-                </ul>
-                <div class="account-action-row">
-                  <a class="button secondary" href="whatsapp.html">Ask support</a>
+                  <a class="button primary" href="tests.html">Book a health test</a>
+                  <a class="button secondary" href="sample-report.html">View sample report</a>
                 </div>
               </article>
             </div>
           </div>
         </section>
 
-        <section class="section-pad account-trends-section" aria-labelledby="account-trends-title">
-          <div class="container">
-            <div class="account-trends-intro">
-              <p class="eyebrow">Sample trends</p>
-              <h2 id="account-trends-title">Health trends</h2>
-              <p>Demo marker history for product preview only. Real ranges, values, and guidance should come from verified reports and clinician-approved content.</p>
-            </div>
-            <div class="account-trends" id="account-trends" data-account-trends></div>
-          </div>
-        </section>
       </div>
     </main>
 
@@ -223,8 +167,7 @@
     <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
     <script src="assets/js/firebase-config.js?v=3"></script>
     <script src="assets/js/google-auth.js?v=6"></script>
-    <script src="assets/js/main.js?v=session-flow-1"></script>
-    <script src="assets/js/account-page.js?v=session-flow-1"></script>
-    <script src="assets/js/account-trends.js?v=account-ux-1"></script>
+    <script src="assets/js/main.js?v=recipient-sync-1"></script>
+    <script src="assets/js/account-page.js?v=family-profiles-1"></script>
   </body>
 </html>

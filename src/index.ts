@@ -278,6 +278,7 @@ export default {
       "/promotions": "/promotions.html",
       "/privacy": "/privacy.html",
       "/terms": "/terms.html",
+      "/policies": "/policies.html",
       "/help": "/help.html",
       "/login": "/login.html",
       "/book": "/book.html",

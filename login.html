@@ -5,17 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Sign in | Dr.Swift Diagnostics</title>
     <meta name="description" content="Customer and doctor login for Dr.Swift Diagnostics — reports, family health, and patient access.">
-    <link rel="stylesheet" href="assets/css/styles.css?v=auth-mobile-1">
+    <link rel="stylesheet" href="assets/css/styles.css?v=profile-vibe-1">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
-  <body class="auth-page" data-hide-nav-google="1">
-    <header class="site-header site-header--auth" id="site-header">
+  <body class="auth-page login-page" data-hide-nav-google="1">
+    <header class="site-header" id="site-header">
       <nav class="navbar container" aria-label="Primary navigation">
         <a class="brand" href="index.html" aria-label="Dr.Swift Diagnostics home">
           <img class="brand-mark" src="assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="40" height="40">
           <span>Dr.Swift Diagnostics</span>
         </a>
-        <a class="auth-nav-back" href="index.html">Back to home</a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu">
+          <span class="sr-only">Menu</span><span></span><span></span><span></span>
+        </button>
+        <div class="nav-menu" id="primary-menu">
+          <div class="nav-links">
+            <a href="tests.html">Tests</a>
+            <a href="reports.html">Reports</a>
+            <a href="about.html">About</a>
+          </div>
+          <div class="nav-actions" aria-label="Account links">
+            <a class="cart-link" href="cart.html" aria-label="View cart">
+              <svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-cart"></use></svg>
+              <span>Cart</span>
+              <span class="cart-count" data-cart-count hidden>0</span>
+            </a>
+            <a class="button primary nav-cta" href="tests.html">Book a test</a>
+          </div>
+        </div>
       </nav>
     </header>
 
@@ -32,7 +49,7 @@
               aria-controls="panel-customer"
               data-audience="customer"
             >
-              Customer
+              Login to My Account
             </button>
             <button
               type="button"
@@ -43,30 +60,28 @@
               aria-controls="panel-doctor"
               data-audience="doctor"
             >
-              Doctor
+              Doctor Login
             </button>
           </div>
 
-          <!-- Customer -->
           <div class="login-panel is-active" id="panel-customer" role="tabpanel" aria-labelledby="tab-customer" data-panel="customer">
             <div class="auth-card__header auth-card__header--login">
-              <h1 class="login-hero-title">Sign in</h1>
-              <p class="login-lead">View reports, track family health, and manage bookings.</p>
+              <p class="login-lead">Access your account to view test history, track health, family health and more.</p>
+              <h1 class="login-hero-title">See More Than Numbers.</h1>
             </div>
 
             <div class="login-method" role="tablist" aria-label="Sign-in method">
               <button type="button" class="login-method__tab is-active" role="tab" aria-selected="true" data-method="phone">
-                Phone
+                Login with Phone
               </button>
               <button type="button" class="login-method__tab" role="tab" aria-selected="false" data-method="mail">
-                Email
+                Login with Mail
               </button>
             </div>
 
-            <!-- Phone OTP -->
             <form class="auth-form login-form" data-auth-form data-login-method="phone" novalidate>
               <div class="form-field">
-                <label for="cust-phone">Mobile number</label>
+                <label for="cust-phone">Phone number</label>
                 <div class="login-inline-field">
                   <div class="input-with-prefix">
                     <span class="input-prefix" aria-hidden="true">+91</span>
@@ -104,12 +119,12 @@
                   >
                   <button type="button" class="button primary login-otp-btn" data-otp-verify>Verify</button>
                 </div>
+                <div data-site-content="otp-hint"></div>
               </div>
               <p class="login-status" data-login-status hidden aria-live="polite"></p>
               <p class="auth-success" data-auth-success aria-live="polite" hidden>Phone verified. Opening your account…</p>
             </form>
 
-            <!-- Email / password -->
             <form class="auth-form login-form" data-auth-form data-login-method="mail" hidden novalidate>
               <div class="form-field">
                 <label for="cust-email">Email</label>
@@ -148,7 +163,7 @@
                 <a href="forgot-password.html">Forgot password?</a>
               </div>
               <button class="button primary full" type="submit">Sign in</button>
-              <p class="auth-success" data-auth-success aria-live="polite" hidden>Signed in successfully. Backend connection coming soon.</p>
+              <p class="auth-success" data-auth-success aria-live="polite" hidden>Signed in successfully. Your account is ready.</p>
             </form>
 
             <div class="login-social" data-customer-social>
@@ -167,11 +182,10 @@
             <p class="auth-alt">New to Dr.Swift? <a href="signup.html">Create an account</a></p>
           </div>
 
-          <!-- Doctor -->
           <div class="login-panel" id="panel-doctor" role="tabpanel" aria-labelledby="tab-doctor" data-panel="doctor" hidden>
             <div class="auth-card__header auth-card__header--login">
-              <h1 class="login-hero-title">Doctor sign in</h1>
-              <p class="login-lead">Access patient reports and clinic bookings.</p>
+              <p class="login-lead">Access your patient reports 24/7.</p>
+              <h1 class="login-hero-title">See Health.</h1>
             </div>
 
             <form class="auth-form login-form" data-auth-form data-doctor-login novalidate>
@@ -208,27 +222,33 @@
                 <span></span>
                 <a href="forgot-password.html">Forgot password?</a>
               </div>
-              <button class="button primary full" type="submit">Sign in</button>
-              <p class="auth-success" data-auth-success aria-live="polite" hidden>Doctor signed in (mock). Patient reports portal connection coming soon.</p>
+              <button class="button primary full" type="submit">Login</button>
+              <p class="auth-success" data-auth-success aria-live="polite" hidden>Your sign-in request was received. We will confirm portal access with your clinic.</p>
             </form>
             <p class="auth-alt"><a href="doctors.html">About the doctors portal</a></p>
           </div>
         </div>
       </div>
+
+      <section class="community-band section-pad" aria-labelledby="login-community-heading">
+        <div class="container">
+          <h2 id="login-community-heading">Join families who test smarter</h2>
+          <p>Book your first panel or download the app to explore health insights built for everyday life.</p>
+          <div class="cta-band__actions">
+            <a class="button secondary" href="tests.html">Shop tests</a>
+            <a class="button primary" href="app.html">Get the app</a>
+          </div>
+        </div>
+      </section>
     </main>
 
-    <footer class="site-footer site-footer--auth">
-      <div class="container footer-bottom footer-bottom--flat">
-        <p>&copy; 2026 Dr.Swift Diagnostics · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="help.html">Help</a></p>
-      </div>
-    </footer>
-
+    <script src="assets/js/site-content.js?v=design-content-1"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
     <script src="assets/js/firebase-config.js?v=3"></script>
     <script src="assets/js/google-auth.js?v=6"></script>
-    <script src="assets/js/main.js?v=session-flow-1"></script>
-    <script src="assets/js/auth.js?v=auth-mobile-1"></script>
-    <script src="assets/js/login-tabs.js?v=auth-mobile-1"></script>
+    <script src="assets/js/main.js?v=recipient-sync-1"></script>
+    <script src="assets/js/auth.js?v=family-profiles-1"></script>
+    <script src="assets/js/login-tabs.js?v=production-ready-1"></script>
   </body>
 </html>

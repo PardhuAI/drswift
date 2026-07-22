@@ -62,7 +62,7 @@
       const message =
         (data && (data.message || data.error)) ||
         (res.status === 404 || res.status === 502
-          ? "Payment service is not connected yet. Please try again shortly."
+          ? "Secure payment is temporarily unavailable. Please try again shortly or contact the care team."
           : `Payment request failed (${res.status}).`);
       const err = new Error(message);
       err.status = res.status;
@@ -89,7 +89,7 @@
       const message =
         (data && (data.message || data.error)) ||
         (res.status === 404 || res.status === 502
-          ? "Payment service is not connected yet. Please try again shortly."
+          ? "Secure payment is temporarily unavailable. Please try again shortly or contact the care team."
           : `Could not check payment (${res.status}).`);
       const err = new Error(message);
       err.status = res.status;
@@ -155,7 +155,7 @@
     } catch (err) {
       if (err.status === 404 || err.status === 502 || err.status === 405) {
         const wrapped = new Error(
-          "Payment APIs are not live yet. Enable local stub with localStorage.setItem('drswift.payment.stub','1') to test the UI, or wire POST /_drswift/checkout/orders."
+          "We could not prepare secure payment. Please try again shortly or contact the care team."
         );
         wrapped.status = err.status;
         wrapped.cause = err;
@@ -191,7 +191,7 @@
     } catch (err) {
       if (err.status === 404 || err.status === 502 || err.status === 405) {
         const wrapped = new Error(
-          "Payment APIs are not live yet. Enable local stub with localStorage.setItem('drswift.payment.stub','1') to test the UI, or wire POST /_drswift/checkout/payments."
+          "We could not start secure payment. Please try again shortly or contact the care team."
         );
         wrapped.status = err.status;
         wrapped.cause = err;

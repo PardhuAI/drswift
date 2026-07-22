@@ -456,6 +456,80 @@
     setCatalogFilterSafe(category);
   }
 
+  function selectCategoryFilter(category) {
+    const exact = healthCategories.find(
+      (item) => item.category.toLowerCase() === category.toLowerCase()
+    );
+    if (exact) {
+      selectHealth(exact.label);
+      return true;
+    }
+    const byLabel = healthCategories.find(
+      (item) => item.label.toLowerCase() === category.toLowerCase()
+    );
+    if (byLabel) {
+      selectHealth(byLabel.label);
+      return true;
+    }
+    activeQuickKey = "";
+    syncQuickLinkState();
+    syncQuickFiltersToggleMark();
+    setSearchQuery("");
+    setCatalogFilterSafe(category);
+    return true;
+  }
+
+  function applyUrlParams() {
+    const params = new URLSearchParams(window.location.search);
+    const group = String(params.get("group") || "").toLowerCase();
+    const category = String(params.get("category") || "").trim();
+    const q = String(params.get("q") || "").trim();
+    let applied = false;
+
+    if (group === "him" || group === "her" || group === "loved") {
+      selectAudience(group);
+      applied = true;
+    }
+
+    if (category) {
+      const normalized = category.toLowerCase();
+      if (normalized === "men" || normalized === "men's health") {
+        selectAudience("him");
+        applied = true;
+      } else if (normalized === "women" || normalized === "women's health") {
+        selectAudience("her");
+        applied = true;
+      } else if (normalized === "50+" || normalized === "loved" || normalized === "senior") {
+        selectAudience("loved");
+        applied = true;
+      } else {
+        const health = healthCategories.find(
+          (item) =>
+            item.category.toLowerCase() === normalized ||
+            item.label.toLowerCase() === normalized
+        );
+        if (health) {
+          selectHealth(health.label);
+        } else if (applied && isAudienceSelection()) {
+          activeQuickKey = "";
+          syncQuickLinkState();
+          setSearchQuery("");
+          setCatalogFilterSafe(category);
+        } else {
+          selectCategoryFilter(category);
+        }
+        applied = true;
+      }
+    }
+
+    if (q) {
+      setSearchQuery(q);
+      applied = true;
+    }
+
+    return applied;
+  }
+
   allTestsButton?.addEventListener("click", () => selectAll());
 
   [...mainTabs, ...panelTabs].forEach((tab) => {
@@ -516,15 +590,7 @@
   enableDragScroll(audienceQuickLinks, updateAudienceCategoriesScrollButtons);
 
   searchToggle?.addEventListener("click", () => {
-    if (!searchPanel) {
-      return;
-    }
-    const willOpen = searchPanel.hasAttribute("hidden");
-    searchPanel.toggleAttribute("hidden", !willOpen);
-    searchToggle.setAttribute("aria-expanded", String(willOpen));
-    if (willOpen) {
-      searchInput?.focus();
-    }
+    searchInput?.focus();
   });
 
   clearSearch?.addEventListener("click", () => {
@@ -566,7 +632,9 @@
 
   renderHealthFilters();
   renderAudienceLinks(activeGroup);
-  selectAll();
+  if (!applyUrlParams()) {
+    selectAll();
+  }
   updateExtraFiltersScrollButtons();
   updateAudienceCategoriesScrollButtons();
 
@@ -578,13 +646,13 @@
     }
 
     const phrases = [
-      "Shop All Tests",
-      "Shop Men's Health Tests",
-      "Shop Women's Health",
-      "Shop Heart Health",
-      "Shop Mom and Dad Health",
-      "Shop Liver Health",
-      "Shop All Tests",
+      "Browse All Tests",
+      "Men's Health Tests",
+      "Women's Health",
+      "Heart Health",
+      "Mom and Dad Health",
+      "Liver Health",
+      "Browse All Tests",
     ];
 
     heading.dataset.rotating = "true";
@@ -637,7 +705,9 @@
 
   // Re-apply after catalog cards render asynchronously.
   window.addEventListener("drswift:catalog-ready", () => {
-    applySelection();
+    if (!applyUrlParams()) {
+      applySelection();
+    }
     startHeadingRotation();
   });
 

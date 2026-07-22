@@ -1,6 +1,20 @@
 const navToggle = document.querySelector(".nav-toggle");
 const navMenu = document.querySelector(".nav-menu");
 
+function ensureSkipLink() {
+  const main = document.querySelector("main");
+  if (!main || document.querySelector(".skip-link")) return;
+  if (!main.id) main.id = "main-content";
+
+  const link = document.createElement("a");
+  link.className = "skip-link";
+  link.href = `#${main.id}`;
+  link.textContent = "Skip to main content";
+  document.body.prepend(link);
+}
+
+ensureSkipLink();
+
 if (navToggle && navMenu) {
   const setNavOpen = (isOpen) => {
     navMenu.classList.toggle("is-open", isOpen);
@@ -782,6 +796,62 @@ if (newsletterForm && newsletterSuccess) {
   });
 }
 
+// Keep a service area available for the booking flow without claiming coverage before it is confirmed.
+const serviceabilityForm = document.querySelector("[data-serviceability-form]");
+
+if (serviceabilityForm) {
+  const cityInput = serviceabilityForm.querySelector("[name='city']");
+  const pinInput = serviceabilityForm.querySelector("[name='pin']");
+  const result = serviceabilityForm.querySelector("[data-serviceability-result]");
+
+  const showServiceabilityResult = (message, isError = false) => {
+    if (!result) return;
+    result.hidden = false;
+    result.textContent = message;
+    result.classList.toggle("is-error", isError);
+  };
+
+  [cityInput, pinInput].forEach((field) => {
+    field?.addEventListener("input", () => {
+      field.removeAttribute("aria-invalid");
+      result?.classList.remove("is-error");
+    });
+  });
+
+  serviceabilityForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const city = String(cityInput?.value || "").trim();
+    const pin = String(pinInput?.value || "").replace(/\D/g, "");
+
+    if (city.length < 2) {
+      cityInput?.setAttribute("aria-invalid", "true");
+      cityInput?.focus();
+      showServiceabilityResult("Enter your city to check collection coverage.", true);
+      return;
+    }
+
+    if (!/^[1-9][0-9]{5}$/.test(pin)) {
+      pinInput?.setAttribute("aria-invalid", "true");
+      pinInput?.focus();
+      showServiceabilityResult("Enter a valid 6-digit PIN code.", true);
+      return;
+    }
+
+    if (pinInput) pinInput.value = pin;
+    try {
+      localStorage.setItem("drswift.serviceArea.v1", JSON.stringify({ city, pin }));
+    } catch {
+      /* Saving the suggestion is optional. */
+    }
+    const coverage = window.DRSWIFT_SITE_CONTENT?.coverage;
+    const hours = coverage?.hours || "collection hours shown at checkout";
+    const cities = Array.isArray(coverage?.cities) ? coverage.cities.join(", ") : "service cities";
+    showServiceabilityResult(
+      `Saved ${city}, ${pin}. Design coverage hours: ${hours}. Cities in design: ${cities}. We’ll reconfirm home-collection availability before payment.`
+    );
+  });
+}
+
 // Tests catalog filters
 const catalogGrid = document.getElementById("catalog-grid");
 const catalogEmpty = document.getElementById("catalog-empty");
@@ -1028,32 +1098,98 @@ function hasLocalAccountSession() {
   );
 }
 
+function currentAccountUser() {
+  return (
+    window.DRSWIFT_USER ||
+    readStoredJson("drswift.demoAccount.v1") ||
+    readStoredJson("drswift.demoSession.v1") ||
+    {}
+  );
+}
+
+function accountDisplayName(user) {
+  return String(user?.displayName || user?.name || user?.email || "My Account").trim();
+}
+
+function initialsForAccount(name) {
+  const parts = String(name || "My Account").trim().split(/\s+/).filter(Boolean);
+  return `${parts[0]?.[0] || "M"}${parts[1]?.[0] || "A"}`.toUpperCase();
+}
+
+function setAccountMenuOpen(menu, open) {
+  if (!menu) return;
+  const button = menu.querySelector("[data-nav-account-toggle]");
+  const panel = menu.querySelector("[data-nav-account-panel]");
+  menu.classList.toggle("is-open", open);
+  if (button) button.setAttribute("aria-expanded", open ? "true" : "false");
+  if (panel) panel.hidden = !open;
+}
+
+function closeAccountMenus(exceptMenu = null) {
+  document.querySelectorAll("[data-nav-account-menu].is-open").forEach((menu) => {
+    if (menu !== exceptMenu) setAccountMenuOpen(menu, false);
+  });
+}
+
 function syncAccountNav() {
   const isSignedIn = hasLocalAccountSession();
   document.querySelectorAll(".nav-cta").forEach((link) => {
-    link.href = isSignedIn ? "account.html" : "login.html";
-    link.textContent = isSignedIn ? "My Account" : "Sign in";
-    link.setAttribute(
-      "aria-label",
-      isSignedIn ? "Open My Account" : "Sign in to My Account"
-    );
+    // Primary CTA stays conversion-focused; account is a utility link.
+    link.href = "tests.html";
+    link.textContent = "Book a test";
+    link.setAttribute("aria-label", "Book a home collection test");
 
     const actions = link.closest(".nav-actions");
     if (!actions) return;
 
-    let logout = actions.querySelector("[data-account-logout]");
+    Array.from(actions.children).forEach((child) => {
+      if (child.matches("[data-account-logout]")) child.remove();
+    });
+
+    let accountLink = actions.querySelector(":scope > [data-nav-account]");
+    let accountMenu = actions.querySelector(":scope > [data-nav-account-menu]");
     if (isSignedIn) {
-      if (!logout) {
-        logout = document.createElement("button");
-        logout.type = "button";
-        logout.className = "nav-logout";
-        logout.setAttribute("data-account-logout", "");
-        actions.appendChild(logout);
+      if (accountLink) {
+        accountLink.remove();
+        accountLink = null;
       }
-      logout.textContent = "Logout";
-      logout.hidden = false;
-    } else if (logout) {
-      logout.remove();
+      if (!accountMenu) {
+        accountMenu = document.createElement("div");
+        accountMenu.className = "nav-account-menu";
+        accountMenu.setAttribute("data-nav-account-menu", "");
+        accountMenu.innerHTML = `
+          <button class="nav-account-trigger" type="button" aria-haspopup="menu" aria-expanded="false" data-nav-account-toggle>
+            <span class="nav-account-avatar" aria-hidden="true"></span>
+            <span class="nav-account-label">My Account</span>
+            <svg class="ui-icon nav-account-chevron" aria-hidden="true" viewBox="0 0 24 24">
+              <path d="m7 10 5 5 5-5"></path>
+            </svg>
+          </button>
+          <div class="nav-account-menu__panel" role="menu" data-nav-account-panel hidden>
+            <a href="account.html" role="menuitem">Dashboard</a>
+            <a href="reports.html" role="menuitem">Reports</a>
+            <a href="signup.html?mode=family" role="menuitem">Family profiles</a>
+            <button type="button" role="menuitem" data-account-logout>Logout</button>
+          </div>
+        `;
+        link.insertAdjacentElement("afterend", accountMenu);
+      }
+      const userName = accountDisplayName(currentAccountUser());
+      const trigger = accountMenu.querySelector("[data-nav-account-toggle]");
+      const avatar = accountMenu.querySelector(".nav-account-avatar");
+      if (trigger) trigger.setAttribute("aria-label", `Open account menu for ${userName}`);
+      if (avatar) avatar.textContent = initialsForAccount(userName);
+    } else {
+      if (accountMenu) accountMenu.remove();
+      if (!accountLink) {
+        accountLink = document.createElement("a");
+        accountLink.className = "nav-account";
+        accountLink.setAttribute("data-nav-account", "");
+        link.insertAdjacentElement("afterend", accountLink);
+      }
+      accountLink.href = "login.html";
+      accountLink.textContent = "Sign in";
+      accountLink.setAttribute("aria-label", "Sign in to My Account");
     }
   });
 }
@@ -2051,7 +2187,7 @@ function renderTestDetailPage() {
           <h1>We could not find that test.</h1>
           <p>Browse the full catalog or message the care team for help choosing a panel.</p>
           <div class="hero-actions">
-            <a class="button primary" href="/tests">Shop tests</a>
+            <a class="button primary" href="/tests">Book a test</a>
             <a class="button secondary" href="/whatsapp">WhatsApp us</a>
           </div>
         </div>
@@ -2090,6 +2226,11 @@ function renderTestDetailPage() {
             ${hasDiscountPrice(test, livePrice) ? `<del>${formatPrice(test.oldPrice)}</del>` : ""}
           </div>
           <p data-live-savings>${savings > 0 ? `Save ${formatPrice(savings)} today.` : "Transparent pricing before booking."}</p>
+          <ul class="product-assurance" aria-label="Booking assurances">
+            <li>At-home sample collection</li>
+            <li>Preparation guidance before collection</li>
+            <li>Partner-lab processing and digital reports</li>
+          </ul>
           ${customizeCta}
           <button class="button primary full" type="button" data-add-to-cart="${escapeHtml(test.slug)}">Add to cart</button>
           <a class="button secondary full" href="book.html?test=${encodeURIComponent(test.name)}">Book now</a>
@@ -2166,7 +2307,7 @@ function renderTestDetailPage() {
             <p class="overline">Frequently bought together</p>
             <h2>Related tests</h2>
           </div>
-          <a class="button secondary" href="tests.html">Shop tests</a>
+          <a class="button secondary" href="tests.html">Book a test</a>
         </div>
         <div class="related-grid">
           ${(test.related || []).map(buildRelatedCard).join("")}
@@ -2358,6 +2499,9 @@ function cartRecipientControlHtml(item) {
 
   const options = cartRecipientOptions();
   const selected = options.includes(item.recipient) ? item.recipient : options[0];
+  if (selected && item.recipient !== selected) {
+    writeCartRecipient(item.slug, selected);
+  }
   return `
     <div class="cart-recipient">
       <label for="cart-recipient-${escapeHtml(item.slug)}">Book for</label>
@@ -2395,7 +2539,7 @@ function renderCartPage() {
         <h2>Your cart is ready for tests.</h2>
         <p>Add one or more panels, then continue to booking for patient and collection details.</p>
         <div class="hero-actions">
-          <a class="button primary" href="tests.html">Shop tests</a>
+          <a class="button primary" href="tests.html">Book a test</a>
           <a class="button secondary" href="whatsapp.html">Book via WhatsApp</a>
         </div>
       </div>
@@ -2444,6 +2588,7 @@ function renderCartPage() {
     </div>
     <aside class="cart-summary" aria-label="Cart summary">
       <h2>Order summary</h2>
+      <p class="cart-summary__mobile-total"><span>Total</span><strong>${formatPrice(totals.subtotal)}</strong></p>
       <dl>
         <div><dt>Tests</dt><dd>${items.length}</dd></div>
         <div><dt>Subtotal</dt><dd>${formatPrice(totals.original)}</dd></div>
@@ -2453,8 +2598,8 @@ function renderCartPage() {
       <a class="button primary full" href="book.html?cart=checkout">Continue to booking</a>
       <button class="cart-clear-link" type="button" data-cart-action="clear">Clear cart</button>
       <ul class="cart-assurance">
-        <li>No payment is taken until your slot is confirmed.</li>
-        <li>Care team reviews address, timing, and preparation.</li>
+        <li>Review address, timing, and preparation before choosing payment.</li>
+        <li>Care team confirms collection details before the visit.</li>
         <li>You can switch to WhatsApp support anytime.</li>
       </ul>
     </aside>
@@ -2481,9 +2626,25 @@ window.addEventListener("drswift:auth-changed", () => {
 });
 
 document.addEventListener("click", (event) => {
+  const accountToggle = event.target.closest("[data-nav-account-toggle]");
+  if (accountToggle) {
+    event.preventDefault();
+    const menu = accountToggle.closest("[data-nav-account-menu]");
+    const shouldOpen = !menu?.classList.contains("is-open");
+    closeAccountMenus(menu);
+    setAccountMenuOpen(menu, shouldOpen);
+    return;
+  }
+
+  const accountMenu = event.target.closest("[data-nav-account-menu]");
+  if (!accountMenu) {
+    closeAccountMenus();
+  }
+
   const logoutButton = event.target.closest("[data-account-logout]");
   if (logoutButton) {
     event.preventDefault();
+    closeAccountMenus();
     logoutAccountSession();
     return;
   }
@@ -2518,6 +2679,12 @@ document.addEventListener("click", (event) => {
       cartButton.getAttribute("data-cart-slug"),
       cartButton.getAttribute("data-cart-action")
     );
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeAccountMenus();
   }
 });
 
@@ -2558,7 +2725,7 @@ function renderPromotionsPage() {
         <span class="promo-card__badge">Offers</span>
         <h3>No active promotions right now</h3>
         <p>Mark tests as promotional in the CMS to show seasonal packages here. Browse the full catalog meanwhile.</p>
-        <a class="button primary full" href="tests.html">Shop tests</a>
+        <a class="button primary full" href="tests.html">Book a test</a>
       </article>
     `;
     return;

@@ -39,14 +39,14 @@
 
   function accountFromForm(form) {
     return {
-      name: form.querySelector("[name='name']")?.value?.trim() || "Demo customer",
+      name: form.querySelector("[name='name']")?.value?.trim() || "Account holder",
       email: form.querySelector("[name='email']")?.value?.trim() || "",
       phone: form.querySelector("[name='phone']")?.value?.trim() || "",
     };
   }
 
   function buildInitialsSeed(name) {
-    return String(name || "Demo customer").trim().toLowerCase().replace(/\s+/g, "-") || "demo";
+    return String(name || "account-holder").trim().toLowerCase().replace(/\s+/g, "-") || "account-holder";
   }
 
   function saveOwnerProfile(form) {
@@ -82,10 +82,10 @@
     const fallbackOwner =
       readJson(localStorage, DEMO_ACCOUNT_KEY) ||
       readJson(sessionStorage, DEMO_ACCOUNT_KEY) ||
-      { name: "Demo customer", email: "", phone: "" };
+      { name: "Account holder", email: "", phone: "" };
     const household = existing || {
       owner: {
-        name: fallbackOwner.name || "Demo customer",
+        name: fallbackOwner.name || "Account holder",
         email: fallbackOwner.email || "",
         phone: fallbackOwner.phone || "",
         relation: "Self",
@@ -140,6 +140,10 @@
     const asideKicker = document.querySelector("[data-signup-aside-kicker]");
     const asideTitle = document.querySelector("[data-signup-aside-title]");
     const asideCopy = document.querySelector("[data-signup-aside-copy]");
+    const tabLabel = document.querySelector("[data-signup-tab-label]");
+    const secondaryLink = document.querySelector("[data-signup-secondary-link]");
+    const social = document.querySelector("[data-signup-social]");
+    const divider = document.querySelector("[data-signup-divider]");
     const relationField = document.querySelector("[data-family-relation-field]");
     const relation = form.querySelector("[name='relation']");
     const passwordField = document.querySelector("[data-password-field]");
@@ -164,6 +168,13 @@
     if (asideKicker) asideKicker.textContent = "Family profile";
     if (asideTitle) asideTitle.textContent = "Tests for yourself and loved ones";
     if (asideCopy) asideCopy.textContent = "Add each person once, then choose who a test is for at booking.";
+    if (tabLabel) tabLabel.textContent = "Add profile";
+    if (secondaryLink) {
+      secondaryLink.textContent = "My Account";
+      secondaryLink.href = "account.html";
+    }
+    if (social) social.hidden = true;
+    if (divider) divider.hidden = true;
 
     if (relationField) relationField.hidden = false;
     if (relation) relation.required = true;

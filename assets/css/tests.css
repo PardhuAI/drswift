@@ -11,6 +11,27 @@
   border-bottom: 1px solid var(--color-line);
 }
 
+@media (max-width: 959px) {
+  .tests-toolbar {
+    position: sticky;
+    top: var(--scroll-header-offset, 84px);
+    z-index: 40;
+    padding: 8px 0;
+    background: #fff;
+    box-shadow: 0 1px 0 var(--color-line);
+  }
+
+  .tests-toolbar__inner {
+    gap: 12px;
+    padding-block: 4px;
+  }
+
+  .tests-page-heading {
+    font-size: 1.35rem;
+    margin: 0;
+  }
+}
+
 .tests-toolbar__inner {
   display: flex;
   flex-direction: column;
@@ -81,7 +102,7 @@
 }
 
 .tests-search-toggle {
-  flex: 0 0 auto;
+  display: none !important;
 }
 
 .tests-search-toggle__icon {
@@ -884,4 +905,3 @@
     max-width: 520px;
   }
 }
-

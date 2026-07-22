@@ -8,7 +8,8 @@
       name="description"
       content="Dr.Swift Diagnostics offers clean, simple health testing, report access, and care-friendly lab services."
     >
-    <link rel="stylesheet" href="assets/css/styles.css?v=mobile-lag-1">
+    <link rel="preload" as="image" href="assets/images/hero-couple.avif" type="image/avif" fetchpriority="high">
+    <link rel="stylesheet" href="assets/css/styles.css?v=profile-vibe-1">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
   <body>
@@ -44,7 +45,7 @@
               <span>Cart</span>
               <span class="cart-count" data-cart-count hidden>0</span>
             </a>
-            <a class="button primary nav-cta" href="login.html">My Account</a>
+            <a class="button primary nav-cta" href="tests.html">Book a test</a>
           </div>
         </div>
       </nav>
@@ -100,20 +101,104 @@
                 </li>
               </ul>
               <div class="hero-actions hero-actions--primary">
-                <a class="button primary" href="tests.html">Shop tests</a>
+                <a class="button primary" href="tests.html">Book home collection</a>
                 <a class="button secondary" href="sample-report.html">View sample report</a>
               </div>
+              <p class="hero-trust-line">Home collection in Hyderabad, Nalgonda, Secunderabad &amp; Warangal · NABL-accredited partner labs · Care: <a href="tel:+919000424591">+91 90004 24591</a></p>
             </article>
 
             <article class="hero-image hero-image--photo" aria-label="Couple reviewing their health results at home">
-              <img class="hero-photo" src="assets/images/hero-couple.png" alt="A couple looking at their health results together on a desktop computer at home">
+              <picture>
+                <source srcset="assets/images/hero-couple.avif" type="image/avif">
+                <img
+                  class="hero-photo"
+                  src="assets/images/hero-couple.png"
+                  alt="A couple looking at their health results together on a desktop computer at home"
+                  width="1584"
+                  height="993"
+                  fetchpriority="high"
+                  decoding="async"
+                >
+              </picture>
               <div class="hero-image-note">
                 <span class="hero-image-note__chip">At-home collection</span>
-                <a class="button primary hero-image-note__cta" href="tests.html">Shop tests</a>
                 <a class="hero-image-note__chip hero-image-note__chip--keep" href="#features">Reports with trends</a>
               </div>
             </article>
           </div>
+        </div>
+      </section>
+
+      <section class="care-assurance section-pad-sm" aria-labelledby="care-assurance-title">
+        <div class="container care-assurance__grid">
+          <div class="care-assurance__intro">
+            <p class="overline">Care you can verify</p>
+            <h2 id="care-assurance-title">Clear collection, careful processing, useful reports</h2>
+          </div>
+          <ul class="care-assurance__list">
+            <li>
+              <svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-home"></use></svg>
+              <span><strong>At-home collection</strong><small>Hyderabad, Nalgonda, Secunderabad &amp; Warangal.</small></span>
+            </li>
+            <li>
+              <svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-shield-check"></use></svg>
+              <span><strong>NABL-accredited partner labs</strong><small>Samples processed with clinical quality standards.</small></span>
+            </li>
+            <li>
+              <svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-document"></use></svg>
+              <span><strong>Digital report access</strong><small>Keep reports ready to review and share with your clinician.</small></span>
+            </li>
+          </ul>
+          <div data-site-content="lab-strip"></div>
+        </div>
+      </section>
+
+      <section class="page-section section-bg-white how-it-works-section" aria-label="How it works">
+        <div class="container">
+          <div class="section-heading section-heading--center">
+            <p class="overline">Simple process</p>
+            <h2>How home collection works</h2>
+          </div>
+          <div class="how-it-works-grid">
+            <article class="how-step">
+              <div class="how-step__number" aria-hidden="true">1</div>
+              <h3>Book online or on WhatsApp</h3>
+              <p>Pick a panel, choose a slot, and confirm your address in minutes.</p>
+            </article>
+            <article class="how-step">
+              <div class="how-step__number" aria-hidden="true">2</div>
+              <h3>We come to you</h3>
+              <p>A trained phlebotomist collects your sample safely at home.</p>
+            </article>
+            <article class="how-step">
+              <div class="how-step__number" aria-hidden="true">3</div>
+              <h3>Insights, not just numbers</h3>
+              <p>Results arrive with trends, graphs, and family profiles in the app.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="coverage-check section-pad-sm section-bg-soft" aria-labelledby="coverage-check-title">
+        <div class="container coverage-check__grid">
+          <div>
+            <p class="overline">Service coverage</p>
+            <h2 id="coverage-check-title">Check home-collection availability</h2>
+            <p>Enter your city and PIN to keep your area handy while booking. Collection availability is confirmed before payment.</p>
+            <div data-site-content="coverage-meta"></div>
+          </div>
+          <form class="coverage-check__form" data-serviceability-form novalidate>
+            <label>
+              <span>City</span>
+              <input type="text" name="city" autocomplete="address-level2" placeholder="Hyderabad" minlength="2" maxlength="80" required>
+            </label>
+            <label>
+              <span>PIN code</span>
+              <input type="text" name="pin" autocomplete="postal-code" inputmode="numeric" pattern="[1-9][0-9]{5}" maxlength="6" placeholder="500001" required>
+            </label>
+            <button class="button primary" type="submit">Check coverage</button>
+            <p class="coverage-check__result" data-serviceability-result aria-live="polite" hidden></p>
+          </form>
         </div>
       </section>
 
@@ -128,34 +213,34 @@
             <div class="audience-column audience-column--him">
               <h3 class="audience-column__title">For Him</h3>
               <div class="audience-tiles">
-                <a class="audience-tile" href="tests.html">Men's Health</a>
-                <a class="audience-tile" href="tests.html">Athletic Performance</a>
-                <a class="audience-tile" href="tests.html">Heart Health</a>
-                <a class="audience-tile" href="tests.html">Hormones</a>
+                <a class="audience-tile" href="tests.html?group=him">Men's Health</a>
+                <a class="audience-tile" href="tests.html?group=him&amp;category=Testosterone">Athletic Performance</a>
+                <a class="audience-tile" href="tests.html?group=him&amp;category=Heart">Heart Health</a>
+                <a class="audience-tile" href="tests.html?group=him&amp;category=Testosterone">Hormones</a>
               </div>
-              <a class="button audience-more" href="tests.html">See more for Him</a>
+              <a class="button audience-more" href="tests.html?group=him">See more for Him</a>
             </div>
 
             <div class="audience-column audience-column--her">
               <h3 class="audience-column__title">For Her</h3>
               <div class="audience-tiles">
-                <a class="audience-tile" href="tests.html">Women's Health</a>
-                <a class="audience-tile" href="tests.html">Maternal Tests</a>
-                <a class="audience-tile" href="tests.html">Hormonal Balance</a>
-                <a class="audience-tile" href="tests.html">Thyroid Profile</a>
+                <a class="audience-tile" href="tests.html?group=her">Women's Health</a>
+                <a class="audience-tile" href="tests.html?group=her&amp;category=Pregnancy">Maternal Tests</a>
+                <a class="audience-tile" href="tests.html?group=her&amp;category=Women">Hormonal Balance</a>
+                <a class="audience-tile" href="tests.html?group=her&amp;category=Thyroid">Thyroid Profile</a>
               </div>
-              <a class="button audience-more" href="tests.html">See more for Her</a>
+              <a class="button audience-more" href="tests.html?group=her">See more for Her</a>
             </div>
 
             <div class="audience-column audience-column--loved">
               <h3 class="audience-column__title">For Loved Ones</h3>
               <div class="audience-tiles">
-                <a class="audience-tile" href="tests.html">General Health</a>
-                <a class="audience-tile" href="tests.html">Diabetic Risk</a>
-                <a class="audience-tile" href="tests.html">Senior Wellness</a>
-                <a class="audience-tile" href="tests.html">Heart Health</a>
+                <a class="audience-tile" href="tests.html?group=loved&amp;category=Full%20Body%20Checkup">General Health</a>
+                <a class="audience-tile" href="tests.html?group=loved&amp;category=Diabetes">Diabetic Risk</a>
+                <a class="audience-tile" href="tests.html?group=loved">Senior Wellness</a>
+                <a class="audience-tile" href="tests.html?group=loved&amp;category=Heart">Heart Health</a>
               </div>
-              <a class="button audience-more" href="tests.html">See more for Loved Ones</a>
+              <a class="button audience-more" href="tests.html?group=loved">See more for Loved Ones</a>
             </div>
           </div>
         </div>
@@ -169,16 +254,16 @@
           </div>
           <div class="quick-select__cards scroll-wrap">
             <div class="quick-cards horizontal-scroll" id="quick-cards" data-scroll-container>
-              <a class="quick-card" href="tests.html">Heart Health Tests</a>
-              <a class="quick-card" href="tests.html">Diabetes Risk Tests</a>
-              <a class="quick-card" href="tests.html">Women Health Postpartum</a>
-              <a class="quick-card" href="tests.html">Hormonal Tests</a>
-              <a class="quick-card" href="tests.html">Liver Enzymes and Fatty Liver</a>
-              <a class="quick-card" href="tests.html">Thyroid Profile</a>
-              <a class="quick-card" href="tests.html">Kidney Function</a>
-              <a class="quick-card" href="tests.html">Vitamin D</a>
-              <a class="quick-card" href="tests.html">Fever &amp; Infection</a>
-              <a class="quick-card" href="tests.html">Full Body Checkup</a>
+              <a class="quick-card" href="tests.html?category=Heart">Heart Health Tests</a>
+              <a class="quick-card" href="tests.html?category=Diabetes">Diabetes Risk Tests</a>
+              <a class="quick-card" href="tests.html?group=her&amp;category=Pregnancy">Women Health Postpartum</a>
+              <a class="quick-card" href="tests.html?category=Women">Hormonal Tests</a>
+              <a class="quick-card" href="tests.html?category=Liver">Liver Enzymes and Fatty Liver</a>
+              <a class="quick-card" href="tests.html?category=Thyroid">Thyroid Profile</a>
+              <a class="quick-card" href="tests.html?category=Kidney">Kidney Function</a>
+              <a class="quick-card" href="tests.html?category=Vitamin%20D">Vitamin D</a>
+              <a class="quick-card" href="tests.html?category=Fever">Fever &amp; Infection</a>
+              <a class="quick-card" href="tests.html?category=Full%20Body%20Checkup">Full Body Checkup</a>
             </div>
           </div>
           <div class="quick-select__hint swipe-hint" aria-hidden="true">
@@ -192,7 +277,7 @@
             >
           </div>
           <div class="section-cta">
-            <a class="button primary" href="tests.html">Shop all tests</a>
+            <a class="button primary" href="tests.html">Browse all tests</a>
           </div>
         </div>
       </section>
@@ -420,7 +505,7 @@
             <p>Preview the kind of report patients receive after booking a test.</p>
           </div>
           <div class="tests-hero__actions">
-            <a class="button secondary" href="tests.html">Shop tests</a>
+            <a class="button secondary" href="tests.html">Book a test</a>
             <a class="button primary" href="sample-report.html">View sample report</a>
           </div>
         </div>
@@ -458,28 +543,28 @@
             <h2 id="reasons-heading">Four reasons to test with Dr.Swift</h2>
           </div>
           <div class="reasons-grid">
-            <article class="reason-card" tabindex="0">
+            <article class="reason-card">
               <div class="reason-card__icon" aria-hidden="true">
                 <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-cart"></use></svg>
               </div>
               <h3>Book your way</h3>
               <p>Web, iOS, Android, or WhatsApp — whichever channel fits your routine.</p>
             </article>
-            <article class="reason-card" tabindex="0">
+            <article class="reason-card">
               <div class="reason-card__icon" aria-hidden="true">
                 <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-price"></use></svg>
               </div>
               <h3>Clear, fair pricing</h3>
               <p>Transparent panel pricing with no surprise add-ons at collection time.</p>
             </article>
-            <article class="reason-card" tabindex="0">
+            <article class="reason-card">
               <div class="reason-card__icon" aria-hidden="true">
                 <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-clock"></use></svg>
               </div>
               <h3>Fast turnaround</h3>
               <p>Most results land in your app within 24–48 hours with notifications when ready.</p>
             </article>
-            <article class="reason-card" tabindex="0">
+            <article class="reason-card">
               <div class="reason-card__icon" aria-hidden="true">
                 <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-shield-check"></use></svg>
               </div>
@@ -497,7 +582,7 @@
             “We stopped juggling PDFs from different labs. Dr.Swift shows trends for my parents and my kids in one place — it finally feels manageable.”
           </blockquote>
           <p class="testimonial-attribution">— Priya M., Dr.Swift family account member</p>
-          <a class="button outline-light" href="tests.html">Shop tests</a>
+          <a class="button outline-light" href="tests.html">Book a test</a>
         </div>
       </section>
 
@@ -509,44 +594,44 @@
           </div>
           <div class="faq-list">
             <article class="faq-item">
-              <button class="faq-question" type="button" aria-expanded="false">
+              <button class="faq-question" type="button" aria-expanded="false" aria-controls="faq-answer-1" id="faq-question-1">
                 <span>How do I book an at-home blood test?</span>
                 <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
               </button>
-              <div class="faq-answer" hidden>
+              <div class="faq-answer" id="faq-answer-1" role="region" aria-labelledby="faq-question-1" hidden>
                 <div class="faq-answer-inner">
                   <p>Choose a test on our website or app, select a collection slot, and confirm your address. You can also message our WhatsApp line to book with help from our team.</p>
                 </div>
               </div>
             </article>
             <article class="faq-item">
-              <button class="faq-question" type="button" aria-expanded="false">
+              <button class="faq-question" type="button" aria-expanded="false" aria-controls="faq-answer-2" id="faq-question-2">
                 <span>When and how will I receive my results?</span>
                 <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
               </button>
-              <div class="faq-answer" hidden>
+              <div class="faq-answer" id="faq-answer-2" role="region" aria-labelledby="faq-question-2" hidden>
                 <div class="faq-answer-inner">
                   <p>Most reports are ready within 24–48 hours. You will get a notification in the app, on WhatsApp, or by email — with insights, graphs, and downloadable PDFs.</p>
                 </div>
               </div>
             </article>
             <article class="faq-item">
-              <button class="faq-question" type="button" aria-expanded="false">
+              <button class="faq-question" type="button" aria-expanded="false" aria-controls="faq-answer-3" id="faq-question-3">
                 <span>Can I manage tests for my whole family?</span>
                 <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
               </button>
-              <div class="faq-answer" hidden>
+              <div class="faq-answer" id="faq-answer-3" role="region" aria-labelledby="faq-question-3" hidden>
                 <div class="faq-answer-inner">
                   <p>Yes. One Dr.Swift account supports multiple profiles — parents, children, and partners — each with their own history, trends, and report access.</p>
                 </div>
               </div>
             </article>
             <article class="faq-item">
-              <button class="faq-question" type="button" aria-expanded="false">
+              <button class="faq-question" type="button" aria-expanded="false" aria-controls="faq-answer-4" id="faq-question-4">
                 <span>Do I need to fast before my test?</span>
                 <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
               </button>
-              <div class="faq-answer" hidden>
+              <div class="faq-answer" id="faq-answer-4" role="region" aria-labelledby="faq-question-4" hidden>
                 <div class="faq-answer-inner">
                   <p>It depends on the panel. Fasting glucose and lipid profiles usually require 8–12 hours of fasting. Your booking confirmation lists preparation steps for each test.</p>
                 </div>
@@ -564,7 +649,7 @@
           <h2 id="community-heading">Ready to see more than numbers?</h2>
           <p>Book your first at-home test or download the app to explore health insights built for real families.</p>
           <div class="cta-band__actions">
-            <a class="button secondary" href="tests.html">Shop tests</a>
+            <a class="button secondary" href="tests.html">Book a test</a>
             <a class="button primary" href="app.html">Get the app</a>
           </div>
         </div>
@@ -594,7 +679,7 @@
         </div>
         <div>
           <h2 class="footer-col-title">Our Tests</h2>
-          <a href="tests.html">Shop tests</a>
+          <a href="tests.html">Book a test</a>
           <a href="tests.html#catalog">By category</a>
           <a href="#popular-tests">Popular panels</a>
           <a href="promotions.html">Promotions</a>
@@ -616,7 +701,9 @@
         <div>
           <h2 class="footer-col-title">Company</h2>
           <a href="about.html">About us</a>
+          <a href="about.html#lab-partners">Lab partners</a>
           <a href="about.html#contact">Contact</a>
+          <a href="policies.html">Policies</a>
           <a href="privacy.html">Privacy policy</a>
           <a href="terms.html">Terms of service</a>
         </div>
@@ -627,6 +714,7 @@
       </div>
     </footer>
 
+    <script src="assets/js/site-content.js?v=design-content-1"></script>
     <script src="assets/js/panel-catalog.js"></script>
     <script src="assets/js/test-data.js"></script>
     <script src="assets/js/api.js?v=freq-1"></script>
@@ -634,6 +722,6 @@
     <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
     <script src="assets/js/firebase-config.js?v=3"></script>
     <script src="assets/js/google-auth.js?v=6"></script>
-    <script src="assets/js/main.js?v=mobile-cart-1"></script>
+    <script src="assets/js/main.js?v=nav-account-menu-1"></script>
   </body>
 </html>

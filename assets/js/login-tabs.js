@@ -3,7 +3,7 @@
  * Phone OTP: Send → 30s cooldown → Resend; OTP field appears after first send.
  */
 (function () {
-  const RESEND_SECONDS = 30;
+  const RESEND_SECONDS = Number(window.DRSWIFT_SITE_CONTENT?.otp?.resendCooldownSec) || 30;
   const DEMO_ACCOUNT_KEY = "drswift.demoAccount.v1";
   const DEMO_SESSION_KEY = "drswift.demoSession.v1";
   const HOUSEHOLD_KEY = "drswift.demoHousehold.v1";
@@ -172,7 +172,8 @@
     otpSentOnce = true;
     if (otpBlock) otpBlock.hidden = false;
     otpInput?.focus();
-    setStatus("OTP sent. Enter the 6-digit code below.");
+    const hint = window.DRSWIFT_SITE_CONTENT?.otp?.hint || "OTP sent. Enter the 6-digit code below.";
+    setStatus(`OTP sent. ${hint}`);
     startCooldown();
   });
 
@@ -205,7 +206,7 @@
         JSON.parse(sessionStorage.getItem(DEMO_ACCOUNT_KEY) || "null") ||
         null;
       const account = {
-        name: storedAccount?.name || "Demo customer",
+        name: storedAccount?.name || "Account holder",
         email: storedAccount?.email || "",
         phone: phoneInput.value || storedAccount?.phone || "",
         method: "phone",

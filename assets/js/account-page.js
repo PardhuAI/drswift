@@ -1,6 +1,5 @@
 /**
- * Account page access state for the static demo.
- * Real production data should replace this with server-backed auth and reports.
+ * Account page access state. Only authenticated account content is exposed.
  */
 (function () {
   const DEMO_KEY = "drswift.demoAccount.v1";
@@ -8,7 +7,6 @@
   const HOUSEHOLD_KEY = "drswift.demoHousehold.v1";
   const gate = document.querySelector("[data-account-gate]");
   const dashboard = document.querySelector("[data-account-dashboard]");
-  const previewButton = document.querySelector("[data-account-preview]");
 
   function readDemoAccount() {
     try {
@@ -44,15 +42,44 @@
   }
 
   function initialsFor(name) {
-    const parts = String(name || "Demo customer")
+    const parts = String(name || "Account")
       .trim()
       .split(/\s+/)
       .filter(Boolean);
-    return (parts[0]?.[0] || "D") + (parts[1]?.[0] || "S");
+    return (parts[0]?.[0] || "A") + (parts[1]?.[0] || "C");
   }
 
   function relationLabel(person, fallback) {
     return person?.relation || fallback || "Family member";
+  }
+
+  function profileTone(person) {
+    const relation = String(person?.relation || "").toLowerCase();
+    const gender = String(person?.gender || "").toLowerCase();
+    const age = Number(person?.age || 0);
+
+    if (
+      age >= 60 ||
+      /(father|mother|parent|grandfather|grandmother|grandparent|senior)/.test(relation)
+    ) {
+      return "senior";
+    }
+    if (/(female|woman|wife|sister|daughter|mother)/.test(`${gender} ${relation}`)) {
+      return "women";
+    }
+    if (/(male|man|husband|brother|son|father)/.test(`${gender} ${relation}`)) {
+      return "men";
+    }
+    return "neutral";
+  }
+
+  function profileDescriptor(person) {
+    const relation = relationLabel(person, "Family member");
+    const parts = [relation];
+    if (person?.age) parts.push(`${person.age} yrs`);
+    if (person?.phone) parts.push("phone added");
+    else if (person?.email) parts.push("email added");
+    return parts.join(" · ");
   }
 
   function renderFamilyProfiles(household, ownerName) {
@@ -65,12 +92,12 @@
 
     if (summary) {
       summary.textContent = names.length > 1
-        ? `${members.length + 1} profiles · ${owner.name} plus ${members.length} loved ${members.length === 1 ? "one" : "ones"}`
-        : `${owner.name || "Demo customer"} · Add loved ones anytime`;
+        ? `${names.length} profiles: ${names.slice(0, 3).join(", ")}${names.length > 3 ? ` +${names.length - 3} more` : ""}`
+        : `${owner.name || "Your profile"} · Add loved ones anytime`;
     }
 
     if (security) {
-      const phoneText = owner.phone ? "Phone verified" : "Phone OTP ready";
+      const phoneText = owner.phone ? "Phone number added" : "Phone number needed";
       const emailText = owner.email ? owner.email : "Email optional";
       security.textContent = `${phoneText} · ${emailText}`;
     }
@@ -82,17 +109,30 @@
       ...members,
     ];
 
+    if (!people.some((person) => person.name)) {
+      list.innerHTML = `
+        <div class="account-family-empty">
+          <strong>No family profiles yet</strong>
+          <span>Add parents, partner, children, or senior members so each booking is attached to the right person.</span>
+        </div>
+      `;
+      return;
+    }
+
     list.innerHTML = people
-      .map(
-        (person) => `
-          <div class="account-family-person">
+      .filter((person) => String(person.name || "").trim())
+      .map((person) => {
+        const tone = profileTone(person);
+        return `
+          <div class="account-family-person" data-profile-tone="${escapeHtml(tone)}">
             <span class="account-family-avatar" aria-hidden="true">${initialsFor(person.name).toUpperCase()}</span>
-            <span>
-              <strong>${escapeHtml(person.name || "Demo customer")}</strong>
-              <small>${escapeHtml(relationLabel(person))}</small>
+            <span class="account-family-person__copy">
+              <strong>${escapeHtml(person.name || "Profile")}</strong>
+              <small>${escapeHtml(profileDescriptor(person))}</small>
             </span>
-          </div>`
-      )
+            <span class="account-family-person__tag">${escapeHtml(relationLabel(person))}</span>
+          </div>`;
+      })
       .join("");
   }
 
@@ -105,10 +145,10 @@
       .replaceAll("'", "&#039;");
   }
 
-  function setDashboardCopy(user, isPreview) {
-    const household = isPreview ? null : readHousehold();
+  function setDashboardCopy(user) {
+    const household = readHousehold();
     const owner = household?.owner || user;
-    const name = owner?.displayName || owner?.name || "Demo customer";
+    const name = owner?.displayName || owner?.name || "Your account";
     const nameEl = document.querySelector("[data-account-name]");
     const modeEl = document.querySelector("[data-account-mode]");
     const introEl = document.querySelector("[data-account-intro]");
@@ -117,45 +157,43 @@
     if (nameEl) nameEl.textContent = name;
     if (avatar) avatar.textContent = initialsFor(name).toUpperCase();
 
-    if (modeEl) {
-      modeEl.textContent = isPreview ? "Sample dashboard preview" : "My account";
-    }
+    if (modeEl) modeEl.textContent = "My account";
     if (introEl) {
-      introEl.textContent = isPreview
-        ? "This is sample account data for the website demo. Real customer reports should load only after backend authentication."
-        : "Review your bookings, reports, family profiles, and health trends from one secure workspace.";
+      introEl.textContent = "Review your bookings, reports, family profiles, and health trends from one secure workspace.";
     }
 
     renderFamilyProfiles(household, name);
   }
 
-  function showDashboard(user, isPreview) {
+  function showDashboard(user) {
     if (gate) gate.hidden = true;
-    if (dashboard) dashboard.hidden = false;
-    setDashboardCopy(user, isPreview);
+    if (dashboard) {
+      dashboard.hidden = false;
+      dashboard.inert = false;
+    }
+    setDashboardCopy(user);
     window.dispatchEvent(new CustomEvent("drswift:account-visible"));
   }
 
   function showGate() {
     if (gate) gate.hidden = false;
-    if (dashboard) dashboard.hidden = true;
+    if (dashboard) {
+      dashboard.hidden = true;
+      dashboard.inert = true;
+    }
   }
-
-  previewButton?.addEventListener("click", () => {
-    showDashboard({ name: "Demo customer" }, true);
-  });
 
   function sync() {
     const firebaseUser = window.DRSWIFT_USER;
     if (firebaseUser) {
-      showDashboard(firebaseUser, false);
+      showDashboard(firebaseUser);
       return;
     }
 
     const demoUser = readDemoAccount();
     const demoSession = readDemoSession();
     if (demoUser && demoSession) {
-      showDashboard(demoUser, false);
+      showDashboard(demoUser);
       return;
     }
 
