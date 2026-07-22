@@ -2173,7 +2173,7 @@ function cartFamilyBannerHtml(cartTotal = 0) {
 let cartRevealTimer = null;
 let cartBodyRevealed = false;
 
-function prefersReducedMotion() {
+function prefersCartReducedMotion() {
   return window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
 }
 
@@ -2195,7 +2195,7 @@ function scheduleCartBodyReveal() {
     setCartBodyVisible(true);
     return;
   }
-  if (prefersReducedMotion()) {
+  if (prefersCartReducedMotion()) {
     cartBodyRevealed = true;
     setCartBodyVisible(true);
     return;
