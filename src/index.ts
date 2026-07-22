@@ -1,5 +1,5 @@
 import type { Env } from "./env";
-import { assertHttpsOrigin } from "./env";
+import { assertHttpsOrigin, originBase } from "./env";
 import { loadCatalog, type CatalogBundle } from "./catalog";
 import {
   fallbackUnavailablePage,
@@ -59,6 +59,97 @@ function canonicalizeWww(request: Request, env: Env): Response | null {
   return null;
 }
 
+const FIREBASE_AUTH_ORIGIN = "https://drswift-platform.firebaseapp.com";
+
+/**
+ * Proxy Firebase Auth helper pages onto drswift.in so authDomain can be same-origin.
+ * Avoids "missing initial state" under browser storage partitioning.
+ * @see https://firebase.google.com/docs/auth/web/redirect-best-practices
+ */
+async function proxyFirebaseAuthHelper(request: Request, url: URL): Promise<Response> {
+  const target = new URL(`${url.pathname}${url.search}`, FIREBASE_AUTH_ORIGIN);
+  const headers = new Headers(request.headers);
+  headers.set("Host", "drswift-platform.firebaseapp.com");
+  headers.delete("cf-connecting-ip");
+  headers.delete("cf-ray");
+  headers.delete("cf-visitor");
+  headers.delete("cf-ipcountry");
+  headers.delete("x-forwarded-proto");
+  headers.delete("x-real-ip");
+
+  const init: RequestInit = {
+    method: request.method,
+    headers,
+    redirect: "manual",
+  };
+  if (request.method !== "GET" && request.method !== "HEAD") {
+    init.body = request.body;
+    // @ts-expect-error Workers duplex streaming for request body
+    init.duplex = "half";
+  }
+
+  const upstream = await fetch(target.toString(), init);
+  const outHeaders = new Headers(upstream.headers);
+  outHeaders.delete("content-security-policy");
+  outHeaders.delete("content-security-policy-report-only");
+  outHeaders.set("Cache-Control", "private, no-store");
+  return new Response(upstream.body, {
+    status: upstream.status,
+    statusText: upstream.statusText,
+    headers: outHeaders,
+  });
+}
+
+/** BFF: browser → Worker → SwiftCMS public API (Basic Auth stays on the Worker). */
+async function proxyOriginPublicApi(request: Request, env: Env, pathname: string): Promise<Response> {
+  assertHttpsOrigin(env);
+  const target = `${originBase(env)}${pathname}`;
+  const headers = new Headers();
+  headers.set("Accept", "application/json");
+  headers.set("Content-Type", request.headers.get("Content-Type") || "application/json");
+  headers.set("X-DrSwift-Caller", "cloudflare-worker");
+  headers.set("Cache-Control", "no-cache");
+  const user = env.ORIGIN_BASIC_AUTH_USERNAME || "";
+  const pass = env.ORIGIN_BASIC_AUTH_PASSWORD || "";
+  if (user && pass) {
+    headers.set("Authorization", `Basic ${btoa(`${user}:${pass}`)}`);
+  }
+
+  const init: RequestInit = {
+    method: request.method,
+    headers,
+    redirect: "manual",
+    cf: { cacheTtl: 0, cacheEverything: false },
+  };
+  if (request.method !== "GET" && request.method !== "HEAD") {
+    init.body = await request.text();
+  }
+
+  const upstream = await fetch(target, init);
+  const contentType = upstream.headers.get("Content-Type") || "";
+  const bodyText = await upstream.text();
+  const outHeaders = new Headers();
+  outHeaders.set("Cache-Control", "private, no-store");
+  outHeaders.set("Content-Type", "application/json; charset=utf-8");
+
+  if (!contentType.includes("application/json")) {
+    const message =
+      upstream.status === 404
+        ? "Checkout API is not deployed on the server yet."
+        : "Checkout API returned an unexpected response.";
+    return new Response(JSON.stringify({ ok: false, message }), {
+      status: upstream.status === 404 ? 502 : upstream.status || 502,
+      headers: outHeaders,
+    });
+  }
+
+  return new Response(bodyText, {
+    status: upstream.status,
+    statusText: upstream.statusText,
+    headers: outHeaders,
+  });
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const redirected = canonicalizeWww(request, env);
@@ -68,6 +159,51 @@ export default {
     let pathname = url.pathname;
     if (pathname.length > 1 && pathname.endsWith("/")) {
       pathname = pathname.slice(0, -1);
+    }
+
+    // Firebase Auth helpers (same-origin authDomain)
+    if (pathname === "/__/firebase/init.json" || pathname.startsWith("/__/auth")) {
+      return proxyFirebaseAuthHelper(request, url);
+    }
+
+    // Checkout BFF (OTP + booking) → SwiftCMS with Worker Basic Auth.
+    // Use /_drswift/* so custom-domain /api/* routes to CMS do not bypass this Worker.
+    if (
+      pathname === "/_drswift/checkout" ||
+      pathname.startsWith("/_drswift/checkout/") ||
+      pathname === "/api/v1/public/checkout" ||
+      pathname.startsWith("/api/v1/public/checkout/")
+    ) {
+      if (request.method === "OPTIONS") {
+        return new Response(null, {
+          status: 204,
+          headers: {
+            "Access-Control-Allow-Origin": url.origin,
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
+            "Access-Control-Max-Age": "86400",
+          },
+        });
+      }
+      if (request.method !== "POST") {
+        return new Response(JSON.stringify({ ok: false, message: "Method not allowed" }), {
+          status: 405,
+          headers: { "Content-Type": "application/json", "Cache-Control": "private, no-store" },
+        });
+      }
+      const originPath = pathname.startsWith("/_drswift/checkout")
+        ? pathname.replace("/_drswift/checkout", "/api/v1/public/checkout")
+        : pathname;
+      try {
+        return await proxyOriginPublicApi(request, env, originPath);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Checkout API unavailable";
+        console.error("Checkout BFF failure:", message);
+        return new Response(JSON.stringify({ ok: false, message: "Checkout is temporarily unavailable." }), {
+          status: 502,
+          headers: { "Content-Type": "application/json", "Cache-Control": "private, no-store" },
+        });
+      }
     }
 
     // Clean URL aliases
@@ -143,6 +279,7 @@ export default {
       "/forgot-password": "/forgot-password.html",
       "/sample-report": "/sample-report.html",
       "/privacy-choices": "/privacy-choices.html",
+      "/account": "/account.html",
     };
 
     if (staticHtmlPages[pathname]) {
@@ -153,7 +290,13 @@ export default {
           return injectSsrBootstrap(template, catalog);
         });
       }
-      const template = await readAsset(env, staticHtmlPages[pathname]!);
+      let template = await readAsset(env, staticHtmlPages[pathname]!);
+      // Some newly uploaded HTML assets resolve via request-origin fetch more reliably than assets.local
+      if (!template) {
+        const assetUrl = new URL(staticHtmlPages[pathname]!, url.origin);
+        const assetRes = await env.ASSETS.fetch(new Request(assetUrl.toString()));
+        if (assetRes.ok) template = await assetRes.text();
+      }
       if (!template) {
         return htmlResponse(fallbackUnavailablePage("Page not found."), 404, PRIVATE_NO_STORE);
       }

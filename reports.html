@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Reports | Dr.Swift Diagnostics</title>
     <meta name="description" content="View Dr.Swift patient reports, compare current and previous values, and download doctor-ready PDFs.">
-    <link rel="stylesheet" href="assets/css/styles.css?v=report-viewer-3">
+    <link rel="stylesheet" href="assets/css/styles.css?v=google-auth-3">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
   <body class="reports-page">
@@ -30,7 +30,7 @@
               <span>Cart</span>
               <span class="cart-count" data-cart-count hidden>0</span>
             </a>
-            <a class="button primary nav-cta" href="tests.html">Shop tests</a>
+            <a class="button primary nav-cta" href="login.html">My Account</a>
           </div>
         </div>
       </nav>
@@ -79,7 +79,7 @@
               <span>Sample patient report</span>
               <div class="sample-report-preview__zoom" role="group" aria-label="Report zoom">
                 <button type="button" class="sample-report-zoom-btn" data-sample-report-zoom="out" aria-label="Zoom out">−</button>
-                <span data-sample-report-zoom-label>115%</span>
+                <span data-sample-report-zoom-label>100%</span>
                 <button type="button" class="sample-report-zoom-btn" data-sample-report-zoom="in" aria-label="Zoom in">+</button>
                 <button type="button" class="sample-report-zoom-btn sample-report-zoom-btn--fit" data-sample-report-zoom="fit">Fit</button>
               </div>
@@ -196,7 +196,8 @@
             </div>
             <div class="band-cta__actions">
               <a class="button outline-light" href="tests.html">Shop tests</a>
-              <a class="button primary" href="login.html">View reports</a>
+              <a class="button primary" href="account.html">Open account (MVP mock)</a>
+              <a class="button secondary" href="login.html">Sign in</a>
             </div>
           </div>
         </div>
@@ -253,7 +254,11 @@
       </div>
     </footer>
 
-    <script src="assets/js/main.js?v=detail-1"></script>
-    <script src="assets/js/sample-report-viewer.js?v=4"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
+    <script src="assets/js/firebase-config.js?v=3"></script>
+    <script src="assets/js/google-auth.js?v=6"></script>
+    <script src="assets/js/main.js?v=cart-qty-1"></script>
+    <script src="assets/js/sample-report-viewer.js?v=5"></script>
   </body>
 </html>

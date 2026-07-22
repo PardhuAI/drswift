@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Account · History &amp; Reports | Dr.Swift Diagnostics</title>
+    <meta name="description" content="Account settings, test history, and health trends for Dr.Swift Diagnostics.">
+    <link rel="stylesheet" href="assets/css/styles.css?v=account-mvp-4">
+    <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
+  </head>
+  <body class="account-page">
+    <header class="site-header" id="site-header">
+      <nav class="navbar container" aria-label="Primary navigation">
+        <a class="brand" href="index.html" aria-label="Dr.Swift Diagnostics home">
+          <img class="brand-mark" src="assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="40" height="40">
+          <span>Dr.Swift Diagnostics</span>
+        </a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu">
+          <span class="sr-only">Menu</span><span></span><span></span><span></span>
+        </button>
+        <div class="nav-menu" id="primary-menu">
+          <div class="nav-links">
+            <a href="tests.html">Tests</a>
+            <a href="reports.html">Reports</a>
+            <a href="about.html">About</a>
+          </div>
+          <div class="nav-actions" aria-label="Account links">
+            <a class="cart-link" href="cart.html" aria-label="View cart">
+              <svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-cart"></use></svg>
+              <span>Cart</span>
+              <span class="cart-count" data-cart-count hidden>0</span>
+            </a>
+            <a class="button primary nav-cta" href="login.html">My Account</a>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="account-hero section-pad-sm">
+        <div class="container">
+          <p class="eyebrow">My account</p>
+          <h1>Account settings, history and reports</h1>
+          <p class="account-hero__lede">Review your profile, past bookings, and long-term marker trends. This page is a static MVP mock with sample data.</p>
+
+          <div class="account-user-bar">
+            <button type="button" class="account-user-chip" aria-current="true">
+              <img src="https://i.pravatar.cc/80?img=12" alt="" width="28" height="28">
+              Madhu Karnati
+            </button>
+            <button type="button" class="button secondary account-add-family" disabled title="Coming soon">
+              + Add family &amp; friends
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Top row: profile + test history cards -->
+      <section class="section-pad-sm section-bg-white">
+        <div class="container account-top-grid">
+          <article class="account-card account-card--profile">
+            <h2 class="account-card__title">Personal info</h2>
+            <dl class="account-profile-dl">
+              <div><dt>Name</dt><dd>Madhu Karnati</dd></div>
+              <div><dt>Email</dt><dd>madhureddy480@gmail.com</dd></div>
+              <div>
+                <dt>Phone</dt>
+                <dd>+91 98765 43210 <span class="account-verified">verified</span></dd>
+              </div>
+              <div><dt>Address</dt><dd>12 Residency Road, Bengaluru 560025</dd></div>
+            </dl>
+            <div class="account-profile-actions">
+              <button type="button" class="account-link-btn" disabled>Add phone</button>
+              <button type="button" class="account-link-btn" disabled>Update phone</button>
+              <button type="button" class="account-link-btn" disabled>Add address</button>
+            </div>
+          </article>
+
+          <article class="account-card account-card--history">
+            <div class="account-card__head">
+              <h2 class="account-card__title">Test history</h2>
+              <span class="account-status account-status--ready">Results ready</span>
+            </div>
+            <p class="account-meta"><strong>Booking:</strong> 12 Jan 2026 · <strong>Result:</strong> 14 Jan 2026</p>
+            <p class="account-subtitle">Tests ordered</p>
+            <ul class="account-test-list">
+              <li>HbA1c</li>
+              <li>Fasting glucose</li>
+              <li>Lipid profile</li>
+              <li>Vitamin D (25-OH)</li>
+            </ul>
+            <div class="account-report-actions">
+              <a class="button secondary" href="sample-report.html">View report</a>
+              <button type="button" class="button secondary" disabled>Download report</button>
+              <button type="button" class="button secondary" disabled>WhatsApp</button>
+              <button type="button" class="button secondary" disabled>Text message</button>
+              <button type="button" class="button secondary" disabled>Email report</button>
+              <button type="button" class="button secondary" disabled>Email to doctor</button>
+              <button type="button" class="button secondary" disabled>Email to friend</button>
+            </div>
+          </article>
+
+          <article class="account-card account-card--history">
+            <div class="account-card__head">
+              <h2 class="account-card__title">Test history</h2>
+              <span class="account-status account-status--ready">Results ready</span>
+            </div>
+            <p class="account-meta"><strong>Booking:</strong> 18 Nov 2025 · <strong>Result:</strong> 20 Nov 2025</p>
+            <p class="account-subtitle">Tests ordered</p>
+            <ul class="account-test-list">
+              <li>Complete blood count</li>
+              <li>TSH</li>
+              <li>Vitamin B12</li>
+              <li>Creatinine &amp; eGFR</li>
+            </ul>
+            <div class="account-report-actions">
+              <a class="button secondary" href="sample-report.html">View report</a>
+              <button type="button" class="button secondary" disabled>Download report</button>
+              <button type="button" class="button secondary" disabled>WhatsApp</button>
+              <button type="button" class="button secondary" disabled>Email report</button>
+            </div>
+          </article>
+
+          <article class="account-card account-card--history">
+            <div class="account-card__head">
+              <h2 class="account-card__title">Test history</h2>
+              <span class="account-status account-status--pending">In progress</span>
+            </div>
+            <p class="account-meta"><strong>Booking:</strong> 08 Jul 2026 · Expected: 10 Jul 2026</p>
+            <p class="account-subtitle">Tests ordered</p>
+            <ul class="account-test-list">
+              <li>LDL cholesterol</li>
+              <li>Triglycerides</li>
+              <li>Hemoglobin</li>
+            </ul>
+            <div class="account-report-actions">
+              <button type="button" class="button secondary" disabled>Awaiting results</button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- Health trends -->
+      <section class="section-pad account-trends-section">
+        <div class="container">
+          <div class="account-trends-intro">
+            <p class="eyebrow">Longitudinal view</p>
+            <h2>Health trends</h2>
+            <p>Ten common lab markers with sample history. Charts are SVG with motion — values are demo only, not medical advice.</p>
+          </div>
+          <div class="account-trends" id="account-trends" data-account-trends></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-bottom footer-bottom--plain">
+        <p>&copy; 2026 Dr.Swift Diagnostics · <a href="privacy.html">Privacy</a> · MVP mock data</p>
+      </div>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
+    <script src="assets/js/firebase-config.js?v=3"></script>
+    <script src="assets/js/google-auth.js?v=6"></script>
+    <script src="assets/js/main.js?v=cart-qty-1"></script>
+    <script src="assets/js/account-trends.js?v=4"></script>
+  </body>
+</html>

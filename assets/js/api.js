@@ -47,6 +47,79 @@
     return "blood";
   }
 
+  /** Top-level CMS fields, or nested attributesJson duplicates. */
+  function attrString(apiTest, keys, fallback) {
+    function tryValue(value) {
+      if (typeof value === "string" && value.trim()) return value.trim();
+      if (Array.isArray(value) && value.length) {
+        const first = String(value[0] || "").trim();
+        return first || null;
+      }
+      return null;
+    }
+    for (const key of keys) {
+      const top = tryValue(apiTest?.[key]);
+      if (top) return top;
+    }
+    let attrs = apiTest?.attributesJson;
+    if (typeof attrs === "string") {
+      try {
+        attrs = JSON.parse(attrs);
+      } catch {
+        attrs = null;
+      }
+    }
+    if (attrs && typeof attrs === "object" && !Array.isArray(attrs)) {
+      for (const key of keys) {
+        const nested = tryValue(attrs[key]);
+        if (nested) return nested;
+      }
+    }
+    return fallback;
+  }
+
+  /** Exact CMS testCategories from top-level or attributesJson. */
+  function extractTestCategories(apiTest) {
+    const fromTop = asArray(apiTest?.testCategories).map(String).filter(Boolean);
+    if (fromTop.length) {
+      return fromTop;
+    }
+    let attrs = apiTest?.attributesJson;
+    if (typeof attrs === "string") {
+      try {
+        attrs = JSON.parse(attrs);
+      } catch {
+        attrs = null;
+      }
+    }
+    if (attrs && typeof attrs === "object" && !Array.isArray(attrs)) {
+      return asArray(attrs.testCategories).map(String).filter(Boolean);
+    }
+    return [];
+  }
+
+  /** Ensure toolbar chips (kidney / cbc / fever / vitamins) match even when CMS categories are broader. */
+  function enrichFilters(apiTest, existing) {
+    const filters = new Set(asArray(existing).map(String).filter(Boolean));
+    filters.add("all");
+    const blob = [
+      apiTest?.name,
+      apiTest?.slug,
+      apiTest?.category,
+      apiTest?.summary,
+      apiTest?.shortDescription,
+      apiTest?.alternativeNames,
+      ...(asArray(apiTest?.filters)),
+    ]
+      .join(" ")
+      .toLowerCase();
+    if (/kidney|creatinine|egfr|\bkft\b|renal/.test(blob)) filters.add("kidney");
+    if (/\bcbc\b|complete blood|hemogram|blood count/.test(blob)) filters.add("cbc");
+    if (/fever|dengue|malaria|typhoid|widal|\bns1\b/.test(blob)) filters.add("fever");
+    if (/vitamin|vit\.?\s*d|vit\.?\s*b|\bb12\b|25-oh/.test(blob)) filters.add("vitamins");
+    return Array.from(filters);
+  }
+
   function mapFaqs(faqs) {
     return asArray(faqs).map((faq) => {
       if (Array.isArray(faq)) {
@@ -107,7 +180,7 @@
       shortName: apiTest.name || "",
       category: apiTest.category || "General",
       eyebrow: String(apiTest.eyebrow || "").trim(),
-      filters: asArray(apiTest.filters).length ? asArray(apiTest.filters) : ["all"],
+      filters: enrichFilters(apiTest, asArray(apiTest.filters).length ? asArray(apiTest.filters) : ["all"]),
       image: apiTest.imageUrl || apiTest.image || "",
       imageTone: toneFromCategory(apiTest.category),
       badge: apiTest.badge || (customizable ? "Customizable" : ""),
@@ -116,15 +189,27 @@
       summary: apiTest.summary || apiTest.shortDescription || "",
       headline: apiTest.headline || apiTest.summary || apiTest.shortDescription || "",
       description: apiTest.description || apiTest.longDescription || apiTest.shortDescription || "",
-      sampleType: apiTest.sampleType || "Blood",
-      collection: apiTest.collection || "At-home sample collection",
-      age: apiTest.age || "18+ recommended",
-      results: apiTest.results || "24-48 hours after sample reaches the lab",
-      preparation: apiTest.preparation || "",
-      hsa: apiTest.hsa || "Accepted",
-      purchaser: apiTest.purchaser || apiTest.bookingNote || "Can be booked for family profiles",
+      sampleType: attrString(apiTest, ["sampleType"], "Blood"),
+      collection: attrString(apiTest, ["collection"], "At-home sample collection"),
+      age: attrString(apiTest, ["age", "ageRange"], "18+ recommended"),
+      results: attrString(
+        apiTest,
+        ["results", "resultsTimeline"],
+        "24-48 hours after sample reaches the lab"
+      ),
+      preparation: attrString(apiTest, ["preparation", "preparationText"], ""),
+      hsa: attrString(apiTest, ["hsa"], "Accepted"),
+      // Public site always shows Online booking.
+      purchaser: "Online",
       customizable,
       testType: apiTest.testType || "Test",
+      frequentlyOrderedTest: Boolean(
+        apiTest.frequentlyOrderedTest ??
+          (apiTest.attributesJson &&
+            typeof apiTest.attributesJson === "object" &&
+            apiTest.attributesJson.frequentlyOrderedTest)
+      ),
+      testCategories: extractTestCategories(apiTest),
       markers: whatsTestedRaw.flatMap((group) =>
         normalizeMarkers(group.markers).map((marker) => marker.name).filter(Boolean)
       ),

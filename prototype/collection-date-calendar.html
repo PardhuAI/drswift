@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prototype — Collection date calendar | Dr.Swift</title>
+  <link rel="stylesheet" href="../assets/css/styles.css?v=checkout-frame-3">
+  <style>
+    :root {
+      --ink: #162033;
+      --muted: #657084;
+      --line: #dce3ee;
+      --soft: #f6f8fb;
+      --blue: #1e5bd7;
+      --green: #4e8c73;
+      --shadow: 0 16px 40px rgba(33, 49, 78, 0.16);
+    }
+
+    body.auth-page .auth-shell {
+      display: block;
+      padding: 28px clamp(16px, 4vw, 40px) 72px;
+    }
+
+    .proto-note {
+      width: min(720px, 100%);
+      margin: 0 auto 16px;
+      padding: 12px 14px;
+      background: #edf4ff;
+      border: 1px solid #c9dbff;
+      border-radius: 10px;
+      color: #123f9b;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .proto-note a { color: #123f9b; font-weight: 700; }
+
+    .demo-card {
+      width: min(720px, 100%);
+      margin: 0 auto;
+      padding: clamp(20px, 3vw, 28px);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 14px 34px rgba(33, 49, 78, 0.08);
+    }
+
+    .demo-card h1 {
+      margin: 0 0 6px;
+      font-size: 1.35rem;
+    }
+
+    .demo-card .lede {
+      margin: 0 0 22px;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    /* Keep sample row identical to checkout */
+    .checkout-time-row {
+      position: relative;
+      margin-bottom: 18px;
+    }
+
+    .checkout-segments {
+      position: relative;
+    }
+
+    /* Selected custom date chip (appears after pick) */
+    .checkout-date-chip {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+      padding: 8px 12px;
+      color: #fff;
+      background: var(--green);
+      border: 1px solid var(--green);
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .checkout-date-chip.is-visible {
+      display: inline-flex;
+    }
+
+    .checkout-date-chip button {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: #fff;
+      font: inherit;
+      font-size: 1rem;
+      line-height: 1;
+      cursor: pointer;
+      opacity: 0.85;
+      padding: 0 2px;
+    }
+
+    .checkout-date-chip button:hover { opacity: 1; }
+
+    .checkout-calendar-btn[aria-expanded="true"] {
+      box-shadow: 0 0 0 3px rgba(78, 140, 115, 0.25);
+    }
+
+    .checkout-select-date-btn {
+      min-height: 38px;
+      padding: 8px 13px;
+      color: #fff;
+      background: var(--green);
+      border: 1px solid var(--green);
+      border-radius: 8px;
+      font: inherit;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .checkout-select-date-btn:hover,
+    .checkout-select-date-btn:focus-visible {
+      background: #3e7a63;
+      border-color: #3e7a63;
+      outline: none;
+    }
+
+    .checkout-select-date-btn[aria-expanded="true"] {
+      box-shadow: 0 0 0 3px rgba(78, 140, 115, 0.25);
+    }
+
+    /* Popover */
+    .cal-popover {
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 118px;
+      z-index: 40;
+      width: min(320px, calc(100vw - 48px));
+      padding: 14px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .cal-popover[hidden] { display: none; }
+
+    .cal-popover__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .cal-popover__title {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .cal-nav {
+      display: inline-flex;
+      gap: 4px;
+    }
+
+    .cal-nav button {
+      appearance: none;
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .cal-nav button:hover,
+    .cal-nav button:focus-visible {
+      border-color: var(--green);
+      outline: none;
+    }
+
+    .cal-nav button:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .cal-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      margin-bottom: 4px;
+    }
+
+    .cal-weekdays span {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 4px 0;
+    }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+    }
+
+    .cal-grid button {
+      appearance: none;
+      aspect-ratio: 1;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--ink);
+      font: inherit;
+      font-size: 0.88rem;
+      font-weight: 650;
+      cursor: pointer;
+    }
+
+    .cal-grid button.is-outside {
+      color: #b7c0ce;
+    }
+
+    .cal-grid button.is-today {
+      box-shadow: inset 0 0 0 1.5px var(--blue);
+      color: var(--blue);
+      font-weight: 800;
+    }
+
+    .cal-grid button.is-selected {
+      background: var(--green);
+      color: #fff;
+      font-weight: 800;
+      box-shadow: none;
+    }
+
+    .cal-grid button:not(:disabled):hover,
+    .cal-grid button:not(:disabled):focus-visible {
+      background: #edf4ff;
+      outline: none;
+    }
+
+    .cal-grid button.is-selected:hover,
+    .cal-grid button.is-selected:focus-visible {
+      background: #3e7a63;
+    }
+
+    .cal-grid button:disabled {
+      color: #c9d2df;
+      cursor: not-allowed;
+      text-decoration: line-through;
+      text-decoration-thickness: 1px;
+    }
+
+    .cal-popover__foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .cal-popover__hint {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.35;
+    }
+
+    .cal-popover__foot .button {
+      min-height: 36px;
+      padding: 8px 12px;
+      font-size: 0.84rem;
+    }
+
+    /* Visible date field that gets populated */
+    .date-field-preview {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 14px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    .date-field-preview label {
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 800;
+    }
+
+    .date-field-preview input {
+      width: 100%;
+      min-height: 46px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 16px;
+    }
+
+    .date-field-preview input:focus-visible {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(30, 91, 215, 0.12);
+      outline: none;
+    }
+
+    .flow-notes {
+      width: min(720px, 100%);
+      margin: 18px auto 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+    }
+
+    .flow-notes li {
+      padding: 12px 14px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      line-height: 1.45;
+      color: var(--ink);
+    }
+
+    .flow-notes strong { font-weight: 800; }
+
+    @media (max-width: 640px) {
+      .cal-popover {
+        left: 0;
+        right: 0;
+        width: auto;
+      }
+
+      .date-field-preview {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+    }
+  </style>
+</head>
+<body class="auth-page">
+  <main class="auth-shell">
+    <div class="proto-note">
+      <strong>Prototype</strong> — calendar popover for the checkout calendar button.
+      Tap <strong>Select date</strong> → pick a day → it fills the date field and becomes the active collection day.
+      · <a href="index.html">Back to prototypes</a>
+    </div>
+
+    <div class="demo-card">
+      <p class="eyebrow" style="margin:0 0 6px">Step 2 · Sample collection</p>
+      <h1>Choose collection date</h1>
+      <p class="lede">Today / Tomorrow stay as quick picks. Calendar is for any later date (next 30 days).</p>
+
+      <div class="checkout-time-row" data-collection-row>
+        <strong>Sample collection</strong>
+        <div class="checkout-segments" role="group" aria-label="Sample collection day">
+          <input id="book-day-today" type="radio" name="sampleDay" value="Today" checked>
+          <label for="book-day-today">Today</label>
+          <input id="book-day-tomorrow" type="radio" name="sampleDay" value="Tomorrow">
+          <label for="book-day-tomorrow">Tomorrow</label>
+
+          <span class="checkout-date-chip" data-date-chip hidden>
+            <span data-date-chip-label></span>
+            <button type="button" aria-label="Clear selected date" data-clear-date>×</button>
+          </span>
+
+          <button
+            class="checkout-select-date-btn"
+            type="button"
+            aria-haspopup="dialog"
+            aria-expanded="false"
+            aria-controls="collection-calendar"
+            data-cal-trigger
+          >
+            Select date
+          </button>
+
+          <!-- Hidden radio used when a custom date is chosen -->
+          <input id="book-day-custom" type="radio" name="sampleDay" value="" data-custom-day hidden>
+
+          <div
+            class="cal-popover"
+            id="collection-calendar"
+            role="dialog"
+            aria-modal="false"
+            aria-label="Choose collection date"
+            hidden
+            data-cal-popover
+          >
+            <div class="cal-popover__head">
+              <p class="cal-popover__title" data-cal-month>July 2026</p>
+              <div class="cal-nav">
+                <button type="button" aria-label="Previous month" data-cal-prev>‹</button>
+                <button type="button" aria-label="Next month" data-cal-next>›</button>
+              </div>
+            </div>
+            <div class="cal-weekdays" aria-hidden="true">
+              <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+            </div>
+            <div class="cal-grid" data-cal-grid role="grid" aria-label="Calendar dates"></div>
+            <div class="cal-popover__foot">
+              <p class="cal-popover__hint">Past dates disabled.<br>Book up to 30 days ahead.</p>
+              <button class="button secondary" type="button" data-cal-close>Close</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="checkout-segments checkout-segments--time" role="group" aria-label="Sample collection window">
+          <input id="book-time-morning" type="radio" name="sampleWindow" value="Morning" checked>
+          <label for="book-time-morning">Morning</label>
+          <input id="book-time-afternoon" type="radio" name="sampleWindow" value="Afternoon">
+          <label for="book-time-afternoon">Afternoon</label>
+          <input id="book-time-evening" type="radio" name="sampleWindow" value="Evening">
+          <label for="book-time-evening">Evening</label>
+        </div>
+      </div>
+
+      <div class="date-field-preview">
+        <label for="collection-date">Collection date</label>
+        <input
+          id="collection-date"
+          name="collectionDate"
+          type="text"
+          readonly
+          placeholder="Select Today, Tomorrow, or pick from calendar"
+          data-date-field
+          value="Today"
+        >
+      </div>
+    </div>
+
+    <ul class="flow-notes">
+      <li><strong>Behavior:</strong> Calendar button opens a popover (not a full-screen modal). Selecting a day closes the popover, checks a custom day radio, and writes a readable date into the field (e.g. <em>Thu, 24 Jul 2026</em>).</li>
+      <li><strong>Quick picks:</strong> Choosing Today / Tomorrow clears the custom chip and resets the date field to “Today” / “Tomorrow”.</li>
+      <li><strong>Rules:</strong> Past dates disabled; range = today → +30 days (phlebo booking window). Easy to change later.</li>
+      <li><strong>Mobile:</strong> Popover stretches under the sample row so it stays tappable.</li>
+    </ul>
+  </main>
+
+  <script>
+    (function () {
+      const MAX_AHEAD_DAYS = 30;
+      const trigger = document.querySelector("[data-cal-trigger]");
+      const popover = document.querySelector("[data-cal-popover]");
+      const grid = document.querySelector("[data-cal-grid]");
+      const monthLabel = document.querySelector("[data-cal-month]");
+      const dateField = document.querySelector("[data-date-field]");
+      const chip = document.querySelector("[data-date-chip]");
+      const chipLabel = document.querySelector("[data-date-chip-label]");
+      const customRadio = document.querySelector("[data-custom-day]");
+      const todayRadio = document.getElementById("book-day-today");
+      const tomorrowRadio = document.getElementById("book-day-tomorrow");
+
+      const today = startOfDay(new Date());
+      const maxDate = addDays(today, MAX_AHEAD_DAYS);
+      let view = new Date(today.getFullYear(), today.getMonth(), 1);
+      let selected = null;
+
+      function startOfDay(d) {
+        return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      }
+
+      function addDays(d, n) {
+        const x = new Date(d);
+        x.setDate(x.getDate() + n);
+        return x;
+      }
+
+      function sameDay(a, b) {
+        return a && b &&
+          a.getFullYear() === b.getFullYear() &&
+          a.getMonth() === b.getMonth() &&
+          a.getDate() === b.getDate();
+      }
+
+      function formatDisplay(d) {
+        return d.toLocaleDateString("en-IN", {
+          weekday: "short",
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
+      }
+
+      function formatChip(d) {
+        return d.toLocaleDateString("en-IN", {
+          weekday: "short",
+          day: "numeric",
+          month: "short",
+        });
+      }
+
+      function formatValue(d) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
+        return `${y}-${m}-${day}`;
+      }
+
+      function openCal() {
+        popover.hidden = false;
+        trigger.setAttribute("aria-expanded", "true");
+        render();
+      }
+
+      function closeCal() {
+        popover.hidden = true;
+        trigger.setAttribute("aria-expanded", "false");
+      }
+
+      function toggleCal() {
+        if (popover.hidden) openCal();
+        else closeCal();
+      }
+
+      function applyCustomDate(d) {
+        selected = startOfDay(d);
+        customRadio.value = formatValue(selected);
+        customRadio.checked = true;
+        todayRadio.checked = false;
+        tomorrowRadio.checked = false;
+
+        dateField.value = formatDisplay(selected);
+        chipLabel.textContent = formatChip(selected);
+        chip.hidden = false;
+        chip.classList.add("is-visible");
+        closeCal();
+        render();
+      }
+
+      function clearCustom() {
+        selected = null;
+        customRadio.value = "";
+        customRadio.checked = false;
+        chip.hidden = true;
+        chip.classList.remove("is-visible");
+        chipLabel.textContent = "";
+      }
+
+      function render() {
+        const year = view.getFullYear();
+        const month = view.getMonth();
+        monthLabel.textContent = view.toLocaleDateString("en-IN", {
+          month: "long",
+          year: "numeric",
+        });
+
+        const first = new Date(year, month, 1);
+        const startPad = first.getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const prevDays = new Date(year, month, 0).getDate();
+
+        const minView = new Date(today.getFullYear(), today.getMonth(), 1);
+        const maxView = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1);
+        document.querySelector("[data-cal-prev]").disabled = view <= minView;
+        document.querySelector("[data-cal-next]").disabled = view >= maxView;
+
+        grid.innerHTML = "";
+        const totalCells = 42;
+        for (let i = 0; i < totalCells; i++) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          let date;
+          let outside = false;
+
+          if (i < startPad) {
+            date = new Date(year, month - 1, prevDays - startPad + i + 1);
+            outside = true;
+          } else if (i >= startPad + daysInMonth) {
+            date = new Date(year, month + 1, i - startPad - daysInMonth + 1);
+            outside = true;
+          } else {
+            date = new Date(year, month, i - startPad + 1);
+          }
+
+          const day = startOfDay(date);
+          btn.textContent = String(day.getDate());
+          btn.setAttribute("role", "gridcell");
+          btn.setAttribute("aria-label", formatDisplay(day));
+
+          if (outside) btn.classList.add("is-outside");
+          if (sameDay(day, today)) btn.classList.add("is-today");
+          if (selected && sameDay(day, selected)) {
+            btn.classList.add("is-selected");
+            btn.setAttribute("aria-current", "date");
+          }
+
+          const disabled = day < today || day > maxDate;
+          btn.disabled = disabled;
+
+          if (!disabled) {
+            btn.addEventListener("click", () => applyCustomDate(day));
+          }
+
+          grid.appendChild(btn);
+        }
+      }
+
+      trigger.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleCal();
+      });
+
+      document.querySelector("[data-cal-close]").addEventListener("click", closeCal);
+      document.querySelector("[data-cal-prev]").addEventListener("click", () => {
+        view = new Date(view.getFullYear(), view.getMonth() - 1, 1);
+        render();
+      });
+      document.querySelector("[data-cal-next]").addEventListener("click", () => {
+        view = new Date(view.getFullYear(), view.getMonth() + 1, 1);
+        render();
+      });
+
+      document.querySelector("[data-clear-date]").addEventListener("click", (e) => {
+        e.stopPropagation();
+        clearCustom();
+        todayRadio.checked = true;
+        dateField.value = "Today";
+      });
+
+      todayRadio.addEventListener("change", () => {
+        if (!todayRadio.checked) return;
+        clearCustom();
+        dateField.value = "Today";
+        closeCal();
+      });
+
+      tomorrowRadio.addEventListener("change", () => {
+        if (!tomorrowRadio.checked) return;
+        clearCustom();
+        dateField.value = "Tomorrow";
+        closeCal();
+      });
+
+      document.addEventListener("click", (e) => {
+        if (popover.hidden) return;
+        if (popover.contains(e.target) || trigger.contains(e.target)) return;
+        closeCal();
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeCal();
+      });
+
+      render();
+    })();
+  </script>
+</body>
+</html>

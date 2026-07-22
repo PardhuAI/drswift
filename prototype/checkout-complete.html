@@ -1,0 +1,1409 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prototype — Complete checkout + payment flow | Dr.Swift</title>
+  <link rel="stylesheet" href="../assets/css/styles.css?v=card-limits-1">
+  <link rel="icon" href="../assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
+  <style>
+    html { scrollbar-gutter: stable; }
+    body.auth-page .auth-shell {
+      display: block;
+      padding: 28px clamp(16px, 4vw, 40px) 64px;
+    }
+    .checkout-proto-frame {
+      width: min(1120px, 100%);
+      margin-inline: auto;
+    }
+    .proto-note {
+      width: min(1120px, 100%);
+      margin: 0 auto 14px;
+      padding: 10px 14px;
+      background: #edf4ff;
+      border: 1px solid #c9dbff;
+      border-radius: 10px;
+      color: #123f9b;
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+    .proto-note a { color: #123f9b; font-weight: 700; }
+    .proto-note code {
+      background: #fff;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 0.82rem;
+    }
+
+    .checkout-wire-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+      gap: 24px;
+      align-items: start;
+      width: 100%;
+    }
+    .checkout-wire-panel.is-active { min-height: 480px; }
+    .checkout-wire-field--wide input,
+    .checkout-wire-field--address textarea { max-width: none; width: 100%; }
+    .checkout-wire-field--phone .phone-verify-row,
+    .checkout-otp .phone-verify-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      width: max-content;
+      max-width: 100%;
+    }
+    .checkout-wire-field--phone .phone-verify-row input,
+    .checkout-otp .phone-verify-row input {
+      width: 12.5rem;
+      max-width: 100%;
+      flex: 0 0 auto;
+    }
+
+    /* Payment method list (two-step) */
+    .pay-method-list { display: grid; gap: 10px; }
+    .pay-method {
+      appearance: none;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 60px;
+      padding: 14px 16px;
+      background: #fff;
+      border: 1px solid var(--color-line);
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(33, 49, 78, 0.06);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+    .pay-method:hover { border-color: #b8c7e6; }
+    .pay-method__left { display: flex; align-items: center; gap: 12px; font-weight: 700; }
+    .pay-ico {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: grid; place-items: center; flex-shrink: 0;
+    }
+    .pay-ico img { display: block; width: 22px; height: 22px; object-fit: contain; }
+    .pay-ico--gpay img,
+    .pay-ico--phonepe img,
+    .pay-ico--upi img { width: 26px; height: 26px; }
+    .pay-ico--card { background: #e8f0ff; }
+    .pay-ico--bank { background: #efe8ff; }
+    .pay-ico--gpay,
+    .pay-ico--phonepe,
+    .pay-ico--upi { background: #fff; border: 1px solid var(--color-line); }
+    .pay-badge {
+      height: 22px; padding: 0 8px; border-radius: 6px;
+      border: 1px solid var(--color-line); background: #fff;
+      font-size: 0.62rem; font-weight: 800; color: #475569;
+      display: inline-grid; place-items: center;
+    }
+
+    /* Clean card form */
+    .pay-tabs {
+      display: flex; gap: 20px; margin: 0 0 16px;
+      border-bottom: 1px solid var(--color-line);
+    }
+    .pay-tabs button {
+      appearance: none; border: 0; background: transparent;
+      padding: 0 0 10px; font: inherit; font-weight: 700;
+      color: var(--color-muted); cursor: pointer;
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .pay-tabs button.is-on {
+      color: var(--color-blue-dark);
+      border-bottom-color: var(--color-blue);
+    }
+    .pay-card-form { display: grid; gap: 14px; }
+    .pay-card-form .field { display: grid; gap: 6px; }
+    .pay-card-form label {
+      color: var(--color-muted); font-size: 0.78rem; font-weight: 700;
+      display: block;
+    }
+    .pay-card-form input:not([type="radio"]),
+    .pay-card-form select {
+      width: 100%; min-height: 46px; padding: 10px 12px;
+      border: 1px solid var(--color-line); border-radius: 10px;
+      background: #fff; font: inherit; font-size: 0.95rem;
+    }
+    .pay-card-form input:not([type="radio"]):focus,
+    .pay-card-form select:focus {
+      outline: none; border-color: var(--color-blue);
+      box-shadow: 0 0 0 3px rgba(30, 91, 215, 0.12);
+    }
+    .pay-card-row {
+      display: grid;
+      grid-template-columns: 1.4fr 0.8fr;
+      gap: 12px;
+    }
+    .pay-exp-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .visually-hidden {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+    .field-optional {
+      color: var(--color-muted); font-size: 0.75rem; font-weight: 600;
+    }
+
+    /* QR */
+    .pay-qr {
+      display: grid;
+      justify-items: center;
+      text-align: center;
+      gap: 12px;
+      padding: 12px 0 8px;
+    }
+    .pay-qr__brand {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 12px; border-radius: 999px;
+      background: #fff; border: 1px solid var(--color-line);
+      font-size: 0.85rem; font-weight: 800;
+    }
+    .pay-qr__amount {
+      margin: 0; font-size: 1.5rem; font-weight: 800;
+    }
+    .pay-qr__card {
+      width: min(220px, 100%); aspect-ratio: 1;
+      background: #fff; border: 1px solid var(--color-line);
+      border-radius: 16px; padding: 16px;
+      box-shadow: 0 10px 24px rgba(33, 49, 78, 0.08);
+    }
+    .pay-qr__card svg { width: 100%; height: 100%; }
+    .pay-qr__upi {
+      margin: 0; padding: 8px 12px; border-radius: 10px;
+      background: var(--color-soft); border: 1px dashed #c9d4e5;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.84rem; font-weight: 700;
+    }
+    .pay-qr__help {
+      margin: 0; max-width: 360px;
+      color: var(--color-muted); font-size: 0.88rem; line-height: 1.45;
+    }
+
+    .bank-list { display: grid; gap: 8px; }
+    .bank-list button {
+      appearance: none; width: 100%; min-height: 48px;
+      padding: 12px 14px; border: 1px solid var(--color-line);
+      border-radius: 10px; background: #fff; text-align: left;
+      font: inherit; font-weight: 700; cursor: pointer;
+    }
+    .bank-list button:hover { border-color: #b8c7e6; }
+    .bank-list button.is-on {
+      border-color: var(--color-blue);
+      box-shadow: 0 0 0 3px rgba(30, 91, 215, 0.12);
+    }
+
+    /* Highlighted control: leave card/QR/bank and re-pick method */
+    .checkout-change-pay {
+      color: #b42318 !important;
+      background: #fff4f2 !important;
+      border: 1px solid #f3c0b8 !important;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-weight: 800;
+      box-shadow: none;
+      gap: 8px;
+    }
+    .checkout-change-pay__icon {
+      flex-shrink: 0;
+      display: block;
+    }
+
+    .checkout-change-pay:hover,
+    .checkout-change-pay:focus-visible {
+      color: #912018 !important;
+      background: #ffe8e4 !important;
+      border-color: #e8a094 !important;
+      outline: none;
+    }
+
+    .checkout-kv { display: grid; gap: 0; margin: 0; }
+    .checkout-kv__row {
+      display: grid;
+      grid-template-columns: 78px minmax(0, 1fr);
+      gap: 6px 10px;
+      align-items: baseline;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--color-line);
+    }
+    .checkout-kv__row:last-child { border-bottom: 0; padding-bottom: 0; }
+    .checkout-kv dt {
+      margin: 0; color: var(--color-muted);
+      font-size: 0.72rem; font-weight: 800; text-transform: uppercase;
+    }
+    .checkout-kv dd {
+      margin: 0; font-size: 0.88rem; font-weight: 650; word-break: break-word;
+    }
+
+    @media (max-width: 879px) {
+      .checkout-wire-layout { grid-template-columns: 1fr; }
+      .checkout-wire-aside { order: -1; position: static; }
+      .checkout-wire-panel.is-active { min-height: 0; }
+      .pay-card-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body class="auth-page">
+  <header class="site-header" id="site-header">
+    <nav class="navbar container" aria-label="Primary navigation">
+      <a class="brand" href="../index.html">
+        <img class="brand-mark" src="../assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="40" height="40">
+        <span>Dr.Swift Diagnostics</span>
+      </a>
+      <div class="nav-menu" id="primary-menu">
+        <div class="nav-links">
+          <a href="../tests.html">Tests</a>
+          <a href="../reports.html">Reports</a>
+          <a href="../about.html">About</a>
+        </div>
+        <div class="nav-actions">
+          <a class="cart-link" href="../cart.html"><span>Cart</span><span class="cart-count">5</span></a>
+          <a class="button primary nav-cta" href="../login.html">My Account</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="auth-shell">
+    <div class="proto-note">
+      <strong>Complete checkout prototype</strong> — details → choose payment → card / QR / net banking → confirmation.
+      Sidebar keeps <em>Selected tests</em>, then customer + payment summaries.
+      Demo OTP: <code>123456</code>
+      · <a href="index.html">Prototypes</a>
+      · <a href="payment-flow-two-step.html">Payment-only mock</a>
+    </div>
+
+    <div class="checkout-proto-frame">
+      <div class="checkout-wire-shell">
+        <div class="auth-card__header">
+          <p class="eyebrow">Checkout</p>
+          <h1>Complete your booking</h1>
+          <p>Confirm collection details, choose how to pay, and receive booking confirmation.</p>
+        </div>
+
+        <div class="checkout-wire-layout">
+          <div class="checkout-wire-main">
+            <!-- DETAILS -->
+            <section class="checkout-wire-panel is-active" data-stage="details">
+              <div class="checkout-wire-head">
+                <span class="checkout-step-badge">2</span>
+                <div>
+                  <p class="checkout-step-kicker">Step 2</p>
+                  <h2>Who is this booking for?</h2>
+                </div>
+              </div>
+              <form class="checkout-wire-form" id="book-form" novalidate>
+                <div class="checkout-time-row">
+                  <strong>Sample Collection Date/Time</strong>
+                  <div class="checkout-segments" role="group" aria-label="Sample collection day">
+                    <input id="day-today" type="radio" name="sampleDay" value="Today" checked>
+                    <label for="day-today">Today</label>
+                    <input id="day-tomorrow" type="radio" name="sampleDay" value="Tomorrow">
+                    <label for="day-tomorrow">Tomorrow</label>
+
+                    <span class="checkout-date-chip" data-date-chip hidden>
+                      <span data-date-chip-label></span>
+                      <button type="button" aria-label="Clear selected date" data-clear-date>×</button>
+                    </span>
+
+                    <button
+                      class="checkout-select-date-btn"
+                      type="button"
+                      aria-haspopup="dialog"
+                      aria-expanded="false"
+                      aria-controls="collection-calendar"
+                      data-cal-trigger
+                    >
+                      Select date
+                    </button>
+
+                    <input id="day-custom" type="radio" name="sampleDay" value="" data-custom-day hidden>
+
+                    <div
+                      class="cal-popover"
+                      id="collection-calendar"
+                      role="dialog"
+                      aria-modal="false"
+                      aria-label="Choose collection date"
+                      hidden
+                      data-cal-popover
+                    >
+                      <div class="cal-popover__head">
+                        <p class="cal-popover__title" data-cal-month>Month</p>
+                        <div class="cal-nav">
+                          <button type="button" aria-label="Previous month" data-cal-prev>‹</button>
+                          <button type="button" aria-label="Next month" data-cal-next>›</button>
+                        </div>
+                      </div>
+                      <div class="cal-weekdays" aria-hidden="true">
+                        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                      </div>
+                      <div class="cal-grid" data-cal-grid role="grid" aria-label="Calendar dates"></div>
+                      <div class="cal-popover__foot">
+                        <p class="cal-popover__hint">Past dates disabled.<br>Book up to 30 days ahead.</p>
+                        <button class="button secondary" type="button" data-cal-close>Close</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="checkout-segments checkout-segments--time" role="group" aria-label="Window">
+                    <input id="win-m" type="radio" name="sampleWindow" value="Morning" checked>
+                    <label for="win-m">Morning</label>
+                    <input id="win-a" type="radio" name="sampleWindow" value="Afternoon">
+                    <label for="win-a">Afternoon</label>
+                    <input id="win-e" type="radio" name="sampleWindow" value="Evening">
+                    <label for="win-e">Evening</label>
+                  </div>
+                  <p class="checkout-window-hint" data-window-hint hidden></p>
+                  <p class="checkout-when-confirm" data-when-confirm aria-live="polite">
+                    <span class="checkout-when-confirm__tick" aria-hidden="true">✓</span>
+                    <strong data-when-confirm-value>Today · Morning</strong>
+                  </p>
+                </div>
+                <div class="checkout-wire-field checkout-wire-field--wide">
+                  <label for="name">Name</label>
+                  <input id="name" name="name" required value="Madhu Karnati">
+                </div>
+                <div class="checkout-gender-age-row">
+                  <span class="checkout-gender-age-row__label" id="gender-label">Gender</span>
+                  <div class="checkout-segments" role="radiogroup" aria-labelledby="gender-label">
+                    <input id="gender-male" type="radio" name="gender" value="Male" checked required>
+                    <label for="gender-male">Male</label>
+                    <input id="gender-female" type="radio" name="gender" value="Female">
+                    <label for="gender-female">Female</label>
+                  </div>
+                  <label for="age">Age</label>
+                  <input id="age" name="age" type="number" min="0" max="120" value="34">
+                </div>
+                <div class="checkout-wire-field checkout-wire-field--phone">
+                  <label for="phone">Phone</label>
+                  <div class="phone-verify-row">
+                    <input id="phone" name="phone" type="tel" inputmode="numeric" placeholder="10-digit mobile" maxlength="10" pattern="[0-9]{10}" required value="9848094942">
+                    <button class="button secondary" type="button" data-otp-send disabled>Send OTP</button>
+                    <p class="phone-verified-badge" data-phone-verified-badge hidden>✓ Verified</p>
+                  </div>
+                </div>
+                <div class="checkout-wire-field checkout-otp" data-otp-block hidden>
+                  <label for="otp">Verify OTP</label>
+                  <div class="phone-verify-row">
+                    <input id="otp" name="otp" maxlength="6" placeholder="6-digit code">
+                    <button class="button secondary" type="button" data-otp-verify>Verify</button>
+                  </div>
+                </div>
+                <p class="checkout-status" data-status hidden aria-live="polite"></p>
+                <div class="checkout-wire-field">
+                  <label for="city">City/Town/Village</label>
+                  <input
+                    id="city"
+                    name="city"
+                    required
+                    value="Hyderabad"
+                    maxlength="99"
+                    minlength="3"
+                    pattern="[A-Za-z].{2,98}"
+                    title="Must start with a letter, include at least 3 letters, and be under 100 characters"
+                  >
+                </div>
+                <div class="checkout-wire-field checkout-wire-field--address">
+                  <label for="address">Address</label>
+                  <textarea id="address" name="address" required>12 Lake View Road, Banjara Hills</textarea>
+                </div>
+                <div class="checkout-wire-actions">
+                  <a class="checkout-back-link" href="../cart.html">← View Cart</a>
+                  <button class="checkout-next-link" type="submit" disabled>Continue to payment</button>
+                </div>
+              </form>
+            </section>
+
+            <!-- CHOOSE PAYMENT -->
+            <section class="checkout-wire-panel" data-stage="pay-choose" hidden>
+              <div class="checkout-wire-head">
+                <span class="checkout-step-badge">3</span>
+                <div>
+                  <p class="checkout-step-kicker">Step 3</p>
+                  <h2>Choose Payment option</h2>
+                </div>
+              </div>
+              <div class="pay-method-list">
+                <button class="pay-method" type="button" data-pay-go="pay-card">
+                  <span class="pay-method__left">
+                    <span class="pay-ico pay-ico--card" aria-hidden="true">
+                      <img src="../assets/images/pay/card.svg" alt="" width="22" height="22">
+                    </span>
+                    Debit / Credit card
+                  </span>
+                </button>
+                <button class="pay-method" type="button" data-pay-go="pay-bank">
+                  <span class="pay-method__left">
+                    <span class="pay-ico pay-ico--bank" aria-hidden="true">
+                      <img src="../assets/images/pay/bank.svg" alt="" width="22" height="22">
+                    </span>
+                    Internet Banking
+                  </span>
+                </button>
+                <button class="pay-method" type="button" data-pay-go="pay-qr" data-brand="gpay">
+                  <span class="pay-method__left">
+                    <span class="pay-ico pay-ico--gpay" aria-hidden="true">
+                      <img src="../assets/images/pay/gpay.svg" alt="" width="26" height="26">
+                    </span>
+                    G Pay
+                  </span>
+                  <span class="pay-badge">UPI</span>
+                </button>
+                <button class="pay-method" type="button" data-pay-go="pay-qr" data-brand="phonepe">
+                  <span class="pay-method__left">
+                    <span class="pay-ico pay-ico--phonepe" aria-hidden="true">
+                      <img src="../assets/images/pay/phonepe.svg" alt="" width="26" height="26">
+                    </span>
+                    PhonePe
+                  </span>
+                  <span class="pay-badge">RuPay</span>
+                </button>
+                <button class="pay-method" type="button" data-pay-go="pay-qr" data-brand="upi">
+                  <span class="pay-method__left">
+                    <span class="pay-ico pay-ico--upi" aria-hidden="true">
+                      <img src="../assets/images/pay/upi.svg" alt="" width="26" height="26">
+                    </span>
+                    Other UPI apps
+                  </span>
+                </button>
+              </div>
+              <div class="checkout-wire-actions">
+                <button class="checkout-back-link" type="button" data-pay-go="details">← Customer details</button>
+              </div>
+            </section>
+
+            <!-- CARD -->
+            <section class="checkout-wire-panel" data-stage="pay-card" hidden>
+              <div class="checkout-wire-head">
+                <span class="checkout-step-badge">3</span>
+                <div>
+                  <p class="checkout-step-kicker">Payment</p>
+                  <h2>Debit / Credit Card</h2>
+                </div>
+              </div>
+              <div class="pay-tabs" role="tablist">
+                <button type="button" class="is-on" data-card-tab>Debit Card</button>
+                <button type="button" data-card-tab>Credit Card</button>
+              </div>
+              <form class="pay-card-form" id="card-form">
+                <div class="field">
+                  <label for="cc-number">Card Number</label>
+                  <input
+                    id="cc-number"
+                    name="cardNumber"
+                    inputmode="numeric"
+                    autocomplete="cc-number"
+                    placeholder="XXXX XXXX XXXX XXXX"
+                    maxlength="19"
+                    pattern="[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}"
+                    title="Enter a 16-digit card number"
+                    required
+                    data-card-number
+                  >
+                </div>
+                <div class="pay-card-row">
+                  <div class="field">
+                    <label>Expiry date</label>
+                    <div class="pay-exp-row">
+                      <select name="expMonth" required aria-label="Month" data-card-exp-month>
+                        <option value="">Month</option>
+                        <option value="01">01</option><option value="02">02</option><option value="03">03</option><option value="04">04</option>
+                        <option value="05">05</option><option value="06">06</option><option value="07">07</option><option value="08">08</option>
+                        <option value="09">09</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                      </select>
+                      <select name="expYear" required aria-label="Year" data-card-exp-year>
+                        <option value="">Year</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="cc-cvv">CVV</label>
+                    <input
+                      id="cc-cvv"
+                      name="cvv"
+                      inputmode="numeric"
+                      autocomplete="cc-csc"
+                      maxlength="4"
+                      minlength="3"
+                      pattern="[0-9]{3,4}"
+                      placeholder="XXX"
+                      title="Enter 3 or 4 digit CVV"
+                      required
+                      data-card-cvv
+                    >
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="cc-name">Name</label>
+                  <input
+                    id="cc-name"
+                    name="cardName"
+                    autocomplete="cc-name"
+                    placeholder="Name on card"
+                    maxlength="60"
+                    minlength="2"
+                    pattern="[A-Za-z][A-Za-z .'-]{1,59}"
+                    title="Enter the name printed on the card"
+                    required
+                    data-card-name
+                  >
+                </div>
+                <fieldset class="pay-billing">
+                  <legend>Billing address</legend>
+                  <div class="pay-address-list" role="radiogroup" aria-label="Billing address">
+                    <label class="pay-address-card is-selected">
+                      <input type="radio" name="billingAddress" value="customer" checked data-billing-choice="customer">
+                      <span class="pay-address-card__body">
+                        <span class="pay-address-card__top">
+                          <span class="pay-address-card__title">Collection address</span>
+                          <span class="pay-address-card__badge">Default</span>
+                        </span>
+                        <span class="pay-address-card__line" data-billing-customer-address>—</span>
+                        <span class="pay-address-card__meta" data-billing-customer-city>—</span>
+                      </span>
+                    </label>
+                    <label class="pay-address-card">
+                      <input type="radio" name="billingAddress" value="new" data-billing-choice="new">
+                      <span class="pay-address-card__body">
+                        <span class="pay-address-card__top">
+                          <span class="pay-address-card__title">Use a different address</span>
+                        </span>
+                        <span class="pay-address-card__hint">Enter a billing address that differs from collection</span>
+                      </span>
+                    </label>
+                  </div>
+                  <div class="pay-address-form" data-billing-new hidden>
+                    <div class="pay-address-form__row">
+                      <label for="billing-street">Street address</label>
+                      <input id="billing-street" type="text" name="billingStreet" placeholder="House no., street, landmark" data-billing-street>
+                    </div>
+                    <div class="pay-address-form__grid">
+                      <div class="pay-address-form__row">
+                        <label for="billing-city">City / Town / Village</label>
+                        <input id="billing-city" type="text" name="billingCity" maxlength="99" minlength="3" pattern="[A-Za-z].{2,98}" placeholder="Hyderabad" data-billing-city>
+                      </div>
+                      <div class="pay-address-form__row">
+                        <label for="billing-pin">PIN code</label>
+                        <input id="billing-pin" type="text" name="billingPin" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" placeholder="500001" data-billing-pin>
+                      </div>
+                    </div>
+                  </div>
+                </fieldset>
+              </form>
+              <div class="checkout-wire-actions">
+                <button class="checkout-back-link checkout-change-pay" type="button" data-pay-go="pay-choose">
+                  <svg class="checkout-change-pay__icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+                    <path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M19 12H5M11 6l-6 6 6 6"/>
+                  </svg>
+                  Select Different Payment Method
+                </button>
+                <button class="checkout-next-link" type="submit" form="card-form">Pay Now</button>
+              </div>
+            </section>
+
+            <!-- QR -->
+            <section class="checkout-wire-panel" data-stage="pay-qr" hidden>
+              <div class="checkout-wire-head">
+                <span class="checkout-step-badge">3</span>
+                <div>
+                  <p class="checkout-step-kicker">Payment</p>
+                  <h2 data-qr-title>Scan &amp; Pay</h2>
+                </div>
+              </div>
+              <div class="pay-qr">
+                <div class="pay-qr__brand" data-qr-brand>G Pay · UPI</div>
+                <p class="pay-qr__amount" data-total>₹1,298</p>
+                <div class="pay-qr__card" aria-label="Payment QR">
+                  <svg viewBox="0 0 120 120" aria-hidden="true">
+                    <rect width="120" height="120" fill="#fff"/>
+                    <g fill="#162033">
+                      <rect x="8" y="8" width="34" height="34" rx="3"/>
+                      <rect x="14" y="14" width="22" height="22" fill="#fff"/>
+                      <rect x="18" y="18" width="14" height="14"/>
+                      <rect x="78" y="8" width="34" height="34" rx="3"/>
+                      <rect x="84" y="14" width="22" height="22" fill="#fff"/>
+                      <rect x="88" y="18" width="14" height="14"/>
+                      <rect x="8" y="78" width="34" height="34" rx="3"/>
+                      <rect x="14" y="84" width="22" height="22" fill="#fff"/>
+                      <rect x="18" y="88" width="14" height="14"/>
+                      <rect x="50" y="8" width="8" height="8"/><rect x="62" y="20" width="8" height="8"/>
+                      <rect x="50" y="32" width="8" height="8"/><rect x="8" y="50" width="8" height="8"/>
+                      <rect x="20" y="50" width="8" height="8"/><rect x="44" y="50" width="8" height="8"/>
+                      <rect x="68" y="50" width="8" height="8"/><rect x="92" y="50" width="8" height="8"/>
+                      <rect x="52" y="52" width="16" height="16" rx="2"/>
+                      <rect x="74" y="74" width="8" height="8"/><rect x="98" y="74" width="8" height="8"/>
+                      <rect x="50" y="98" width="8" height="8"/><rect x="74" y="98" width="8" height="8"/>
+                    </g>
+                  </svg>
+                </div>
+                <p class="pay-qr__upi">drswift@okaxis</p>
+                <p class="pay-qr__help" data-qr-help>Open your UPI app and scan this QR to complete payment.</p>
+              </div>
+              <div class="checkout-wire-actions">
+                <button class="checkout-back-link checkout-change-pay" type="button" data-pay-go="pay-choose">
+                  <svg class="checkout-change-pay__icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+                    <path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M19 12H5M11 6l-6 6 6 6"/>
+                  </svg>
+                  Select Different Payment Method
+                </button>
+                <button class="checkout-next-link" type="button" data-complete-pay="UPI">I’ve paid</button>
+              </div>
+            </section>
+
+            <!-- BANK -->
+            <section class="checkout-wire-panel" data-stage="pay-bank" hidden>
+              <div class="checkout-wire-head">
+                <span class="checkout-step-badge">3</span>
+                <div>
+                  <p class="checkout-step-kicker">Payment</p>
+                  <h2>Internet Banking</h2>
+                </div>
+              </div>
+              <div class="bank-list">
+                <button type="button" data-bank>HDFC Bank</button>
+                <button type="button" data-bank>ICICI Bank</button>
+                <button type="button" data-bank>SBI</button>
+                <button type="button" data-bank>Axis Bank</button>
+                <button type="button" data-bank>Kotak Mahindra</button>
+              </div>
+              <div class="checkout-wire-actions">
+                <button class="checkout-back-link checkout-change-pay" type="button" data-pay-go="pay-choose">
+                  <svg class="checkout-change-pay__icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+                    <path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M19 12H5M11 6l-6 6 6 6"/>
+                  </svg>
+                  Select Different Payment Method
+                </button>
+                <button class="checkout-next-link" type="button" data-complete-pay="Net Banking" disabled data-bank-continue>Continue</button>
+              </div>
+            </section>
+
+            <!-- CONFIRMATION -->
+            <section class="checkout-wire-panel" data-stage="confirmation" hidden>
+              <div class="checkout-wire-head">
+                <span class="checkout-step-badge">4</span>
+                <div>
+                  <p class="checkout-step-kicker">Step 4</p>
+                  <h2>Booking confirmed</h2>
+                </div>
+              </div>
+              <div class="confirmation-message">
+                <p>Confirmed</p>
+                <strong>Our phlebo will call you and arrive at your address on or before your selected collection time.</strong>
+                <span>Support: 9848094942 · Ref <span data-ref>DRS-PROTO</span></span>
+              </div>
+              <div class="checkout-wire-actions">
+                <a class="checkout-back-link" href="../account.html">My Account</a>
+                <a class="checkout-next-link" href="../tests.html">Shop All Tests</a>
+              </div>
+            </section>
+          </div>
+
+          <aside class="checkout-wire-aside" aria-label="Checkout summary">
+            <section class="checkout-summary-panel">
+              <div class="checkout-summary-title">
+                <span class="checkout-step-badge">1</span>
+                <h2>Selected Tests</h2>
+              </div>
+              <div class="booking-cart-summary">
+                <ul>
+                  <li>Lipid Profile</li>
+                  <li>Thyroid Profile</li>
+                  <li>HbA1c &amp; Glucose</li>
+                  <li>Vitamin D Test</li>
+                  <li>Complete Blood Count</li>
+                </ul>
+                <p class="booking-cart-summary__total">Estimated total: <span data-total>₹1,298</span></p>
+              </div>
+            </section>
+
+            <section class="checkout-summary-panel" data-summary-customer hidden>
+              <div class="checkout-summary-title">
+                <span class="checkout-step-badge">2</span>
+                <h2>Customer details</h2>
+              </div>
+              <dl class="checkout-kv" data-customer-kv></dl>
+            </section>
+
+            <section class="checkout-summary-panel" data-summary-payment hidden>
+              <div class="checkout-summary-title">
+                <span class="checkout-step-badge">3</span>
+                <h2>Payment</h2>
+              </div>
+              <p class="payment-success-mark">✓ Payment successful</p>
+              <dl class="checkout-kv" data-payment-kv></dl>
+            </section>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bottom footer-bottom--plain">
+      <p>&copy; 2026 Dr.Swift Diagnostics · Complete checkout prototype</p>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const DEMO_OTP = "123456";
+      const TOTAL = "₹1,298";
+      const brandCopy = {
+        gpay: { title: "G Pay", brand: "G Pay · UPI", help: "Open Google Pay and scan this QR, or pay to the UPI ID below." },
+        phonepe: { title: "PhonePe", brand: "PhonePe · RuPay UPI", help: "Open PhonePe and scan this QR. Keep this screen open until confirmation." },
+        upi: { title: "UPI", brand: "Any UPI app", help: "Scan with GPay, PhonePe, Paytm, or BHIM." },
+      };
+
+      let phoneVerified = false;
+      let otpSent = false;
+      let details = null;
+      let selectedBank = "";
+
+      const form = document.getElementById("book-form");
+      const statusEl = document.querySelector("[data-status]");
+      const otpBlock = document.querySelector("[data-otp-block]");
+      const badge = document.querySelector("[data-phone-verified-badge]");
+      const phoneInput = form.querySelector("#phone");
+      const sendBtn = form.querySelector("[data-otp-send]");
+      const submitBtn = form.querySelector('[type="submit"]');
+
+      function setStatus(msg, isError) {
+        statusEl.hidden = !msg;
+        statusEl.textContent = msg || "";
+        statusEl.classList.toggle("is-error", !!isError);
+      }
+
+      function isValidCityVillage(value) {
+        const text = String(value || "").trim();
+        if (text.length < 3 || text.length > 99) return false;
+        if (!/^[A-Za-z]/.test(text)) return false;
+        return (text.match(/[A-Za-z]/g) || []).length >= 3;
+      }
+
+      function syncOtpSendEnabled() {
+        const digits = String(phoneInput.value || "").replace(/\D/g, "").slice(0, 10);
+        sendBtn.disabled = digits.length !== 10 || phoneVerified;
+      }
+
+      function setPhoneUi() {
+        badge.hidden = !phoneVerified;
+        otpBlock.hidden = phoneVerified || !otpSent;
+        sendBtn.hidden = phoneVerified;
+        sendBtn.setAttribute("aria-hidden", phoneVerified ? "true" : "false");
+        const phoneRow = form.querySelector(".checkout-wire-field--phone .phone-verify-row");
+        if (phoneRow) phoneRow.classList.toggle("is-verified", phoneVerified);
+        submitBtn.disabled = !phoneVerified;
+        syncOtpSendEnabled();
+      }
+
+      function escapeHtml(v) {
+        return String(v ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;");
+      }
+
+      function showStage(name) {
+        document.querySelectorAll("[data-stage]").forEach((el) => {
+          const on = el.getAttribute("data-stage") === name;
+          el.hidden = !on;
+          el.classList.toggle("is-active", on);
+        });
+        const order = ["details", "pay-choose", "pay-card", "pay-qr", "pay-bank", "confirmation"];
+        const idx = order.indexOf(name);
+        const customer = document.querySelector("[data-summary-customer]");
+        const payment = document.querySelector("[data-summary-payment]");
+        if (customer) customer.hidden = idx < 1 || name === "details";
+        if (payment) payment.hidden = name !== "confirmation";
+
+        const frame = document.querySelector(".checkout-proto-frame");
+        if (frame) {
+          const top = frame.getBoundingClientRect().top + window.scrollY - 90;
+          window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+        }
+      }
+
+      function renderCustomer(d) {
+        const kv = document.querySelector("[data-customer-kv]");
+        const rows = [
+          ["Name", d.name],
+          ["Gender", d.gender],
+          ["Age", d.age],
+          ["Phone", d.phone],
+          ["When", `${d.sampleDay} · ${d.sampleWindow}`],
+          ["City", d.city],
+          ["Address", d.address],
+        ];
+        kv.innerHTML = rows
+          .map(([k, v]) => `<div class="checkout-kv__row"><dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd></div>`)
+          .join("");
+        document.querySelector("[data-summary-customer]").hidden = false;
+      }
+
+      function renderPayment(method) {
+        const ref = `DRS-${Date.now().toString(36).toUpperCase()}`;
+        document.querySelector("[data-ref]").textContent = ref;
+        const kv = document.querySelector("[data-payment-kv]");
+        kv.innerHTML = `
+          <div class="checkout-kv__row"><dt>Method</dt><dd>${escapeHtml(method)}</dd></div>
+          <div class="checkout-kv__row"><dt>Amount</dt><dd>${TOTAL}</dd></div>
+          <div class="checkout-kv__row"><dt>Ref</dt><dd>${escapeHtml(ref)}</dd></div>
+        `;
+        document.querySelector("[data-summary-payment]").hidden = false;
+      }
+
+      document.querySelectorAll("[data-total]").forEach((el) => {
+        el.textContent = TOTAL;
+      });
+
+      phoneInput.addEventListener("input", () => {
+        phoneInput.value = phoneInput.value.replace(/\D/g, "").slice(0, 10);
+        if (phoneVerified || otpSent) {
+          phoneVerified = false;
+          otpSent = false;
+          form.otp.value = "";
+        }
+        setPhoneUi();
+      });
+
+      sendBtn.addEventListener("click", () => {
+        const phone = String(phoneInput.value || "").replace(/\D/g, "").slice(0, 10);
+        if (phone.length !== 10) {
+          setStatus("Enter a valid 10-digit mobile number before sending OTP.", true);
+          return;
+        }
+        phoneInput.value = phone;
+        phoneVerified = false;
+        otpSent = true;
+        setPhoneUi();
+        setStatus(`OTP sent (demo). Use ${DEMO_OTP}.`, false);
+        form.otp.focus();
+      });
+
+      document.querySelector("[data-otp-verify]").addEventListener("click", () => {
+        if (String(form.otp.value || "").trim() !== DEMO_OTP) {
+          setStatus("Incorrect OTP. Demo code is 123456.", true);
+          return;
+        }
+        phoneVerified = true;
+        otpSent = false;
+        setPhoneUi();
+        setStatus("", false);
+      });
+
+      setPhoneUi();
+
+      function getIstNow() {
+        const parts = Object.fromEntries(
+          new Intl.DateTimeFormat("en-GB", {
+            timeZone: "Asia/Kolkata",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            hourCycle: "h23",
+          })
+            .formatToParts(new Date())
+            .filter((part) => part.type !== "literal")
+            .map((part) => [part.type, part.value])
+        );
+        return { hour: Number(parts.hour), ymd: `${parts.year}-${parts.month}-${parts.day}` };
+      }
+
+      function availableWindowsForIstHour(hour) {
+        return {
+          Morning: hour < 12,
+          Afternoon: hour < 12,
+          Evening: hour < 16,
+        };
+      }
+
+      function formatSampleDayLabel(value) {
+        if (!value) return "";
+        if (value === "Today" || value === "Tomorrow") return value;
+        const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+        if (!match) return value;
+        const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+        if (Number.isNaN(date.getTime())) return value;
+        return date.toLocaleDateString("en-IN", {
+          weekday: "short",
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
+      }
+
+      function updateWhenConfirm() {
+        const valueEl = document.querySelector("[data-when-confirm-value]");
+        if (!valueEl) return;
+        const day = form.querySelector("input[name='sampleDay']:checked")?.value || "Today";
+        const window = form.querySelector("input[name='sampleWindow']:checked")?.value || "";
+        const dayLabel = formatSampleDayLabel(day);
+        valueEl.textContent = window ? `${dayLabel} · ${window}` : dayLabel;
+      }
+
+      function isSampleDayToday() {
+        const checked = form.querySelector("input[name='sampleDay']:checked");
+        if (!checked) return false;
+        if (checked.value === "Today") return true;
+        if (checked.value === "Tomorrow") return false;
+        return checked.value === getIstNow().ymd;
+      }
+
+      function syncSampleWindows() {
+        const todayRadio = document.getElementById("day-today");
+        const tomorrowRadio = document.getElementById("day-tomorrow");
+        const customRadio = form.querySelector("[data-custom-day]");
+        const hint = document.querySelector("[data-window-hint]");
+        const ist = getIstNow();
+        const todayAvailability = availableWindowsForIstHour(ist.hour);
+        const todayHasAny = Object.values(todayAvailability).some(Boolean);
+        const filterToday = isSampleDayToday();
+        const available = filterToday
+          ? todayAvailability
+          : { Morning: true, Afternoon: true, Evening: true };
+
+        if (todayRadio) todayRadio.disabled = !todayHasAny;
+
+        const windows = [
+          { value: "Morning", id: "win-m" },
+          { value: "Afternoon", id: "win-a" },
+          { value: "Evening", id: "win-e" },
+        ];
+
+        let firstVisible = null;
+        let checkedStillVisible = false;
+
+        windows.forEach(({ value, id }) => {
+          const input = document.getElementById(id);
+          const label = document.querySelector(`label[for="${id}"]`);
+          if (!input) return;
+          const show = !!available[value];
+          input.disabled = !show;
+          input.hidden = !show;
+          if (label) label.hidden = !show;
+          if (show && !firstVisible) firstVisible = input;
+          if (show && input.checked) checkedStillVisible = true;
+        });
+
+        if (filterToday && !todayHasAny) {
+          if (hint) {
+            hint.hidden = false;
+            hint.textContent = "No collection windows left for today (IST). Tomorrow is selected.";
+          }
+          todayRadio.checked = false;
+          if (tomorrowRadio && !customRadio?.checked) tomorrowRadio.checked = true;
+          windows.forEach(({ id }) => {
+            const input = document.getElementById(id);
+            const label = document.querySelector(`label[for="${id}"]`);
+            if (!input) return;
+            input.disabled = false;
+            input.hidden = false;
+            if (label) label.hidden = false;
+          });
+          document.getElementById("win-m").checked = true;
+          updateWhenConfirm();
+          return;
+        }
+
+        if (hint) {
+          if (filterToday && (!todayAvailability.Morning || !todayAvailability.Afternoon)) {
+            const remaining = windows
+              .filter(({ value }) => todayAvailability[value])
+              .map(({ value }) => value)
+              .join(" / ");
+            hint.hidden = !remaining;
+            hint.textContent = remaining
+              ? `Earlier windows have passed (IST). Available today: ${remaining}.`
+              : "";
+          } else {
+            hint.hidden = true;
+            hint.textContent = "";
+          }
+        }
+
+        if (!checkedStillVisible && firstVisible) firstVisible.checked = true;
+        updateWhenConfirm();
+      }
+
+      function initCollectionCalendar() {
+        const MAX_AHEAD_DAYS = 30;
+        const trigger = form.querySelector("[data-cal-trigger]");
+        const popover = form.querySelector("[data-cal-popover]");
+        const grid = form.querySelector("[data-cal-grid]");
+        const monthLabel = form.querySelector("[data-cal-month]");
+        const chip = form.querySelector("[data-date-chip]");
+        const chipLabel = form.querySelector("[data-date-chip-label]");
+        const customRadio = form.querySelector("[data-custom-day]");
+        const todayRadio = document.getElementById("day-today");
+        const tomorrowRadio = document.getElementById("day-tomorrow");
+        const prevBtn = form.querySelector("[data-cal-prev]");
+        const nextBtn = form.querySelector("[data-cal-next]");
+        const closeBtn = form.querySelector("[data-cal-close]");
+        const clearBtn = form.querySelector("[data-clear-date]");
+
+        if (!trigger || !popover || !grid || !customRadio || !todayRadio || !tomorrowRadio) return;
+
+        const today = startOfDay(new Date());
+        const maxDate = addDays(today, MAX_AHEAD_DAYS);
+        let view = new Date(today.getFullYear(), today.getMonth(), 1);
+        let selected = null;
+
+        function startOfDay(d) {
+          return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        }
+        function addDays(d, n) {
+          const x = new Date(d);
+          x.setDate(x.getDate() + n);
+          return x;
+        }
+        function sameDay(a, b) {
+          return a && b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+        }
+        function formatDisplay(d) {
+          return d.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+        }
+        function formatChip(d) {
+          return d.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });
+        }
+        function formatValue(d) {
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, "0");
+          const day = String(d.getDate()).padStart(2, "0");
+          return `${y}-${m}-${day}`;
+        }
+        function openCal() {
+          popover.hidden = false;
+          trigger.setAttribute("aria-expanded", "true");
+          render();
+        }
+        function closeCal() {
+          popover.hidden = true;
+          trigger.setAttribute("aria-expanded", "false");
+        }
+        function clearCustom() {
+          selected = null;
+          customRadio.value = "";
+          customRadio.checked = false;
+          if (chip) {
+            chip.hidden = true;
+            chip.classList.remove("is-visible");
+          }
+          if (chipLabel) chipLabel.textContent = "";
+        }
+        function applyCustomDate(d) {
+          selected = startOfDay(d);
+          customRadio.value = formatValue(selected);
+          customRadio.checked = true;
+          todayRadio.checked = false;
+          tomorrowRadio.checked = false;
+          if (chipLabel) chipLabel.textContent = formatChip(selected);
+          if (chip) {
+            chip.hidden = false;
+            chip.classList.add("is-visible");
+          }
+          closeCal();
+          render();
+          syncSampleWindows();
+        }
+        function render() {
+          const year = view.getFullYear();
+          const month = view.getMonth();
+          if (monthLabel) {
+            monthLabel.textContent = view.toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+          }
+          const first = new Date(year, month, 1);
+          const startPad = first.getDay();
+          const daysInMonth = new Date(year, month + 1, 0).getDate();
+          const prevDays = new Date(year, month, 0).getDate();
+          const minView = new Date(today.getFullYear(), today.getMonth(), 1);
+          const maxView = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1);
+          if (prevBtn) prevBtn.disabled = view <= minView;
+          if (nextBtn) nextBtn.disabled = view >= maxView;
+          grid.innerHTML = "";
+          for (let i = 0; i < 42; i += 1) {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            let date;
+            let outside = false;
+            if (i < startPad) {
+              date = new Date(year, month - 1, prevDays - startPad + i + 1);
+              outside = true;
+            } else if (i >= startPad + daysInMonth) {
+              date = new Date(year, month + 1, i - startPad - daysInMonth + 1);
+              outside = true;
+            } else {
+              date = new Date(year, month, i - startPad + 1);
+            }
+            const day = startOfDay(date);
+            btn.textContent = String(day.getDate());
+            btn.setAttribute("role", "gridcell");
+            btn.setAttribute("aria-label", formatDisplay(day));
+            if (outside) btn.classList.add("is-outside");
+            if (sameDay(day, today)) btn.classList.add("is-today");
+            if (selected && sameDay(day, selected)) {
+              btn.classList.add("is-selected");
+              btn.setAttribute("aria-current", "date");
+            }
+            const disabled = day < today || day > maxDate;
+            btn.disabled = disabled;
+            if (!disabled) btn.addEventListener("click", () => applyCustomDate(day));
+            grid.appendChild(btn);
+          }
+        }
+
+        trigger.addEventListener("click", (event) => {
+          event.stopPropagation();
+          if (popover.hidden) openCal();
+          else closeCal();
+        });
+        closeBtn?.addEventListener("click", closeCal);
+        prevBtn?.addEventListener("click", () => {
+          view = new Date(view.getFullYear(), view.getMonth() - 1, 1);
+          render();
+        });
+        nextBtn?.addEventListener("click", () => {
+          view = new Date(view.getFullYear(), view.getMonth() + 1, 1);
+          render();
+        });
+        clearBtn?.addEventListener("click", (event) => {
+          event.stopPropagation();
+          clearCustom();
+          todayRadio.checked = true;
+          syncSampleWindows();
+        });
+        todayRadio.addEventListener("change", () => {
+          if (!todayRadio.checked) return;
+          clearCustom();
+          closeCal();
+          syncSampleWindows();
+        });
+        tomorrowRadio.addEventListener("change", () => {
+          if (!tomorrowRadio.checked) return;
+          clearCustom();
+          closeCal();
+          syncSampleWindows();
+        });
+        document.addEventListener("click", (event) => {
+          if (popover.hidden) return;
+          if (popover.contains(event.target) || trigger.contains(event.target)) return;
+          closeCal();
+        });
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") closeCal();
+        });
+        render();
+      }
+
+      initCollectionCalendar();
+      form.querySelectorAll("input[name='sampleWindow']").forEach((input) => {
+        input.addEventListener("change", updateWhenConfirm);
+      });
+      syncSampleWindows();
+      window.setInterval(syncSampleWindows, 60 * 1000);
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (!phoneVerified) {
+          setStatus("Verify phone with OTP before continuing.", true);
+          return;
+        }
+        if (!form.reportValidity()) return;
+        const city = String(form.city.value || "").trim();
+        if (!isValidCityVillage(city)) {
+          setStatus(
+            "City/Town/Village must start with a letter, include at least 3 letters, and be under 100 characters.",
+            true
+          );
+          form.city.focus();
+          return;
+        }
+        const data = new FormData(form);
+        details = {
+          name: String(data.get("name") || "").trim(),
+          gender: String(data.get("gender") || "").trim(),
+          age: String(data.get("age") || "").trim(),
+          phone: String(data.get("phone") || "").replace(/\D/g, "").slice(-10),
+          city,
+          address: String(data.get("address") || "").trim(),
+          sampleDay: formatSampleDayLabel(String(data.get("sampleDay") || "").trim()),
+          sampleWindow: String(data.get("sampleWindow") || "").trim(),
+        };
+        document.getElementById("cc-name").value = details.name;
+        const addrEl = document.querySelector("[data-billing-customer-address]");
+        const cityEl = document.querySelector("[data-billing-customer-city]");
+        if (addrEl) addrEl.textContent = details.address || "—";
+        if (cityEl) cityEl.textContent = details.city || "—";
+        renderCustomer(details);
+        showStage("pay-choose");
+      });
+
+      (function initBillingAddressUi() {
+        const cards = document.querySelectorAll(".pay-address-card");
+        const choices = document.querySelectorAll("[data-billing-choice]");
+        const newForm = document.querySelector("[data-billing-new]");
+        const street = document.querySelector("[data-billing-street]");
+        const cityInput = document.querySelector("[data-billing-city]");
+        const pin = document.querySelector("[data-billing-pin]");
+        if (!choices.length || !newForm) return;
+        function sync() {
+          const selected = document.querySelector("[data-billing-choice]:checked");
+          const isNew = selected?.value === "new";
+          newForm.hidden = !isNew;
+          cards.forEach((card) => {
+            const input = card.querySelector("[data-billing-choice]");
+            card.classList.toggle("is-selected", !!input?.checked);
+          });
+          if (street) {
+            street.required = isNew;
+            if (!isNew) street.value = "";
+          }
+          if (cityInput) {
+            cityInput.required = isNew;
+            if (!isNew) cityInput.value = "";
+          }
+          if (pin) {
+            pin.required = isNew;
+            if (!isNew) pin.value = "";
+          }
+        }
+        choices.forEach((input) => input.addEventListener("change", sync));
+        sync();
+      })();
+
+      document.querySelectorAll("[data-pay-go]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const target = btn.getAttribute("data-pay-go");
+          if (target === "pay-card" && details) {
+            const addrEl = document.querySelector("[data-billing-customer-address]");
+            const cityEl = document.querySelector("[data-billing-customer-city]");
+            if (addrEl) addrEl.textContent = details.address || "—";
+            if (cityEl) cityEl.textContent = details.city || "—";
+          }
+          if (target === "pay-qr") {
+            const key = btn.getAttribute("data-brand") || "upi";
+            const copy = brandCopy[key];
+            document.querySelector("[data-qr-title]").textContent = copy.title;
+            document.querySelector("[data-qr-brand]").textContent = copy.brand;
+            document.querySelector("[data-qr-help]").textContent = copy.help;
+          }
+          showStage(target);
+        });
+      });
+
+      document.querySelectorAll("[data-card-tab]").forEach((tab) => {
+        tab.addEventListener("click", () => {
+          document.querySelectorAll("[data-card-tab]").forEach((t) => t.classList.remove("is-on"));
+          tab.classList.add("is-on");
+        });
+      });
+
+      (function initCardFieldGuards() {
+        const form = document.getElementById("card-form");
+        if (!form) return;
+        const number = form.querySelector("[data-card-number]");
+        const cvv = form.querySelector("[data-card-cvv]");
+        const name = form.querySelector("[data-card-name]");
+        const expYear = form.querySelector("[data-card-exp-year]");
+        const pin = form.querySelector("[data-billing-pin]");
+        const digitsOnly = (v) => String(v || "").replace(/\D/g, "");
+        const formatCard = (v) => digitsOnly(v).slice(0, 16).replace(/(\d{4})(?=\d)/g, "$1 ").trim();
+
+        if (expYear && expYear.dataset.filled !== "1") {
+          const start = new Date().getFullYear();
+          for (let y = start; y <= start + 15; y += 1) {
+            const opt = document.createElement("option");
+            opt.value = String(y);
+            opt.textContent = String(y);
+            expYear.appendChild(opt);
+          }
+          expYear.dataset.filled = "1";
+        }
+
+        number?.addEventListener("input", () => {
+          number.value = formatCard(number.value);
+          number.setCustomValidity("");
+        });
+        cvv?.addEventListener("input", () => {
+          cvv.value = digitsOnly(cvv.value).slice(0, 4);
+          cvv.setCustomValidity("");
+        });
+        name?.addEventListener("input", () => {
+          name.value = name.value.replace(/[^A-Za-z .'-]/g, "").slice(0, 60);
+        });
+        pin?.addEventListener("input", () => {
+          pin.value = digitsOnly(pin.value).slice(0, 6);
+        });
+
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          if (number) {
+            const digits = digitsOnly(number.value);
+            if (digits.length !== 16) {
+              number.setCustomValidity("Enter a valid 16-digit card number.");
+              number.reportValidity();
+              return;
+            }
+            number.value = formatCard(digits);
+            number.setCustomValidity("");
+          }
+          if (cvv) {
+            const digits = digitsOnly(cvv.value);
+            if (digits.length < 3 || digits.length > 4) {
+              cvv.setCustomValidity("CVV must be 3 or 4 digits.");
+              cvv.reportValidity();
+              return;
+            }
+            cvv.setCustomValidity("");
+          }
+          const month = form.querySelector("[data-card-exp-month]");
+          if (month?.value && expYear?.value) {
+            const expEnd = new Date(Number(expYear.value), Number(month.value), 0, 23, 59, 59);
+            if (expEnd < new Date()) {
+              month.setCustomValidity("Card expiry cannot be in the past.");
+              month.reportValidity();
+              return;
+            }
+            month.setCustomValidity("");
+          }
+          if (!form.reportValidity()) return;
+          renderPayment("Credit / Debit card");
+          showStage("confirmation");
+        });
+      })();
+
+      document.querySelectorAll("[data-bank]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("[data-bank]").forEach((b) => b.classList.remove("is-on"));
+          btn.classList.add("is-on");
+          selectedBank = btn.textContent.trim();
+          document.querySelector("[data-bank-continue]").disabled = false;
+        });
+      });
+
+      document.querySelector("[data-bank-continue]").addEventListener("click", () => {
+        if (!selectedBank) return;
+        renderPayment(`Net Banking · ${selectedBank}`);
+        showStage("confirmation");
+      });
+
+      document.querySelectorAll("[data-complete-pay]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          renderPayment(btn.getAttribute("data-complete-pay") || "UPI");
+          showStage("confirmation");
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

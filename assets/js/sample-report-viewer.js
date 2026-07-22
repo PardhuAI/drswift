@@ -6,7 +6,7 @@
   const PDF_WORKER_SRC = "/assets/js/vendor/pdfjs/pdf.worker.min.js";
   const MIN_ZOOM = 0.85;
   const MAX_ZOOM = 2.4;
-  const DEFAULT_ZOOM = 1.15;
+  const DEFAULT_ZOOM = 1; // Fit-width (100%) on first load
 
   function loadScript(src) {
     return new Promise((resolve, reject) => {

@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prototype — Account settings &amp; profile | Dr.Swift</title>
+  <style>
+    :root {
+      --ink: #162033;
+      --muted: #657084;
+      --line: #dce3ee;
+      --panel: #ffffff;
+      --soft: #f6f8fb;
+      --blue: #1e5bd7;
+      --blue-soft: #edf4ff;
+      --green: #2f9850;
+      --error: #b42318;
+      --error-soft: #fff4f2;
+      --shadow: 0 10px 28px rgba(22, 32, 51, 0.12);
+      --radius: 12px;
+      font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(900px 400px at 10% -10%, #edf4ff 0%, transparent 55%),
+        radial-gradient(700px 360px at 100% 0%, #fff4f2 0%, transparent 45%),
+        var(--soft);
+      min-height: 100vh;
+    }
+    .page { max-width: 1280px; margin: 0 auto; padding: 28px 18px 72px; }
+    .eyebrow {
+      font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--muted); margin: 0 0 8px;
+    }
+    h1 { margin: 0 0 8px; font-size: 1.7rem; letter-spacing: -0.02em; }
+    .lede { margin: 0 0 22px; color: var(--muted); line-height: 1.5; max-width: 46rem; }
+
+    /* Site-like chrome (mirrors index.html header) */
+    .mock-header {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--blue); cursor: pointer; }
+    .brand-mark {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, #1e5bd7, #5a2d8f);
+    }
+    .mock-links { display: none; gap: 18px; color: var(--muted); font-size: 14px; }
+    @media (min-width: 760px) { .mock-links { display: flex; } }
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    .nav-cta {
+      appearance: none; border: 0; background: var(--blue); color: #fff;
+      font: inherit; font-weight: 600; font-size: 13px; padding: 9px 14px;
+      border-radius: 999px; cursor: default;
+    }
+
+    .nav-google-wrap { position: relative; width: 40px; height: 40px; }
+    .nav-google {
+      appearance: none; width: 40px; height: 40px; border-radius: 999px;
+      border: 1px solid var(--line); background: #fff; padding: 0; cursor: pointer;
+      display: grid; place-items: center;
+    }
+    .nav-google[aria-expanded="true"] { box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2); }
+    .nav-google__avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+
+    .nav-google-menu {
+      position: absolute; top: calc(100% + 10px); right: 0; width: 240px;
+      background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 10px; z-index: 40;
+      opacity: 0; visibility: hidden; transform: translateY(-4px) scale(0.98);
+      transform-origin: top right; transition: 0.14s ease;
+    }
+    .nav-google-menu.is-open { opacity: 1; visibility: visible; transform: none; }
+    .nav-google-menu__user {
+      display: flex; gap: 10px; align-items: center; padding: 6px 6px 10px;
+      border-bottom: 1px solid var(--line); margin-bottom: 8px;
+    }
+    .nav-google-menu__user img { width: 32px; height: 32px; border-radius: 50%; }
+    .nav-google-menu__name { font-size: 13px; font-weight: 650; }
+    .nav-google-menu__email { font-size: 11px; color: var(--muted); }
+    .nav-google-menu__email-tag {
+      display: inline-block; margin-top: 2px; font-size: 10px; font-weight: 600;
+      color: var(--blue); background: var(--blue-soft); padding: 1px 6px; border-radius: 999px;
+    }
+    .menu-btn {
+      width: 100%; appearance: none; border-radius: 10px; border: 1px solid transparent;
+      font: inherit; font-size: 13px; font-weight: 600; padding: 10px 12px; cursor: pointer;
+      text-align: center; margin-top: 6px;
+    }
+    .menu-btn--settings {
+      background: var(--blue-soft); color: var(--blue); border-color: #cfe0ff;
+    }
+    .menu-btn--settings:hover { background: #dceaff; }
+    .menu-btn--signout {
+      background: var(--error); color: #fff;
+      box-shadow: 0 6px 14px rgba(180, 35, 24, 0.22);
+    }
+    .menu-btn--cancel { background: transparent; color: var(--muted); font-weight: 500; }
+    .menu-btn--cancel:hover { background: var(--soft); color: var(--ink); }
+
+    .screen { display: none; }
+    .screen.is-active { display: block; }
+
+    .hero-mini {
+      background: var(--panel); border: 1px solid var(--line); border-radius: 16px;
+      padding: 22px 20px; box-shadow: 0 4px 16px rgba(22, 32, 51, 0.04); margin-bottom: 18px;
+    }
+    .hero-mini h2 { margin: 0 0 6px; font-size: 1.15rem; }
+    .hero-mini p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.45; }
+
+    .flow {
+      display: grid; gap: 10px; margin: 16px 0 0; padding: 0; list-style: none;
+    }
+    .flow li {
+      display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start;
+      font-size: 14px; line-height: 1.45;
+    }
+    .flow span {
+      width: 28px; height: 28px; border-radius: 999px; background: var(--blue);
+      color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 700;
+    }
+
+    .panel {
+      background: var(--panel); border: 1px solid var(--line); border-radius: 16px;
+      padding: 16px; margin-bottom: 0;
+      display: flex; flex-direction: column; min-height: 0; min-width: 0;
+    }
+    .panel h3 { margin: 0 0 4px; font-size: 0.95rem; }
+    .panel .hint { margin: 0 0 12px; color: var(--muted); font-size: 12px; line-height: 1.4; }
+    .panel-body {
+      flex: 1; min-height: 0; overflow: auto;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+
+    /* Four vertical cards side-by-side */
+    .profile-columns {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      align-items: stretch;
+      margin-bottom: 14px;
+    }
+    @media (min-width: 720px) {
+      .profile-columns { grid-template-columns: 1fr 1fr; }
+    }
+    @media (min-width: 1100px) {
+      .profile-columns {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        min-height: min(70vh, 640px);
+      }
+      .profile-columns .panel { height: 100%; }
+      .form-row.two { grid-template-columns: 1fr; }
+      .phone-row { grid-template-columns: 1fr; }
+      .search-result { flex-direction: column; align-items: stretch; }
+    }
+
+    .form-grid { display: grid; gap: 12px; }
+    .form-row { display: grid; gap: 12px; }
+    @media (min-width: 640px) and (max-width: 1099px) {
+      .form-row.two { grid-template-columns: 1fr 1fr; }
+    }
+    label { display: grid; gap: 6px; font-size: 13px; font-weight: 600; }
+    label span.opt { font-weight: 500; color: var(--muted); }
+    input, select, textarea {
+      width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line);
+      border-radius: 8px; font: inherit; font-size: 15px; background: #fff;
+    }
+    textarea { min-height: 80px; resize: vertical; }
+    input:disabled { background: var(--soft); color: var(--muted); }
+
+    .row-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .btn {
+      appearance: none; border: 0; border-radius: 999px; padding: 10px 14px;
+      font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-secondary { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+    .btn-ghost { background: transparent; color: var(--muted); }
+    .btn-danger { background: var(--error-soft); color: var(--error); border: 1px solid #f3c1bb; }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700;
+      padding: 3px 8px; border-radius: 999px;
+    }
+    .badge-ok { background: #e8f7ee; color: var(--green); }
+    .badge-warn { background: #fff6e5; color: #a05a00; }
+    .badge-locked { background: var(--blue-soft); color: var(--blue); }
+
+    .phone-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+    @media (max-width: 520px) { .phone-row { grid-template-columns: 1fr; } }
+
+    .address-card, .member-card {
+      border: 1px solid var(--line); border-radius: 12px; padding: 12px;
+      display: grid; gap: 6px; background: var(--soft);
+    }
+    .address-card + .address-card, .member-card + .member-card { margin-top: 10px; }
+    .address-card strong, .member-card strong { font-size: 14px; }
+    .meta { font-size: 12px; color: var(--muted); }
+    .card-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+
+    .search-box {
+      display: grid; gap: 10px; padding: 12px; border: 1px dashed #b7c6de;
+      border-radius: 12px; background: #fafcff;
+    }
+    .search-result {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 10px; border-radius: 10px; background: #fff; border: 1px solid var(--line);
+    }
+
+    .toast {
+      position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%) translateY(12px);
+      background: #1f2937; color: #fff; padding: 12px 16px; border-radius: 12px;
+      font-size: 13px; opacity: 0; pointer-events: none; transition: 0.2s ease; z-index: 80;
+      max-width: min(92vw, 420px);
+    }
+    .toast.is-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .spec {
+      margin: 18px 0 0; padding: 14px 14px 14px 1.2rem; background: var(--panel);
+      border: 1px solid var(--line); border-radius: 12px; font-size: 13px; line-height: 1.5;
+      color: var(--ink);
+    }
+    .spec li + li { margin-top: 6px; }
+
+    .profile-head {
+      display: flex; flex-wrap: wrap; gap: 14px; align-items: center;
+      margin-bottom: 16px;
+    }
+    .profile-head img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; }
+    .profile-head h2 { margin: 0; font-size: 1.25rem; }
+    .profile-head p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+
+    .sticky-save {
+      position: sticky; bottom: 12px; display: flex; justify-content: flex-end; gap: 8px;
+      padding: 10px; background: rgba(255,255,255,0.92); border: 1px solid var(--line);
+      border-radius: 12px; box-shadow: var(--shadow); backdrop-filter: blur(8px);
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <p class="eyebrow">Prototype · confirm before implement</p>
+    <h1>Account menu → Settings → Profile</h1>
+    <p class="lede">
+      After Google sign-in, the Google email is stored as the <strong>primary email</strong> (locked).
+      The avatar menu adds <strong>Settings</strong>. Settings opens a profile page for username, name,
+      verified phone, multiple addresses, and family members (find by phone).
+    </p>
+
+    <!-- Shared mock site header -->
+    <div class="mock-header" aria-label="Mock site header (like index.html)">
+      <div class="brand" data-go="home" title="Back to concept home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        Dr.Swift Diagnostics
+      </div>
+      <div class="mock-links" aria-hidden="true">
+        <span>Tests</span><span>Reports</span><span>About</span>
+      </div>
+      <div class="nav-actions">
+        <div class="nav-google-wrap" id="google-wrap">
+          <button type="button" class="nav-google" id="google-btn" aria-expanded="false" aria-haspopup="menu" aria-controls="google-menu" title="Account">
+            <img class="nav-google__avatar" src="https://i.pravatar.cc/96?img=12" alt="">
+          </button>
+          <div class="nav-google-menu" id="google-menu" role="menu" hidden>
+            <div class="nav-google-menu__user">
+              <img src="https://i.pravatar.cc/96?img=12" alt="">
+              <div>
+                <div class="nav-google-menu__name" id="menu-name">Madhu Karnati</div>
+                <div class="nav-google-menu__email" id="menu-email">madhureddy480@gmail.com</div>
+                <span class="nav-google-menu__email-tag">Primary email</span>
+              </div>
+            </div>
+            <button type="button" class="menu-btn menu-btn--settings" id="btn-settings" role="menuitem">Settings</button>
+            <button type="button" class="menu-btn menu-btn--signout" id="btn-signout" role="menuitem">Sign out</button>
+            <button type="button" class="menu-btn menu-btn--cancel" id="btn-cancel" role="menuitem">Cancel</button>
+          </div>
+        </div>
+        <button type="button" class="nav-cta" tabindex="-1">Shop tests</button>
+      </div>
+    </div>
+
+    <!-- SCREEN: home / concept -->
+    <section class="screen is-active" data-screen="home">
+      <div class="hero-mini">
+        <h2>Try the flow</h2>
+        <p>Click the profile photo in the header → <strong>Settings</strong> opens the profile concept. Google email is already primary.</p>
+        <ol class="flow">
+          <li><span>1</span><div><strong>Google sign-in</strong> → backend upserts account; email becomes primary (read-only).</div></li>
+          <li><span>2</span><div><strong>Avatar menu</strong> → Settings · Sign out (red) · Cancel.</div></li>
+          <li><span>3</span><div><strong>Profile / Settings</strong> → username, names, phone OTP, addresses, family (search by phone).</div></li>
+        </ol>
+        <div class="row-actions" style="margin-top:16px">
+          <button type="button" class="btn btn-primary" data-go="profile">Open Settings page</button>
+          <a class="btn btn-secondary" href="google-account-menu.html">Earlier menu-only prototype</a>
+        </div>
+      </div>
+      <ul class="spec">
+        <li><strong>Primary email</strong> — from Google only; shown locked on profile (not editable here).</li>
+        <li><strong>Username</strong> — public handle (e.g. for family search display).</li>
+        <li><strong>Phone</strong> — required for bookings; OTP verify same pattern as checkout.</li>
+        <li><strong>Addresses</strong> — add many; mark one as default collection address.</li>
+        <li><strong>Family</strong> — search by phone → if account exists, request/add as member with relationship.</li>
+      </ul>
+    </section>
+
+    <!-- SCREEN: profile settings -->
+    <section class="screen" data-screen="profile">
+      <div class="profile-head">
+        <img src="https://i.pravatar.cc/96?img=12" alt="">
+        <div>
+          <h2>Account settings</h2>
+          <p>Complete your profile for faster checkout and family reports.</p>
+        </div>
+        <button type="button" class="btn btn-ghost" data-go="home" style="margin-left:auto">← Back</button>
+      </div>
+
+      <div class="profile-columns">
+      <!-- Identity -->
+      <div class="panel">
+        <h3>Identity</h3>
+        <p class="hint">Google email is your primary login email. Username is how family may recognize you.</p>
+        <div class="panel-body">
+        <div class="form-grid">
+          <label>
+            Primary email <span class="badge badge-locked">From Google</span>
+            <input type="email" value="madhureddy480@gmail.com" disabled>
+          </label>
+          <label>
+            Username
+            <input id="username" type="text" value="madhu.k" placeholder="e.g. madhu.k" autocomplete="username">
+          </label>
+          <div class="form-row two">
+            <label>First name<input id="first" type="text" value="Madhu" autocomplete="given-name"></label>
+            <label>Last name<input id="last" type="text" value="Karnati" autocomplete="family-name"></label>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <!-- Phone -->
+      <div class="panel">
+        <h3>Phone number</h3>
+        <p class="hint">Verified phone is required for bookings and family linking.</p>
+        <div class="panel-body">
+        <div class="form-grid">
+          <label>
+            Mobile
+            <div class="phone-row">
+              <input id="phone" type="tel" value="9876543210" placeholder="10-digit mobile">
+              <button type="button" class="btn btn-secondary" id="send-otp">Send OTP</button>
+            </div>
+          </label>
+          <div id="otp-block" class="form-row two" hidden>
+            <label>OTP code<input id="otp" type="text" maxlength="6" placeholder="6 digits" inputmode="numeric"></label>
+            <div class="row-actions" style="align-items:end">
+              <button type="button" class="btn btn-primary" id="verify-otp">Verify phone</button>
+            </div>
+          </div>
+          <p id="phone-status"><span class="badge badge-warn">Not verified</span></p>
+        </div>
+        </div>
+      </div>
+
+      <!-- Addresses -->
+      <div class="panel">
+        <h3>Addresses</h3>
+        <p class="hint">Save multiple collection addresses. One can be the default.</p>
+        <div class="panel-body">
+        <div id="address-list">
+          <div class="address-card" data-id="1">
+            <strong>Home <span class="badge badge-ok">Default</span></strong>
+            <div class="meta">12 Residency Road, Bengaluru 560025</div>
+            <div class="card-actions">
+              <button type="button" class="btn btn-ghost" data-edit-address>Edit</button>
+              <button type="button" class="btn btn-danger" data-remove-address>Remove</button>
+            </div>
+          </div>
+          <div class="address-card" data-id="2">
+            <strong>Office</strong>
+            <div class="meta">Manyata Tech Park, Bengaluru 560045</div>
+            <div class="card-actions">
+              <button type="button" class="btn btn-secondary" data-make-default>Make default</button>
+              <button type="button" class="btn btn-ghost" data-edit-address>Edit</button>
+              <button type="button" class="btn btn-danger" data-remove-address>Remove</button>
+            </div>
+          </div>
+        </div>
+        <div class="search-box">
+          <strong style="font-size:13px">Add address</strong>
+          <label>Label<input id="addr-label" type="text" placeholder="Home, Office, Parents…"></label>
+          <label>Full address<textarea id="addr-line" placeholder="House / street / area / city / PIN"></textarea></label>
+          <div class="row-actions">
+            <button type="button" class="btn btn-primary" id="add-address">Add address</button>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <!-- Family -->
+      <div class="panel">
+        <h3>Family members</h3>
+        <p class="hint">Search by phone. If that person has a Dr.Swift account, you can add them to your family.</p>
+        <div class="panel-body">
+        <div id="member-list">
+          <div class="member-card">
+            <strong>Self</strong>
+            <div class="meta">Madhu Karnati · +91 98765 43210 · Account holder</div>
+          </div>
+        </div>
+        <div class="search-box">
+          <strong style="font-size:13px">Find by phone</strong>
+          <div class="phone-row">
+            <input id="family-phone" type="tel" placeholder="Family member mobile">
+            <button type="button" class="btn btn-secondary" id="search-family">Search</button>
+          </div>
+          <div id="family-result" hidden></div>
+        </div>
+        </div>
+      </div>
+      </div>
+
+      <div class="sticky-save">
+        <button type="button" class="btn btn-ghost" data-go="home">Cancel</button>
+        <button type="button" class="btn btn-primary" id="save-profile">Save profile</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    const state = {
+      phoneVerified: false,
+      addresses: [
+        { id: 1, label: "Home", line: "12 Residency Road, Bengaluru 560025", isDefault: true },
+        { id: 2, label: "Office", line: "Manyata Tech Park, Bengaluru 560045", isDefault: false },
+      ],
+      members: [
+        { name: "Madhu Karnati", phone: "9876543210", relationship: "SELF", self: true },
+      ],
+    };
+
+    const DIRECTORY = {
+      "9988776655": { name: "Ananya Reddy", username: "ananya.r" },
+      "9123456780": { name: "Ravi Kumar", username: "ravi.k" },
+    };
+
+    const btn = document.getElementById("google-btn");
+    const menu = document.getElementById("google-menu");
+    const toast = document.getElementById("toast");
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add("is-visible");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => toast.classList.remove("is-visible"), 2800);
+    }
+
+    function closeMenu() {
+      menu.classList.remove("is-open");
+      menu.hidden = true;
+      btn.setAttribute("aria-expanded", "false");
+    }
+
+    function openMenu() {
+      menu.hidden = false;
+      requestAnimationFrame(() => menu.classList.add("is-open"));
+      btn.setAttribute("aria-expanded", "true");
+    }
+
+    function go(screen) {
+      closeMenu();
+      document.querySelectorAll(".screen").forEach((el) => {
+        el.classList.toggle("is-active", el.dataset.screen === screen);
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (menu.classList.contains("is-open")) closeMenu();
+      else openMenu();
+    });
+    document.getElementById("btn-cancel").addEventListener("click", closeMenu);
+    document.getElementById("btn-settings").addEventListener("click", () => go("profile"));
+    document.getElementById("btn-signout").addEventListener("click", () => {
+      closeMenu();
+      showToast("Signed out (mock). Primary email remains on account until deleted.");
+      go("home");
+    });
+    document.addEventListener("click", (e) => {
+      if (!document.getElementById("google-wrap").contains(e.target)) closeMenu();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeMenu();
+    });
+    document.querySelectorAll("[data-go]").forEach((el) => {
+      el.addEventListener("click", () => go(el.dataset.go));
+    });
+
+    // Phone verify
+    document.getElementById("send-otp").addEventListener("click", () => {
+      document.getElementById("otp-block").hidden = false;
+      showToast("OTP sent (mock). Use any 6 digits, or 726726.");
+    });
+    document.getElementById("verify-otp").addEventListener("click", () => {
+      const code = document.getElementById("otp").value.trim();
+      if (code.length < 4) {
+        showToast("Enter the OTP code.");
+        return;
+      }
+      state.phoneVerified = true;
+      document.getElementById("phone-status").innerHTML = '<span class="badge badge-ok">✓ Verified</span>';
+      document.getElementById("otp-block").hidden = true;
+      showToast("Phone verified and linked to this account.");
+    });
+
+    // Addresses
+    function renderAddresses() {
+      const list = document.getElementById("address-list");
+      list.innerHTML = state.addresses.map((a) => `
+        <div class="address-card" data-id="${a.id}">
+          <strong>${a.label}${a.isDefault ? ' <span class="badge badge-ok">Default</span>' : ""}</strong>
+          <div class="meta">${a.line}</div>
+          <div class="card-actions">
+            ${a.isDefault ? "" : '<button type="button" class="btn btn-secondary" data-make-default>Make default</button>'}
+            <button type="button" class="btn btn-danger" data-remove-address>Remove</button>
+          </div>
+        </div>
+      `).join("");
+    }
+    document.getElementById("add-address").addEventListener("click", () => {
+      const label = document.getElementById("addr-label").value.trim() || "Address";
+      const line = document.getElementById("addr-line").value.trim();
+      if (!line) {
+        showToast("Enter a full address.");
+        return;
+      }
+      state.addresses.push({
+        id: Date.now(),
+        label,
+        line,
+        isDefault: state.addresses.length === 0,
+      });
+      document.getElementById("addr-label").value = "";
+      document.getElementById("addr-line").value = "";
+      renderAddresses();
+      showToast("Address added.");
+    });
+    document.getElementById("address-list").addEventListener("click", (e) => {
+      const card = e.target.closest(".address-card");
+      if (!card) return;
+      const id = Number(card.dataset.id);
+      if (e.target.matches("[data-make-default]")) {
+        state.addresses.forEach((a) => { a.isDefault = a.id === id; });
+        renderAddresses();
+        showToast("Default collection address updated.");
+      }
+      if (e.target.matches("[data-remove-address]")) {
+        state.addresses = state.addresses.filter((a) => a.id !== id);
+        if (state.addresses.length && !state.addresses.some((a) => a.isDefault)) {
+          state.addresses[0].isDefault = true;
+        }
+        renderAddresses();
+        showToast("Address removed.");
+      }
+    });
+
+    // Family search
+    function renderMembers() {
+      const list = document.getElementById("member-list");
+      list.innerHTML = state.members.map((m) => `
+        <div class="member-card">
+          <strong>${m.self ? "Self" : m.name}</strong>
+          <div class="meta">${m.name} · +91 ${m.phone}${m.relationship && !m.self ? " · " + m.relationship : m.self ? " · Account holder" : ""}</div>
+          ${m.self ? "" : '<div class="card-actions"><button type="button" class="btn btn-danger" data-remove-member data-phone="' + m.phone + '">Remove</button></div>'}
+        </div>
+      `).join("");
+    }
+    document.getElementById("search-family").addEventListener("click", () => {
+      const phone = document.getElementById("family-phone").value.replace(/\D/g, "").slice(-10);
+      const box = document.getElementById("family-result");
+      const hit = DIRECTORY[phone];
+      box.hidden = false;
+      if (!hit) {
+        box.innerHTML = `<div class="meta">No Dr.Swift account found for that phone. They can sign up, then you can add them.</div>`;
+        return;
+      }
+      if (state.members.some((m) => m.phone === phone)) {
+        box.innerHTML = `<div class="meta">${hit.name} is already in your family.</div>`;
+        return;
+      }
+      box.innerHTML = `
+        <div class="search-result">
+          <div>
+            <strong style="font-size:14px">${hit.name}</strong>
+            <div class="meta">@${hit.username} · +91 ${phone}</div>
+          </div>
+          <div class="row-actions">
+            <select id="rel-select" aria-label="Relationship">
+              <option>SPOUSE</option><option>PARENT</option><option>CHILD</option><option>SIBLING</option><option>OTHER</option>
+            </select>
+            <button type="button" class="btn btn-primary" id="add-member" data-phone="${phone}">Add</button>
+          </div>
+        </div>`;
+      document.getElementById("add-member").addEventListener("click", () => {
+        const rel = document.getElementById("rel-select").value;
+        state.members.push({ name: hit.name, phone, relationship: rel, self: false });
+        renderMembers();
+        box.hidden = true;
+        document.getElementById("family-phone").value = "";
+        showToast(`${hit.name} added as ${rel}.`);
+      });
+    });
+    document.getElementById("member-list").addEventListener("click", (e) => {
+      if (!e.target.matches("[data-remove-member]")) return;
+      const phone = e.target.getAttribute("data-phone");
+      state.members = state.members.filter((m) => m.phone !== phone);
+      renderMembers();
+      showToast("Family member removed.");
+    });
+
+    document.getElementById("save-profile").addEventListener("click", () => {
+      if (!state.phoneVerified) {
+        showToast("Verify your phone before saving (required).");
+        return;
+      }
+      showToast("Profile saved (mock). Ready to wire to SwiftCMS user_accounts.");
+    });
+
+    renderAddresses();
+    renderMembers();
+  </script>
+</body>
+</html>

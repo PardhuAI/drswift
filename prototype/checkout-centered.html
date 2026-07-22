@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Prototype — Checkout centered (full form) | Dr.Swift</title>
+    <link rel="stylesheet" href="../assets/css/styles.css?v=checkout-pay-1">
+    <link rel="icon" href="../assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
+    <style>
+      /*
+        Prototype-only layout fixes. Design + fields match live book.html.
+        Goal: keep the entire checkout composition centered with even side
+        padding across step 2 → 3 → 4 (no left drift, no shrink-to-fit).
+      */
+      html {
+        scrollbar-gutter: stable;
+      }
+
+      body.auth-page .auth-shell {
+        display: block;
+        padding: 36px clamp(16px, 4vw, 40px) 64px;
+        min-height: calc(100vh - 72px);
+      }
+
+      /* One stable centered frame — width never changes between steps */
+      .checkout-proto-frame {
+        width: min(1120px, 100%);
+        margin-inline: auto;
+      }
+
+      .checkout-proto-frame .checkout-wire-shell {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+      }
+
+      .checkout-proto-frame .auth-card__header {
+        margin-bottom: 22px;
+        text-align: left;
+      }
+
+      .checkout-proto-frame .checkout-wire-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+        gap: 24px;
+        align-items: start;
+        width: 100%;
+      }
+
+      .checkout-proto-frame .checkout-wire-main,
+      .checkout-proto-frame .checkout-wire-aside {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .checkout-proto-frame .checkout-wire-panel,
+      .checkout-proto-frame .checkout-summary-panel {
+        width: 100%;
+      }
+
+      /* Same left-column height rhythm so step 3 doesn’t look “short / left” */
+      .checkout-proto-frame .checkout-wire-panel.is-active {
+        min-height: 520px;
+      }
+
+      /* Justify fields: inputs fill the form column (labels stay 118px) */
+      .checkout-proto-frame .checkout-wire-field--wide input,
+      .checkout-proto-frame .checkout-wire-field--address textarea,
+      .checkout-proto-frame .checkout-wire-field input,
+      .checkout-proto-frame .checkout-wire-field select {
+        max-width: none;
+        width: 100%;
+      }
+
+      .checkout-proto-frame .checkout-wire-field--phone .phone-verify-row,
+      .checkout-proto-frame .checkout-otp .phone-verify-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+        align-items: center;
+        width: 100%;
+      }
+
+      .checkout-proto-frame .payment-chip-row {
+        width: 100%;
+      }
+
+      .checkout-proto-frame .payment-card-form {
+        width: 100%;
+      }
+
+      .checkout-proto-frame .payment-card-form label {
+        grid-template-columns: 118px minmax(0, 1fr);
+      }
+
+      .checkout-proto-frame .payment-card-form__row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 16px;
+      }
+
+      .checkout-proto-frame .payment-card-form__row label {
+        grid-template-columns: 48px minmax(0, 1fr);
+      }
+
+      .checkout-proto-banner {
+        width: min(1120px, 100%);
+        margin: 0 auto 16px;
+        padding: 10px 14px;
+        background: #edf4ff;
+        border: 1px solid #c9dbff;
+        border-radius: 10px;
+        color: #123f9b;
+        font-size: 0.88rem;
+        line-height: 1.45;
+      }
+
+      .checkout-proto-banner code {
+        font-size: 0.84rem;
+        background: #fff;
+        padding: 1px 6px;
+        border-radius: 4px;
+      }
+
+      @media (max-width: 879px) {
+        .checkout-proto-frame .checkout-wire-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .checkout-proto-frame .checkout-wire-aside {
+          order: -1;
+          position: static;
+        }
+
+        .checkout-proto-frame .checkout-wire-panel.is-active {
+          min-height: 0;
+        }
+      }
+    </style>
+  </head>
+  <body class="auth-page">
+    <header class="site-header" id="site-header">
+      <nav class="navbar container" aria-label="Primary navigation">
+        <a class="brand" href="../index.html">
+          <img class="brand-mark" src="../assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="40" height="40">
+          <span>Dr.Swift Diagnostics</span>
+        </a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu">
+          <span class="sr-only">Menu</span><span></span><span></span><span></span>
+        </button>
+        <div class="nav-menu" id="primary-menu">
+          <div class="nav-links">
+            <a href="../tests.html">Tests</a>
+            <a href="../reports.html">Reports</a>
+            <a href="../about.html">About</a>
+          </div>
+          <div class="nav-actions">
+            <a class="cart-link" href="../cart.html" aria-label="View cart">
+              <svg class="ui-icon" aria-hidden="true"><use href="../assets/images/ui-icons.svg#icon-cart"></use></svg>
+              <span>Cart</span>
+              <span class="cart-count">5</span>
+            </a>
+            <a class="button primary nav-cta" href="../login.html">My Account</a>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="auth-shell">
+      <div class="checkout-proto-banner">
+        <strong>Prototype</strong> — full live checkout form (all fields retained).
+        Centered frame with even side padding; steps swap inside the left column only.
+        Demo OTP: <code>123456</code>
+        · <a href="index.html">Back to prototypes</a>
+      </div>
+
+      <div class="checkout-proto-frame">
+        <div class="checkout-wire-shell">
+          <div class="auth-card__header">
+            <p class="eyebrow">Checkout</p>
+            <h1>Complete your booking</h1>
+            <p>Confirm collection details, pay securely, and receive booking confirmation.</p>
+          </div>
+
+          <div class="checkout-wire-layout" data-checkout-flow>
+            <div class="checkout-wire-main">
+              <!-- STEP 2 — full customer form (unchanged field set) -->
+              <section class="checkout-wire-panel is-active" data-checkout-stage="details">
+                <div class="checkout-wire-head">
+                  <span class="checkout-step-badge">2</span>
+                  <div>
+                    <p class="checkout-step-kicker">Step 2</p>
+                    <h2>Who is this booking for?</h2>
+                  </div>
+                </div>
+                <form class="checkout-wire-form" data-checkout-form id="book-form" novalidate>
+                  <div class="checkout-time-row">
+                    <strong>Sample collection</strong>
+                    <div class="checkout-segments" role="group" aria-label="Sample collection day">
+                      <input id="book-day-today" type="radio" name="sampleDay" value="Today" checked>
+                      <label for="book-day-today">Today</label>
+                      <input id="book-day-tomorrow" type="radio" name="sampleDay" value="Tomorrow">
+                      <label for="book-day-tomorrow">Tomorrow</label>
+                      <button class="checkout-calendar-btn" type="button" aria-label="Choose date" data-pick-date>
+                        <svg class="ui-icon" aria-hidden="true"><use href="../assets/images/ui-icons.svg#icon-calendar"></use></svg>
+                      </button>
+                    </div>
+                    <div class="checkout-segments checkout-segments--time" role="group" aria-label="Sample collection window">
+                      <input id="book-time-morning" type="radio" name="sampleWindow" value="Morning" checked>
+                      <label for="book-time-morning">Morning</label>
+                      <input id="book-time-afternoon" type="radio" name="sampleWindow" value="Afternoon">
+                      <label for="book-time-afternoon">Afternoon</label>
+                      <input id="book-time-evening" type="radio" name="sampleWindow" value="Evening">
+                      <label for="book-time-evening">Evening</label>
+                    </div>
+                  </div>
+
+                  <div class="checkout-wire-field checkout-wire-field--wide">
+                    <label for="book-name">Name</label>
+                    <input id="book-name" type="text" name="name" autocomplete="name" required>
+                  </div>
+                  <div class="checkout-wire-field">
+                    <label for="book-gender">Gender</label>
+                    <select id="book-gender" name="gender" required>
+                      <option value="">Select</option>
+                      <option>Female</option>
+                      <option>Male</option>
+                      <option>Other</option>
+                      <option>Prefer not to say</option>
+                    </select>
+                  </div>
+                  <div class="checkout-wire-field">
+                    <label for="book-age">Age</label>
+                    <input id="book-age" type="number" name="age" inputmode="numeric" min="0" max="120" required>
+                  </div>
+                  <div class="checkout-wire-field checkout-wire-field--phone">
+                    <label for="book-phone">Phone</label>
+                    <div class="phone-verify-row">
+                      <input id="book-phone" type="tel" name="phone" autocomplete="tel" inputmode="numeric" placeholder="10-digit mobile" required>
+                      <button class="button secondary" type="button" data-otp-send>Send OTP</button>
+                      <p class="phone-verified-badge" data-phone-verified-badge hidden>✓ Verified</p>
+                    </div>
+                  </div>
+                  <div class="checkout-wire-field checkout-otp" data-otp-block hidden>
+                    <label for="book-otp">Verify OTP</label>
+                    <div class="phone-verify-row">
+                      <input id="book-otp" type="text" name="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code">
+                      <button class="button secondary" type="button" data-otp-verify>Verify</button>
+                    </div>
+                  </div>
+                  <p class="checkout-status" data-checkout-status hidden aria-live="polite"></p>
+                  <div class="checkout-wire-field">
+                    <label for="book-city">City/Town</label>
+                    <input id="book-city" type="text" name="city" autocomplete="address-level2" required>
+                  </div>
+                  <div class="checkout-wire-field checkout-wire-field--address">
+                    <label for="book-address">Address</label>
+                    <textarea id="book-address" name="address" autocomplete="street-address" required></textarea>
+                  </div>
+                  <div class="checkout-wire-actions">
+                    <a class="checkout-back-link" href="../cart.html" aria-label="View cart">
+                      <span aria-hidden="true">←</span> View Cart
+                    </a>
+                    <button class="checkout-next-link" type="submit" disabled>Continue to payment</button>
+                  </div>
+                </form>
+              </section>
+
+              <!-- STEP 3 — full payment options (unchanged) -->
+              <section class="checkout-wire-panel" data-checkout-stage="payment" hidden>
+                <div class="checkout-wire-head">
+                  <span class="checkout-step-badge">3</span>
+                  <div>
+                    <p class="checkout-step-kicker">Step 3</p>
+                    <h2>Payment options</h2>
+                  </div>
+                </div>
+                <div class="payment-chip-row" aria-label="Fast payment options">
+                  <button type="button" class="pay-chip pay-chip--phonepe" data-pay-method="phonepe">PhonePe</button>
+                  <button type="button" class="pay-chip pay-chip--gpay" data-pay-method="gpay">Google Pay</button>
+                  <button type="button" class="pay-chip pay-chip--paytm" data-pay-method="paytm">Paytm</button>
+                  <button type="button" class="pay-chip pay-chip--upi" data-pay-method="upi">UPI</button>
+                  <button type="button" class="pay-chip pay-chip--card is-selected" data-pay-method="card" aria-pressed="true">Credit / Debit</button>
+                </div>
+                <div class="payment-card-form" data-card-form>
+                  <p class="payment-card-form__title">Pay with card</p>
+                  <label>Card number <input type="text" inputmode="numeric" autocomplete="cc-number" placeholder="XXXX XXXX XXXX XXXX"></label>
+                  <div class="payment-card-form__row">
+                    <label>Exp <input type="text" autocomplete="cc-exp" placeholder="MM/YY"></label>
+                    <label>CVV <input type="text" inputmode="numeric" autocomplete="cc-csc" placeholder="123"></label>
+                  </div>
+                  <label>Name on the card <input type="text" autocomplete="cc-name" data-card-name></label>
+                  <label>Billing address <textarea data-payment-address></textarea></label>
+                </div>
+                <div class="checkout-wire-actions">
+                  <button class="checkout-back-link" type="button" data-checkout-back="details">
+                    <span aria-hidden="true">←</span> Customer Details
+                  </button>
+                  <button class="checkout-next-link" type="button" data-inline-pay-now>Submit</button>
+                </div>
+              </section>
+
+              <!-- STEP 4 — confirmation -->
+              <section class="checkout-wire-panel checkout-wire-panel--confirmation" data-checkout-stage="confirmation" hidden>
+                <div class="checkout-wire-head">
+                  <span class="checkout-step-badge">4</span>
+                  <div>
+                    <p class="checkout-step-kicker">Step 4</p>
+                    <h2>Booking confirmed</h2>
+                  </div>
+                </div>
+                <div class="confirmation-message">
+                  <div class="checkout-confirmation-icon" aria-hidden="true">
+                    <svg class="ui-icon"><use href="../assets/images/ui-icons.svg#icon-shield-check"></use></svg>
+                  </div>
+                  <p>Confirmed</p>
+                  <strong>Our phlebo will call you and arrive at your address on or before your selected collection time.</strong>
+                  <span>If you need help anytime, contact customer support at 9848094942.</span>
+                </div>
+                <div class="checkout-wire-actions">
+                  <a class="checkout-back-link" href="../account.html">My Account</a>
+                  <a class="checkout-next-link" href="../tests.html">Shop All Tests</a>
+                </div>
+              </section>
+            </div>
+
+            <aside class="checkout-wire-aside" aria-label="Checkout summary">
+              <section class="checkout-summary-panel">
+                <div class="checkout-summary-title">
+                  <span class="checkout-step-badge">1</span>
+                  <h2>Selected Tests</h2>
+                </div>
+                <div class="booking-cart-summary" data-booking-cart>
+                  <ul>
+                    <li>Lipid Profile</li>
+                    <li>Thyroid Profile</li>
+                    <li>HbA1c &amp; Glucose</li>
+                    <li>Full Body Checkup</li>
+                    <li>Vitamin D Test</li>
+                  </ul>
+                  <p class="booking-cart-summary__total">Estimated total: ₹238</p>
+                </div>
+              </section>
+              <section class="checkout-summary-panel" data-summary-customer hidden>
+                <div class="checkout-summary-title">
+                  <span class="checkout-step-badge">2</span>
+                  <h2>Customer details</h2>
+                </div>
+                <dl data-inline-payment-patient></dl>
+              </section>
+              <section class="checkout-summary-panel" data-summary-payment hidden>
+                <div class="checkout-summary-title">
+                  <span class="checkout-step-badge">3</span>
+                  <h2>Payment</h2>
+                </div>
+                <p class="payment-success-mark">✓ Payment successful</p>
+                <dl data-inline-confirm-summary hidden></dl>
+              </section>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-bottom footer-bottom--plain">
+        <p>&copy; 2026 Dr.Swift Diagnostics · Checkout prototype</p>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        const DEMO_OTP = "123456";
+        const form = document.querySelector("[data-checkout-form]");
+        const statusEl = document.querySelector("[data-checkout-status]");
+        const otpBlock = document.querySelector("[data-otp-block]");
+        const verifiedBadge = document.querySelector("[data-phone-verified-badge]");
+        const submitBtn = form?.querySelector('[type="submit"]');
+        let phoneVerified = false;
+
+        function setStatus(message, isError) {
+          if (!statusEl) return;
+          statusEl.hidden = !message;
+          statusEl.textContent = message || "";
+          statusEl.classList.toggle("is-error", !!isError);
+        }
+
+        function activateStage(name) {
+          const order = ["details", "payment", "confirmation"];
+          document.querySelectorAll("[data-checkout-stage]").forEach((stage) => {
+            const on = stage.getAttribute("data-checkout-stage") === name;
+            stage.hidden = !on;
+            stage.classList.toggle("is-active", on);
+          });
+          const idx = order.indexOf(name);
+          const customer = document.querySelector("[data-summary-customer]");
+          const payment = document.querySelector("[data-summary-payment]");
+          if (customer) customer.hidden = idx < order.indexOf("payment");
+          if (payment) payment.hidden = idx < order.indexOf("confirmation");
+
+          const frame = document.querySelector(".checkout-proto-frame");
+          if (frame) {
+            const top =
+              frame.getBoundingClientRect().top +
+              window.scrollY -
+              90;
+            window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+          }
+        }
+
+        function readDetails() {
+          const data = new FormData(form);
+          return {
+            name: String(data.get("name") || "").trim(),
+            gender: String(data.get("gender") || "").trim(),
+            age: String(data.get("age") || "").trim(),
+            phone: String(data.get("phone") || "").replace(/\D/g, "").slice(-10),
+            city: String(data.get("city") || "").trim(),
+            address: String(data.get("address") || "").trim(),
+            sampleDay: String(data.get("sampleDay") || "").trim(),
+            sampleWindow: String(data.get("sampleWindow") || "").trim(),
+          };
+        }
+
+        function escapeHtml(value) {
+          return String(value ?? "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;");
+        }
+
+        function renderCustomerSummary(details) {
+          const patient = document.querySelector("[data-inline-payment-patient]");
+          if (!patient) return;
+          const rows = [
+            ["Name", details.name],
+            ["Gender", details.gender],
+            ["Age", details.age],
+            ["Phone", details.phone],
+            ["When", `${details.sampleDay} · ${details.sampleWindow}`],
+            ["City", details.city],
+            ["Address", details.address],
+          ];
+          patient.classList.add("checkout-kv");
+          patient.innerHTML = rows
+            .filter(([, value]) => value != null && String(value).trim() !== "")
+            .map(
+              ([label, value]) =>
+                `<div class="checkout-kv__row"><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`
+            )
+            .join("");
+        }
+
+        document.querySelectorAll("[data-pay-method]").forEach((chip) => {
+          chip.addEventListener("click", () => {
+            document.querySelectorAll("[data-pay-method]").forEach((other) => {
+              other.classList.remove("is-selected");
+              other.setAttribute("aria-pressed", "false");
+            });
+            chip.classList.add("is-selected");
+            chip.setAttribute("aria-pressed", "true");
+            const cardForm = document.querySelector("[data-card-form]");
+            if (cardForm) cardForm.hidden = chip.getAttribute("data-pay-method") !== "card";
+          });
+        });
+
+        document.querySelector("[data-otp-send]")?.addEventListener("click", () => {
+          const phone = String(form.phone.value || "").replace(/\D/g, "").slice(-10);
+          if (phone.length !== 10) {
+            setStatus("Enter a valid 10-digit mobile number.", true);
+            return;
+          }
+          phoneVerified = false;
+          if (verifiedBadge) verifiedBadge.hidden = true;
+          if (submitBtn) submitBtn.disabled = true;
+          if (otpBlock) otpBlock.hidden = false;
+          setStatus(`OTP sent (demo). Use ${DEMO_OTP}.`, false);
+        });
+
+        document.querySelector("[data-otp-verify]")?.addEventListener("click", () => {
+          const otp = String(form.otp.value || "").trim();
+          if (otp !== DEMO_OTP) {
+            setStatus("Incorrect OTP. Demo code is 123456.", true);
+            return;
+          }
+          phoneVerified = true;
+          if (otpBlock) otpBlock.hidden = true;
+          if (verifiedBadge) verifiedBadge.hidden = false;
+          if (submitBtn) submitBtn.disabled = false;
+          setStatus("Phone verified.", false);
+        });
+
+        form?.addEventListener("submit", (event) => {
+          event.preventDefault();
+          if (!phoneVerified) {
+            setStatus("Verify phone with OTP before continuing.", true);
+            return;
+          }
+          if (!form.reportValidity()) return;
+          const details = readDetails();
+          renderCustomerSummary(details);
+          const payAddress = document.querySelector("[data-payment-address]");
+          const cardName = document.querySelector("[data-card-name]");
+          if (payAddress && !payAddress.value) payAddress.value = details.address;
+          if (cardName && !cardName.value) cardName.value = details.name;
+          activateStage("payment");
+        });
+
+        document.querySelectorAll("[data-checkout-back]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            activateStage(btn.getAttribute("data-checkout-back") || "details");
+          });
+        });
+
+        document.querySelector("[data-inline-pay-now]")?.addEventListener("click", () => {
+          const details = readDetails();
+          const summary = document.querySelector("[data-inline-confirm-summary]");
+          if (summary) {
+            summary.hidden = false;
+            summary.innerHTML = `
+              <div><dt>Reference</dt><dd>DRS-PROTO-24081</dd></div>
+              <div><dt>Name</dt><dd>${escapeHtml(details.name)}</dd></div>
+              <div><dt>Phone</dt><dd>${escapeHtml(details.phone)}</dd></div>
+              <div><dt>Address</dt><dd>${escapeHtml(details.address)}</dd></div>
+            `;
+          }
+          activateStage("confirmation");
+        });
+
+        document.querySelector("[data-pick-date]")?.addEventListener("click", () => {
+          setStatus("Calendar picker stays as in live checkout (Tomorrow + custom date next).", false);
+          const tomorrow = document.getElementById("book-day-tomorrow");
+          if (tomorrow) tomorrow.checked = true;
+        });
+      })();
+    </script>
+  </body>
+</html>

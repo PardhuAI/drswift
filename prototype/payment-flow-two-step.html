@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prototype — Two-step payment flow | Dr.Swift</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #162033;
+      --muted: #657084;
+      --line: #e5eaf2;
+      --soft: #f4f6fa;
+      --panel: #ffffff;
+      --blue: #2f6bff;
+      --blue-dark: #1e5bd7;
+      --green: #4e8c73;
+      --shadow: 0 10px 28px rgba(22, 32, 51, 0.08);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: Inter, system-ui, sans-serif;
+      background: linear-gradient(180deg, #eef2f8 0%, #f7f9fc 40%, #f7f9fc 100%);
+    }
+
+    .page {
+      width: min(920px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 24px 0 64px;
+    }
+
+    .proto-note {
+      margin-bottom: 16px;
+      padding: 12px 14px;
+      background: #edf4ff;
+      border: 1px solid #c9dbff;
+      border-radius: 10px;
+      color: #123f9b;
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    .proto-note a { color: #123f9b; font-weight: 700; }
+
+    .demo-wrap {
+      display: grid;
+      grid-template-columns: minmax(0, 390px) minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    /* Phone frame */
+    .phone {
+      width: 100%;
+      max-width: 390px;
+      margin: 0 auto;
+      background: var(--soft);
+      border: 1px solid #d8dee8;
+      border-radius: 28px;
+      box-shadow: 0 24px 50px rgba(22, 32, 51, 0.14);
+      overflow: hidden;
+      min-height: 720px;
+      position: relative;
+    }
+
+    .screen {
+      display: none;
+      padding: 18px 18px 24px;
+      min-height: 720px;
+      flex-direction: column;
+    }
+
+    .screen.is-active {
+      display: flex;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .back {
+      appearance: none;
+      width: 36px;
+      height: 36px;
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--ink);
+      font-size: 1.25rem;
+      font-weight: 700;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .back:hover { background: #e8edf5; }
+
+    .topbar h1 {
+      margin: 0;
+      font-size: 1.28rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .amount-pill {
+      margin: 0 0 18px;
+      padding: 10px 12px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.88rem;
+      font-weight: 650;
+    }
+
+    .amount-pill span { color: var(--muted); font-weight: 600; }
+
+    /* Method list */
+    .method-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .method {
+      appearance: none;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 64px;
+      padding: 14px 16px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color 140ms ease, transform 140ms ease;
+    }
+
+    .method:hover {
+      border-color: #b8c7e6;
+      transform: translateY(-1px);
+    }
+
+    .method__left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .method__label {
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .icon--card { background: #e8f0ff; color: var(--blue); }
+    .icon--bank { background: #efe8ff; color: #6d28d9; }
+    .icon--gpay { background: #fff; border: 1px solid var(--line); color: #4285f4; }
+    .icon--phonepe { background: #5f259f; color: #fff; }
+    .icon--plus { background: #eef2f7; color: var(--muted); font-size: 1.2rem; }
+
+    .badge {
+      height: 22px;
+      padding: 0 8px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      background: #fff;
+      font-size: 0.62rem;
+      font-weight: 800;
+      color: #475569;
+      display: inline-grid;
+      place-items: center;
+      letter-spacing: 0.02em;
+    }
+
+    .badge--upi { color: #097a4b; border-color: #b7e4cf; background: #f0faf5; }
+    .badge--rupay { color: #0b5cab; border-color: #c5daf5; background: #f3f8ff; }
+
+    /* Card screen */
+    .tabs {
+      display: flex;
+      gap: 22px;
+      margin: 0 0 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .tabs button {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0 0 10px;
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+
+    .tabs button.is-on {
+      color: var(--blue-dark);
+      border-bottom-color: var(--blue);
+    }
+
+    .card-form {
+      display: grid;
+      gap: 14px;
+      flex: 1;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field label {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .input,
+    .select {
+      width: 100%;
+      min-height: 48px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 0.95rem;
+    }
+
+    .input:focus,
+    .select:focus {
+      outline: none;
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.14);
+    }
+
+    .card-number-wrap {
+      position: relative;
+    }
+
+    .card-number-wrap .input {
+      padding-right: 54px;
+    }
+
+    .mc-mark {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 34px;
+      height: 22px;
+    }
+
+    .mc-mark span {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      top: 2px;
+    }
+
+    .mc-mark span:first-child { left: 0; background: #eb001b; }
+    .mc-mark span:last-child { right: 0; background: #f79e1b; opacity: 0.92; }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1.4fr 0.8fr;
+      gap: 12px;
+    }
+
+    .exp-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .save {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .save input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--blue);
+    }
+
+    .footer-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: auto;
+      padding-top: 22px;
+    }
+
+    .link-btn {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .primary {
+      appearance: none;
+      min-height: 48px;
+      min-width: 132px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--blue);
+      color: #fff;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(47, 107, 255, 0.28);
+    }
+
+    .primary:hover { background: var(--blue-dark); }
+
+    /* QR screen */
+    .qr-body {
+      flex: 1;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      gap: 14px;
+      padding: 8px 0 12px;
+    }
+
+    .qr-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid var(--line);
+      font-size: 0.85rem;
+      font-weight: 800;
+    }
+
+    .qr-card {
+      width: min(240px, 100%);
+      aspect-ratio: 1;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+      display: grid;
+      place-items: center;
+    }
+
+    .qr-card svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .qr-amount {
+      margin: 0;
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .qr-help {
+      margin: 0;
+      max-width: 280px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    .upi-id {
+      margin: 0;
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: #fff;
+      border: 1px dashed #c9d4e5;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--ink);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    /* Bank screen */
+    .bank-list {
+      display: grid;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .bank-list button {
+      appearance: none;
+      width: 100%;
+      min-height: 52px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      text-align: left;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .bank-list button:hover {
+      border-color: #b8c7e6;
+    }
+
+    /* Side explainer */
+    .explain {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .explain h2 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+    }
+
+    .explain p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .explain ol {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--ink);
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+
+    .explain li { margin-bottom: 6px; }
+
+    .flow-map {
+      display: grid;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .flow-map div {
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: var(--soft);
+      font-size: 0.84rem;
+      line-height: 1.4;
+    }
+
+    .flow-map strong { font-weight: 800; }
+
+    @media (max-width: 820px) {
+      .demo-wrap { grid-template-columns: 1fr; }
+      .phone { max-width: 420px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="proto-note">
+      <strong>Prototype</strong> — two-step payment: choose method → card form <em>or</em> QR pay screen.
+      Confirm before wiring into <code>book.html</code>.
+      · <a href="index.html">Back to prototypes</a>
+      · <a href="payment-details-clean.html">Earlier clean card form</a>
+    </div>
+
+    <div class="demo-wrap">
+      <div class="phone" aria-live="polite">
+        <!-- SCREEN: choose -->
+        <section class="screen is-active" data-screen="choose">
+          <div class="topbar">
+            <button class="back" type="button" data-go="exit" aria-label="Back">←</button>
+            <h1>Choose Payment option</h1>
+          </div>
+          <p class="amount-pill"><span>Amount payable</span><strong>₹238</strong></p>
+          <div class="method-list">
+            <button class="method" type="button" data-go="card">
+              <span class="method__left">
+                <span class="icon icon--card" aria-hidden="true">▣</span>
+                <span class="method__label">Debit / Credit card</span>
+              </span>
+            </button>
+            <button class="method" type="button" data-go="bank">
+              <span class="method__left">
+                <span class="icon icon--bank" aria-hidden="true">⌂</span>
+                <span class="method__label">Internet Banking</span>
+              </span>
+            </button>
+            <button class="method" type="button" data-go="qr" data-brand="gpay">
+              <span class="method__left">
+                <span class="icon icon--gpay" aria-hidden="true">G</span>
+                <span class="method__label">G Pay</span>
+              </span>
+              <span class="badge badge--upi">UPI</span>
+            </button>
+            <button class="method" type="button" data-go="qr" data-brand="phonepe">
+              <span class="method__left">
+                <span class="icon icon--phonepe" aria-hidden="true">Pe</span>
+                <span class="method__label">PhonePe</span>
+              </span>
+              <span class="badge badge--rupay">RuPay</span>
+            </button>
+            <button class="method" type="button" data-go="qr" data-brand="upi">
+              <span class="method__left">
+                <span class="icon icon--plus" aria-hidden="true">+</span>
+                <span class="method__label">Add another UPI option</span>
+              </span>
+            </button>
+          </div>
+        </section>
+
+        <!-- SCREEN: card -->
+        <section class="screen" data-screen="card">
+          <div class="topbar">
+            <button class="back" type="button" data-go="choose" aria-label="Back">←</button>
+            <h1>Debit / Credit Card</h1>
+          </div>
+          <div class="tabs" role="tablist">
+            <button type="button" class="is-on" data-card-tab="debit">Debit Card</button>
+            <button type="button" data-card-tab="credit">Credit Card</button>
+          </div>
+          <form class="card-form" id="pay-card-form">
+            <div class="field">
+              <label for="card-number">Card Number</label>
+              <div class="card-number-wrap">
+                <input class="input" id="card-number" name="cardNumber" inputmode="numeric" placeholder="XXXX XXXX XXXX XXXX" autocomplete="cc-number">
+                <span class="mc-mark" aria-hidden="true"><span></span><span></span></span>
+              </div>
+            </div>
+            <div class="row-2">
+              <div class="field">
+                <label>Expiry date</label>
+                <div class="exp-row">
+                  <select class="select" name="expMonth" aria-label="Month">
+                    <option value="">Month</option>
+                    <option>01</option><option>02</option><option>03</option><option>04</option>
+                    <option>05</option><option>06</option><option>07</option><option>08</option>
+                    <option>09</option><option>10</option><option>11</option><option>12</option>
+                  </select>
+                  <select class="select" name="expYear" aria-label="Year">
+                    <option value="">Year</option>
+                    <option>2026</option><option>2027</option><option>2028</option>
+                    <option>2029</option><option>2030</option><option>2031</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <label for="card-cvv">CVV</label>
+                <input class="input" id="card-cvv" name="cvv" inputmode="numeric" maxlength="4" placeholder="XXX" autocomplete="cc-csc">
+              </div>
+            </div>
+            <div class="field">
+              <label for="card-name">Name</label>
+              <input class="input" id="card-name" name="name" placeholder="Name on card" autocomplete="cc-name">
+            </div>
+            <label class="save">
+              <input type="checkbox" checked>
+              Save card for future checkouts
+            </label>
+          </form>
+          <div class="footer-actions">
+            <button class="link-btn" type="button" data-go="choose">Cancel payment</button>
+            <button class="primary" type="submit" form="pay-card-form">Pay Now</button>
+          </div>
+        </section>
+
+        <!-- SCREEN: QR -->
+        <section class="screen" data-screen="qr">
+          <div class="topbar">
+            <button class="back" type="button" data-go="choose" aria-label="Back">←</button>
+            <h1 data-qr-title>Scan &amp; Pay</h1>
+          </div>
+          <div class="qr-body">
+            <div class="qr-brand" data-qr-brand>G Pay · UPI</div>
+            <p class="qr-amount">₹238</p>
+            <div class="qr-card" aria-label="Payment QR code">
+              <svg viewBox="0 0 120 120" role="img" aria-hidden="true">
+                <rect width="120" height="120" fill="#fff"/>
+                <g fill="#162033">
+                  <rect x="8" y="8" width="34" height="34" rx="3"/>
+                  <rect x="14" y="14" width="22" height="22" fill="#fff"/>
+                  <rect x="18" y="18" width="14" height="14"/>
+                  <rect x="78" y="8" width="34" height="34" rx="3"/>
+                  <rect x="84" y="14" width="22" height="22" fill="#fff"/>
+                  <rect x="88" y="18" width="14" height="14"/>
+                  <rect x="8" y="78" width="34" height="34" rx="3"/>
+                  <rect x="14" y="84" width="22" height="22" fill="#fff"/>
+                  <rect x="18" y="88" width="14" height="14"/>
+                  <rect x="50" y="8" width="8" height="8"/><rect x="62" y="8" width="8" height="8"/>
+                  <rect x="50" y="20" width="8" height="8"/><rect x="62" y="20" width="8" height="8"/>
+                  <rect x="50" y="32" width="8" height="8"/><rect x="62" y="32" width="8" height="8"/>
+                  <rect x="8" y="50" width="8" height="8"/><rect x="20" y="50" width="8" height="8"/>
+                  <rect x="32" y="50" width="8" height="8"/><rect x="44" y="50" width="8" height="8"/>
+                  <rect x="56" y="50" width="8" height="8"/><rect x="68" y="50" width="8" height="8"/>
+                  <rect x="80" y="50" width="8" height="8"/><rect x="92" y="50" width="8" height="8"/>
+                  <rect x="104" y="50" width="8" height="8"/>
+                  <rect x="50" y="62" width="8" height="8"/><rect x="62" y="62" width="8" height="8"/>
+                  <rect x="74" y="62" width="8" height="8"/><rect x="86" y="62" width="8" height="8"/>
+                  <rect x="98" y="62" width="8" height="8"/>
+                  <rect x="50" y="74" width="8" height="8"/><rect x="62" y="86" width="8" height="8"/>
+                  <rect x="74" y="74" width="8" height="8"/><rect x="86" y="86" width="8" height="8"/>
+                  <rect x="98" y="74" width="8" height="8"/><rect x="50" y="98" width="8" height="8"/>
+                  <rect x="74" y="98" width="8" height="8"/><rect x="98" y="98" width="8" height="8"/>
+                  <rect x="52" y="52" width="16" height="16" rx="2"/>
+                </g>
+              </svg>
+            </div>
+            <p class="upi-id" data-qr-upi>drswift@okaxis</p>
+            <p class="qr-help" data-qr-help>
+              Open your UPI app and scan this QR to complete payment. This screen updates automatically when payment succeeds.
+            </p>
+          </div>
+          <div class="footer-actions">
+            <button class="link-btn" type="button" data-go="choose">Cancel payment</button>
+            <button class="primary" type="button" data-simulate-paid>I’ve paid</button>
+          </div>
+        </section>
+
+        <!-- SCREEN: bank -->
+        <section class="screen" data-screen="bank">
+          <div class="topbar">
+            <button class="back" type="button" data-go="choose" aria-label="Back">←</button>
+            <h1>Internet Banking</h1>
+          </div>
+          <p class="amount-pill"><span>Amount payable</span><strong>₹238</strong></p>
+          <div class="bank-list">
+            <button type="button" data-bank>HDFC Bank</button>
+            <button type="button" data-bank>ICICI Bank</button>
+            <button type="button" data-bank>SBI</button>
+            <button type="button" data-bank>Axis Bank</button>
+            <button type="button" data-bank>Kotak Mahindra</button>
+          </div>
+          <div class="footer-actions">
+            <button class="link-btn" type="button" data-go="choose">Cancel payment</button>
+            <button class="primary" type="button" data-simulate-paid>Continue</button>
+          </div>
+        </section>
+      </div>
+
+      <aside class="explain">
+        <h2>Two-step payment concept</h2>
+        <p>Matches your reference: pick a method first, then land on a focused final screen.</p>
+        <ol>
+          <li><strong>Choose Payment option</strong> — card, net banking, G Pay, PhonePe, other UPI.</li>
+          <li><strong>Card path</strong> — Debit/Credit tabs, number, expiry, CVV, name, save card, Pay Now.</li>
+          <li><strong>UPI / GPay / PhonePe path</strong> — QR card + UPI ID + “I’ve paid”.</li>
+          <li><strong>Internet Banking</strong> — bank list, then continue to bank (simulated).</li>
+        </ol>
+        <div class="flow-map">
+          <div><strong>Card</strong> → form screen (this mock)</div>
+          <div><strong>G Pay / PhonePe / UPI</strong> → QR screen</div>
+          <div><strong>Internet Banking</strong> → bank picker</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const brandCopy = {
+      gpay: {
+        title: "G Pay",
+        brand: "G Pay · UPI",
+        help: "Open Google Pay and scan this QR, or pay to the UPI ID below.",
+      },
+      phonepe: {
+        title: "PhonePe",
+        brand: "PhonePe · RuPay UPI",
+        help: "Open PhonePe and scan this QR to pay. Keep this screen open until confirmation.",
+      },
+      upi: {
+        title: "UPI",
+        brand: "Any UPI app",
+        help: "Scan with GPay, PhonePe, Paytm, or BHIM. Payment syncs when the transfer completes.",
+      },
+    };
+
+    function showScreen(name) {
+      document.querySelectorAll("[data-screen]").forEach((el) => {
+        el.classList.toggle("is-active", el.getAttribute("data-screen") === name);
+      });
+    }
+
+    document.querySelectorAll("[data-go]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const target = btn.getAttribute("data-go");
+        if (target === "exit") {
+          alert("Prototype: would return to checkout customer details.");
+          return;
+        }
+        if (target === "qr") {
+          const key = btn.getAttribute("data-brand") || "upi";
+          const copy = brandCopy[key] || brandCopy.upi;
+          document.querySelector("[data-qr-title]").textContent = copy.title;
+          document.querySelector("[data-qr-brand]").textContent = copy.brand;
+          document.querySelector("[data-qr-help]").textContent = copy.help;
+        }
+        showScreen(target);
+      });
+    });
+
+    document.querySelectorAll("[data-card-tab]").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll("[data-card-tab]").forEach((t) => t.classList.remove("is-on"));
+        tab.classList.add("is-on");
+      });
+    });
+
+    document.getElementById("pay-card-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      alert("Prototype: card payment submitted. Wire to live gateway later.");
+      showScreen("choose");
+    });
+
+    document.querySelectorAll("[data-simulate-paid], [data-bank]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (btn.hasAttribute("data-bank")) {
+          alert(`Prototype: redirect to ${btn.textContent} net banking.`);
+          return;
+        }
+        alert("Prototype: payment marked complete → booking confirmation.");
+        showScreen("choose");
+      });
+    });
+  </script>
+</body>
+</html>

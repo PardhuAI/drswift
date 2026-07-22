@@ -57,6 +57,84 @@ function toneFromCategory(category: string): string {
   return "blood";
 }
 
+/** Read a display string from top-level or attributesJson (CMS duplicates both). */
+function attrString(
+  apiTest: Record<string, unknown>,
+  keys: string[],
+  fallback: string,
+): string {
+  const tryValue = (value: unknown): string | null => {
+    if (typeof value === "string" && value.trim()) return value.trim();
+    if (Array.isArray(value) && value.length) {
+      const first = String(value[0] ?? "").trim();
+      return first || null;
+    }
+    return null;
+  };
+  for (const key of keys) {
+    const top = tryValue(apiTest[key]);
+    if (top) return top;
+  }
+  let attrs: unknown = apiTest.attributesJson;
+  if (typeof attrs === "string") {
+    try {
+      attrs = JSON.parse(attrs);
+    } catch {
+      attrs = null;
+    }
+  }
+  if (attrs && typeof attrs === "object" && !Array.isArray(attrs)) {
+    const record = attrs as Record<string, unknown>;
+    for (const key of keys) {
+      const nested = tryValue(record[key]);
+      if (nested) return nested;
+    }
+  }
+  return fallback;
+}
+
+/** Exact CMS testCategories from top-level or attributesJson. */
+function extractTestCategories(apiTest: Record<string, unknown>): string[] {
+  const fromTop = asArray<string>(apiTest.testCategories).map(String).filter(Boolean);
+  if (fromTop.length) return fromTop;
+  let attrs: unknown = apiTest.attributesJson;
+  if (typeof attrs === "string") {
+    try {
+      attrs = JSON.parse(attrs);
+    } catch {
+      attrs = null;
+    }
+  }
+  if (attrs && typeof attrs === "object" && !Array.isArray(attrs)) {
+    return asArray<string>((attrs as Record<string, unknown>).testCategories)
+      .map(String)
+      .filter(Boolean);
+  }
+  return [];
+}
+
+/** Ensure toolbar chips (kidney / cbc / fever / vitamins) match live catalog names. */
+function enrichFilters(apiTest: Record<string, unknown>, existing: string[]): string[] {
+  const filters = new Set(existing.map(String).filter(Boolean));
+  filters.add("all");
+  const blob = [
+    apiTest.name,
+    apiTest.slug,
+    apiTest.category,
+    apiTest.summary,
+    apiTest.shortDescription,
+    apiTest.alternativeNames,
+    ...asArray<string>(apiTest.filters),
+  ]
+    .join(" ")
+    .toLowerCase();
+  if (/kidney|creatinine|egfr|\bkft\b|renal/.test(blob)) filters.add("kidney");
+  if (/\bcbc\b|complete blood|hemogram|blood count/.test(blob)) filters.add("cbc");
+  if (/fever|dengue|malaria|typhoid|widal|\bns1\b/.test(blob)) filters.add("fever");
+  if (/vitamin|vit\.?\s*d|vit\.?\s*b|\bb12\b|25-oh/.test(blob)) filters.add("vitamins");
+  return Array.from(filters);
+}
+
 function mapApiTest(apiTest: Record<string, unknown>, panels: Record<string, unknown>): MappedTest {
   const whatsTested = asArray<Record<string, unknown>>(apiTest.whatsTested);
   const customizable = Boolean(apiTest.customizable);
@@ -80,7 +158,10 @@ function mapApiTest(apiTest: Record<string, unknown>, panels: Record<string, unk
     slug: String(apiTest.slug || ""),
     name: String(apiTest.name || ""),
     category: String(apiTest.category || "General"),
-    filters: asArray<string>(apiTest.filters).length ? asArray<string>(apiTest.filters) : ["all"],
+    filters: enrichFilters(
+      apiTest,
+      asArray<string>(apiTest.filters).length ? asArray<string>(apiTest.filters) : ["all"],
+    ),
     image: String(apiTest.imageUrl || apiTest.image || ""),
     imageTone: toneFromCategory(String(apiTest.category || "")),
     badge: String(apiTest.badge || (customizable ? "Customizable" : "")),
@@ -92,8 +173,23 @@ function mapApiTest(apiTest: Record<string, unknown>, panels: Record<string, unk
     reasons: asArray(apiTest.reasons),
     customizable,
     testType: apiTest.testType,
-    sampleType: apiTest.sampleType || "Blood",
-    collection: apiTest.collection || "At-home sample collection",
+    sampleType: attrString(apiTest, ["sampleType"], "Blood"),
+    collection: attrString(apiTest, ["collection"], "At-home sample collection"),
+    age: attrString(apiTest, ["age", "ageRange"], "18+ recommended"),
+    results: attrString(apiTest, ["results", "resultsTimeline"], "24-48 hours after sample reaches the lab"),
+    preparation: attrString(apiTest, ["preparation", "preparationText"], ""),
+    hsa: attrString(apiTest, ["hsa"], "Accepted"),
+    // Public site always shows Online booking (not CMS bookingNote / purchaser text).
+    purchaser: "Online",
+    bookingNote: "Online",
+    frequentlyOrderedTest: Boolean(
+      apiTest.frequentlyOrderedTest ??
+        (apiTest.attributesJson &&
+          typeof apiTest.attributesJson === "object" &&
+          !Array.isArray(apiTest.attributesJson) &&
+          (apiTest.attributesJson as Record<string, unknown>).frequentlyOrderedTest),
+    ),
+    testCategories: extractTestCategories(apiTest),
     description: apiTest.description || apiTest.longDescription || "",
     whatsTested,
     faqs: asArray(apiTest.faqs),
@@ -178,7 +274,20 @@ async function fetchCatalogFromOrigin(env: Env): Promise<CatalogPayload> {
 
 export function mapCatalog(raw: CatalogPayload): CatalogBundle {
   const panels: Record<string, unknown> = {};
-  const tests = asArray<Record<string, unknown>>(raw.tests).map((t) => mapApiTest(t, panels));
+  const tests = asArray<Record<string, unknown>>(raw.tests)
+    .filter((t) => {
+      // Public website: General Public audience only (CMS: attributesJson.testAudience)
+      let audiences = asArray<string>(t.testAudience);
+      if (!audiences.length) {
+        const attrs = t.attributesJson;
+        if (attrs && typeof attrs === "object" && !Array.isArray(attrs)) {
+          audiences = asArray<string>((attrs as Record<string, unknown>).testAudience as string[]);
+        }
+      }
+      if (!audiences.length) return false;
+      return audiences.some((a) => String(a).trim().toLowerCase() === "general public");
+    })
+    .map((t) => mapApiTest(t, panels));
   const promotions = asArray<Record<string, unknown>>(raw.promotions).map(mapPromotion);
   return { tests, panels, promotions, raw };
 }

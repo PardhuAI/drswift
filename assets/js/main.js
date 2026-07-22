@@ -770,9 +770,16 @@ function applyCatalogFilter(filter) {
   let visibleCount = 0;
 
   cards.forEach((card) => {
-    const categories = card.getAttribute("data-category") || "";
+    let categories = [];
+    try {
+      const parsed = JSON.parse(card.getAttribute("data-test-categories") || "[]");
+      categories = Array.isArray(parsed) ? parsed.map(String) : [];
+    } catch {
+      categories = [];
+    }
     const haystack = card.getAttribute("data-search") || card.textContent || "";
-    const matchesFilter = filter === "all" || categories.split(/\s+/).includes(filter);
+    // Exact match against CMS attributesJson.testCategories values.
+    const matchesFilter = filter === "all" || categories.includes(filter);
     const matchesSearch = !query || haystack.toLowerCase().includes(query);
     const matches = matchesFilter && matchesSearch;
     card.classList.toggle("is-hidden", !matches);
@@ -853,7 +860,7 @@ let TESTS = Array.isArray(window.DRSWIFT_TESTS) ? window.DRSWIFT_TESTS : [];
 const CART_STORAGE_KEY = "drswift.cart.v1";
 
 function escapeHtml(value) {
-  return String(value)
+  return String(value ?? "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
@@ -920,12 +927,16 @@ function readCart() {
     if (!Array.isArray(parsed)) {
       return [];
     }
+    // Lab tests are one line each — never keep duplicate quantities.
     return parsed
       .filter((item) => item && item.slug && (!TESTS.length || getTestBySlug(item.slug)))
       .map((item) => ({
         slug: item.slug,
-        quantity: Math.max(1, Number(item.quantity) || 1),
-        ...(Array.isArray(item.customPanels) ? { customPanels: item.customPanels } : {})
+        quantity: 1,
+        ...(Array.isArray(item.customPanels) ? { customPanels: item.customPanels } : {}),
+        ...(typeof item.recipient === "string" && item.recipient.trim()
+          ? { recipient: item.recipient.trim() }
+          : {})
       }));
   } catch {
     return [];
@@ -938,7 +949,7 @@ function writeCart(cart) {
 }
 
 function cartQuantity() {
-  return readCart().reduce((sum, item) => sum + item.quantity, 0);
+  return readCart().length;
 }
 
 function updateCartBadges() {
@@ -960,6 +971,7 @@ function getTestLivePrice(test, customPanels) {
   return Number(test.price || 0);
 }
 
+/** @returns {"added"|"exists"|undefined} */
 function addToCart(slug) {
   const test = getTestBySlug(slug);
   if (!test) {
@@ -969,18 +981,19 @@ function addToCart(slug) {
   const customPanels = test.customizable ? readCustomSelectionForTest(test) : undefined;
   const existing = cart.find((item) => item.slug === slug);
   if (existing) {
-    existing.quantity += 1;
     if (customPanels) {
       existing.customPanels = customPanels;
+      writeCart(cart);
     }
-  } else {
-    cart.push({
-      slug,
-      quantity: 1,
-      ...(customPanels ? { customPanels } : {})
-    });
+    return "exists";
   }
+  cart.push({
+    slug,
+    quantity: 1,
+    ...(customPanels ? { customPanels } : {})
+  });
   writeCart(cart);
+  return "added";
 }
 
 function updateCartItem(slug, action) {
@@ -997,15 +1010,12 @@ function updateCartItem(slug, action) {
     return;
   }
 
-  if (action === "increase") {
-    item.quantity += 1;
+  // Quantity +/- removed — diagnostics cart is one of each test.
+  if (action === "increase" || action === "decrease") {
+    return;
   }
 
-  if (action === "decrease") {
-    item.quantity -= 1;
-  }
-
-  if (action === "remove" || item.quantity <= 0) {
+  if (action === "remove") {
     cart = cart.filter((entry) => entry.slug !== slug);
   }
 
@@ -1033,6 +1043,7 @@ function showCartToast(message) {
 
 function buildCatalogCard(test) {
   const filters = (test.filters || ["all"]).join(" ");
+  const testCategories = Array.isArray(test.testCategories) ? test.testCategories.map(String) : [];
   const searchText = [
     test.name,
     test.category,
@@ -1046,7 +1057,7 @@ function buildCatalogCard(test) {
     : "";
   const displayPrice = getTestLivePrice(test);
   return `
-    <article class="test-card test-card--catalog" data-category="${escapeHtml(filters)}" data-search="${escapeHtml(searchText)}" data-detail-url="${detailUrl(test.slug)}">
+    <article class="test-card test-card--catalog" data-category="${escapeHtml(filters)}" data-test-categories="${escapeHtml(JSON.stringify(testCategories))}" data-search="${escapeHtml(searchText)}" data-detail-url="${detailUrl(test.slug)}">
       <a class="test-card__layer test-card__media test-image photo-thumb photo-thumb--${escapeHtml(test.imageTone || "blood")}" href="${detailUrl(test.slug)}" aria-label="View ${escapeHtml(test.name)} details">
         <img src="${escapeHtml(test.image)}" alt="" loading="lazy" decoding="async">
         ${badge}
@@ -1441,13 +1452,15 @@ function buildCustomizeSection(test, selectedPanelIds) {
 }
 
 function buildPreparationCard(test) {
+  const preparation = String(test?.preparation ?? "").trim()
+    || "No special preparation required unless paired with another fasting test.";
   return `
     <div class="custom-preparation-card">
       <div>
         <p class="overline">Preparation</p>
         <h3>Before your sample collection</h3>
       </div>
-      <p>${escapeHtml(test.preparation)}</p>
+      <p>${escapeHtml(preparation)}</p>
       <p class="detail-note">If you have urgent symptoms, active medical concerns, or abnormal prior results, speak with a qualified clinician before booking self-directed testing.</p>
     </div>
   `;
@@ -1986,7 +1999,7 @@ function renderTestDetailPage() {
           ${buildFact("icon-home", "Collection", test.collection)}
           ${buildFact("icon-family", "Age", test.age)}
           ${buildFact("icon-clock", "Results", test.results)}
-          ${buildFact("icon-document", "Booking", test.purchaser)}
+          ${buildFact("icon-document", "Booking", test.purchaser || "Online")}
         </ul>
       </div>
     </section>
@@ -2096,6 +2109,91 @@ function cartTotals(items) {
   );
 }
 
+function cartUserName() {
+  const name = String(window.DRSWIFT_USER?.displayName || "").trim();
+  return name || "Me";
+}
+
+function cartRecipientOptions() {
+  return [cartUserName(), "Parent", "Partner", "Child"];
+}
+
+function writeCartRecipient(slug, recipient) {
+  const cart = readCart();
+  const item = cart.find((entry) => entry.slug === slug);
+  if (!item) {
+    return;
+  }
+  item.recipient = recipient;
+  writeCart(cart);
+}
+
+function cartFamilyBannerHtml(cartTotal = 0) {
+  const isSignedIn = Boolean(window.DRSWIFT_USER);
+  const familySaveAmount = Math.round(Number(cartTotal || 0) * 0.15);
+  const familySaveText =
+    familySaveAmount > 0
+      ? ` That’s additional ${formatPrice(familySaveAmount)}.`
+      : "";
+  return `
+    <section class="cart-family-banner" aria-label="Family booking account setup">
+      <div class="cart-family-banner__visual">
+        <picture>
+          <source srcset="assets/images/wellness-family.webp" type="image/webp">
+          <img
+            src="assets/images/wellness-family.jpg"
+            alt="Family reviewing health profiles together at home"
+            loading="lazy"
+            decoding="async"
+            width="560"
+            height="420"
+          >
+        </picture>
+      </div>
+      <div class="cart-family-banner__content">
+        <h2>Book Together. Save 15%.</h2>
+        <p>Create your free Dr. Swift account to book tests for you and a family member.</p>
+        <p class="cart-family-saving">
+          <svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-price"></use></svg>
+          <strong>Add a family member and everyone in this booking gets 15% family savings.${familySaveText}</strong>
+        </p>
+      </div>
+      <div class="cart-family-banner__actions">
+        ${
+          isSignedIn
+            ? `<a class="button primary" href="account.html">Manage Family Members</a>`
+            : `<a class="button primary" href="signup.html">Create Account &amp; Save 15%</a>`
+        }
+        <a class="cart-family-skip" href="book.html?cart=checkout">${isSignedIn ? "Continue to checkout" : "Continue without an account"}</a>
+      </div>
+    </section>
+  `;
+}
+
+function cartRecipientControlHtml(item) {
+  const isSignedIn = Boolean(window.DRSWIFT_USER);
+  if (!isSignedIn) {
+    return "";
+  }
+
+  const options = cartRecipientOptions();
+  const selected = options.includes(item.recipient) ? item.recipient : options[0];
+  return `
+    <div class="cart-recipient">
+      <label for="cart-recipient-${escapeHtml(item.slug)}">Book for</label>
+      <select id="cart-recipient-${escapeHtml(item.slug)}" data-cart-recipient="${escapeHtml(item.slug)}">
+        ${options
+          .map(
+            (option) =>
+              `<option value="${escapeHtml(option)}"${option === selected ? " selected" : ""}>${escapeHtml(option)}</option>`
+          )
+          .join("")}
+      </select>
+      <a href="account.html">Add family member</a>
+    </div>
+  `;
+}
+
 function renderCartPage() {
   const container = document.querySelector("[data-cart-page]");
   if (!container || !TESTS.length) {
@@ -2120,13 +2218,13 @@ function renderCartPage() {
 
   const totals = cartTotals(items);
   const savings = Math.max(0, totals.original - totals.subtotal);
-  const cartNames = items.map((item) => `${item.test.name} x ${item.quantity}`).join(", ");
 
   container.innerHTML = `
+    ${cartFamilyBannerHtml(totals.subtotal)}
     <div class="cart-items" aria-label="Selected tests">
       ${items
         .map((item) => {
-          const { test, quantity } = item;
+          const { test } = item;
           const unitPrice = getTestLivePrice(test, item.customPanels);
           return `
             <article class="cart-item">
@@ -2137,20 +2235,12 @@ function renderCartPage() {
                 <p class="overline">${escapeHtml(test.category)}</p>
                 <h2><a href="${detailUrl(test.slug)}">${escapeHtml(test.name)}</a></h2>
                 <p>${escapeHtml(test.summary)}</p>
-                <ul class="test-meta">
-                  <li>${escapeHtml(test.collection)}</li>
-                  <li>${escapeHtml(test.results.replace(" after sample reaches the lab", ""))}</li>
-                </ul>
+                ${cartRecipientControlHtml(item)}
               </div>
               <div class="cart-item__controls">
                 <div class="price-row">
-                  <span class="price">${formatPrice(unitPrice * quantity)}</span>
-                  ${formatOldPriceHtml(test, unitPrice, quantity)}
-                </div>
-                <div class="quantity-control" aria-label="Quantity for ${escapeHtml(test.name)}">
-                  <button type="button" data-cart-action="decrease" data-cart-slug="${escapeHtml(test.slug)}" aria-label="Decrease ${escapeHtml(test.name)} quantity">-</button>
-                  <span>${quantity}</span>
-                  <button type="button" data-cart-action="increase" data-cart-slug="${escapeHtml(test.slug)}" aria-label="Increase ${escapeHtml(test.name)} quantity">+</button>
+                  <span class="price">${formatPrice(unitPrice)}</span>
+                  ${formatOldPriceHtml(test, unitPrice)}
                 </div>
                 <button class="cart-remove" type="button" data-cart-action="remove" data-cart-slug="${escapeHtml(test.slug)}">Remove</button>
               </div>
@@ -2162,13 +2252,12 @@ function renderCartPage() {
     <aside class="cart-summary" aria-label="Cart summary">
       <h2>Order summary</h2>
       <dl>
-        <div><dt>Tests</dt><dd>${items.reduce((sum, item) => sum + item.quantity, 0)}</dd></div>
+        <div><dt>Tests</dt><dd>${items.length}</dd></div>
         <div><dt>Subtotal</dt><dd>${formatPrice(totals.original)}</dd></div>
         <div><dt>Savings</dt><dd>-${formatPrice(savings)}</dd></div>
         <div class="cart-summary__total"><dt>Total</dt><dd>${formatPrice(totals.subtotal)}</dd></div>
       </dl>
       <a class="button primary full" href="book.html?cart=checkout">Continue to booking</a>
-      <a class="button secondary full" href="whatsapp.html?message=${encodeURIComponent(`I want to book: ${cartNames}`)}">Book via WhatsApp</a>
       <button class="cart-clear-link" type="button" data-cart-action="clear">Clear cart</button>
       <ul class="cart-assurance">
         <li>No payment is taken until your slot is confirmed.</li>
@@ -2179,6 +2268,22 @@ function renderCartPage() {
   `;
 }
 
+document.addEventListener("change", (event) => {
+  const recipientSelect = event.target.closest("[data-cart-recipient]");
+  if (!recipientSelect) {
+    return;
+  }
+  writeCartRecipient(
+    recipientSelect.getAttribute("data-cart-recipient"),
+    recipientSelect.value
+  );
+  showCartToast(`This test is set for ${recipientSelect.value}.`);
+});
+
+window.addEventListener("drswift:auth-changed", () => {
+  renderCartPage();
+});
+
 document.addEventListener("click", (event) => {
   const addButton = event.target.closest("[data-add-to-cart]");
   if (addButton) {
@@ -2187,9 +2292,13 @@ document.addEventListener("click", (event) => {
     const slug = addButton.getAttribute("data-add-to-cart");
     const test = getTestBySlug(slug);
     if (test) {
-      addToCart(slug);
+      const result = addToCart(slug);
       renderCartPage();
-      showCartToast(`${test.name} added to cart.`);
+      if (result === "exists") {
+        showCartToast(`${test.name} is already in your cart.`);
+      } else if (result === "added") {
+        showCartToast(`${test.name} added to cart.`);
+      }
     }
     return;
   }
@@ -2214,19 +2323,10 @@ function renderHomeFeatured() {
   if (!rail) {
     return;
   }
-  const preferred = String(rail.getAttribute("data-home-featured-slugs") || "")
-    .split(",")
-    .map((slug) => slug.trim())
-    .filter(Boolean);
-  const bySlug = new Map(TESTS.map((test) => [test.slug, test]));
-  let featured = preferred.map((slug) => bySlug.get(slug)).filter(Boolean);
-  if (!featured.length) {
-    featured = TESTS.filter((test) => test.badge).slice(0, 5);
-  }
-  if (!featured.length) {
-    featured = TESTS.slice(0, 5);
-  }
-  rail.innerHTML = featured.map(buildCatalogCard).join("");
+  const featured = TESTS.filter((test) => Boolean(test.frequentlyOrderedTest));
+  rail.innerHTML = featured.length
+    ? featured.map(buildCatalogCard).join("")
+    : "";
 }
 
 async function bootStorefront() {

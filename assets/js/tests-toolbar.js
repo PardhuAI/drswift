@@ -4,42 +4,55 @@
     return;
   }
 
+  // category = exact CMS testCategories checkbox value (attributesJson.testCategories).
   const healthCategories = [
-    { label: "Heart Health Tests", filter: "heart" },
-    { label: "Diabetes Risk Tests", filter: "diabetes" },
-    { label: "Thyroid Profile", filter: "thyroid" },
-    { label: "Women's Health", filter: "women" },
-    { label: "Full Body Checkup", filter: "full-body" },
-    { label: "Vitamin D", filter: "all", search: "vitamin" },
+    { label: "Heart Health Tests", category: "Heart" },
+    { label: "Diabetes Risk Tests", category: "Diabetes" },
+    { label: "Thyroid Profile", category: "Thyroid" },
+    { label: "Women's Health", category: "Women" },
+    { label: "Full Body Checkup", category: "Full Body Checkup" },
+    { label: "Vitamin D", category: "Vitamin D" },
+    { label: "Kidney Health", category: "Kidney" },
+    { label: "CBC", category: "CBC" },
+    { label: "Fever", category: "Fever" },
+    { label: "Vitamins", category: "Vitamins" },
+    { label: "Cholesterol", category: "Cholesterol" },
   ];
 
   const audienceLinks = {
     him: [
-      { label: "Heart Health Tests", filter: "heart" },
-      { label: "Diabetes Risk Tests", filter: "diabetes" },
-      { label: "Full Body Checkup", filter: "full-body" },
-      { label: "Thyroid Profile", filter: "thyroid" },
+      { label: "Heart Health Tests", category: "Heart" },
+      { label: "Diabetes Risk Tests", category: "Diabetes" },
+      { label: "Full Body Checkup", category: "Full Body Checkup" },
+      { label: "Kidney Health", category: "Kidney" },
+      { label: "Sexual Health", category: "Sexual Health" },
+      { label: "Testosterone", category: "Testosterone" },
+      { label: "Cholesterol", category: "Cholesterol" },
+      { label: "Liver Health", category: "Liver" },
     ],
     her: [
-      { label: "Women's Health", filter: "women" },
-      { label: "Thyroid Profile", filter: "thyroid" },
-      { label: "Full Body Checkup", filter: "full-body" },
-      { label: "Vitamin D", filter: "all", search: "vitamin" },
-      { label: "Heart Health Tests", filter: "heart" },
+      { label: "Women's Health", category: "Women" },
+      { label: "Thyroid Profile", category: "Thyroid" },
+      { label: "Full Body Checkup", category: "Full Body Checkup" },
+      { label: "Vitamin D", category: "Vitamin D" },
+      { label: "Heart Health Tests", category: "Heart" },
+      { label: "Pregnancy Care", category: "Pregnancy" },
+      { label: "Hairfall", category: "HairFall" },
+      { label: "Weight Management", category: "Weight" },
     ],
     loved: [
-      { label: "Full Body Checkup", filter: "full-body" },
-      { label: "Heart Health Tests", filter: "heart" },
-      { label: "Diabetes Risk Tests", filter: "diabetes" },
-      { label: "Thyroid Profile", filter: "thyroid" },
-      { label: "Vitamin D", filter: "all", search: "vitamin" },
+      { label: "Full Body Checkup", category: "Full Body Checkup" },
+      { label: "Heart Health Tests", category: "Heart" },
+      { label: "Diabetes Risk Tests", category: "Diabetes" },
+      { label: "Thyroid Profile", category: "Thyroid" },
+      { label: "Vitamin D", category: "Vitamin D" },
     ],
   };
 
   const audienceFilter = {
-    him: "men",
-    her: "women",
-    loved: "full-body",
+    him: "Men",
+    her: "Women",
+    loved: "50+",
   };
 
   const mainTabs = [...document.querySelectorAll(".tests-audience-tabs .tests-tab")];
@@ -122,18 +135,13 @@
 
     const health = findHealth(row1Selection);
     if (!health) {
+      setSearchQuery("");
       setCatalogFilterSafe("all");
       return;
     }
 
-    if (health.search) {
-      setCatalogFilterSafe(health.filter || "all");
-      setSearchQuery(health.search);
-      return;
-    }
-
     setSearchQuery("");
-    setCatalogFilterSafe(health.filter || "all");
+    setCatalogFilterSafe(health.category);
   }
 
   function syncRow1State() {
@@ -352,11 +360,8 @@
     button.type = "button";
     button.className = className;
     button.textContent = item.label;
-    button.dataset.quickKey = `${item.filter}:${item.search || ""}:${item.label}`;
-    button.dataset.filter = item.filter;
-    if (item.search) {
-      button.dataset.search = item.search;
-    }
+    button.dataset.quickKey = item.category;
+    button.dataset.filter = item.category;
     button.setAttribute("aria-pressed", "false");
     return button;
   }
@@ -443,13 +448,12 @@
   }
 
   function selectQuickLink(button) {
-    const filter = button.dataset.filter || "all";
-    const search = button.dataset.search || "";
+    const category = button.dataset.filter || "all";
     activeQuickKey = button.dataset.quickKey || "";
     syncQuickLinkState();
     syncQuickFiltersToggleMark();
-    setCatalogFilterSafe(filter);
-    setSearchQuery(search);
+    setSearchQuery("");
+    setCatalogFilterSafe(category);
   }
 
   allTestsButton?.addEventListener("click", () => selectAll());

@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prototype — Clean payment details | Dr.Swift</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #162033;
+      --muted: #657084;
+      --line: #dce3ee;
+      --soft: #f6f8fb;
+      --panel: #ffffff;
+      --blue: #1e5bd7;
+      --green: #4e8c73;
+      --shadow: 0 18px 40px rgba(33, 49, 78, 0.12);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: Inter, system-ui, sans-serif;
+      background:
+        radial-gradient(900px 420px at 12% -10%, #edf4ff 0%, transparent 55%),
+        linear-gradient(180deg, #fafcff 0%, #f3f6fb 100%);
+    }
+
+    .page {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 72px;
+    }
+
+    .proto-note {
+      margin-bottom: 16px;
+      padding: 12px 14px;
+      background: #edf4ff;
+      border: 1px solid #c9dbff;
+      border-radius: 10px;
+      color: #123f9b;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .proto-note a { color: #123f9b; font-weight: 700; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .pay-stage {
+      padding: clamp(24px, 3.5vw, 36px);
+    }
+
+    .step-kicker {
+      margin: 0 0 4px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .pay-stage > h1 {
+      margin: 0 0 22px;
+      font-family: "Source Serif 4", Georgia, serif;
+      font-size: clamp(1.7rem, 3vw, 2.1rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    .wallet-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 22px;
+    }
+
+    .wallet-row button {
+      appearance: none;
+      min-height: 44px;
+      border-radius: 10px;
+      border: 1.5px solid transparent;
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .wallet-row .phonepe { color: #fff; background: #5f259f; }
+    .wallet-row .gpay {
+      color: #1f1f1f;
+      background: #fff;
+      border-color: #4285f4;
+    }
+    .wallet-row .paytm { color: #003b70; background: #00baf2; }
+    .wallet-row .upi { color: #fff; background: #097a4b; }
+
+    .wallet-row button.is-on {
+      box-shadow: 0 0 0 3px rgba(30, 91, 215, 0.18);
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 20px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+
+    /* —— Clean payment details card (concept) —— */
+    .card-details {
+      padding: 0;
+    }
+
+    .card-details__title {
+      margin: 0 0 14px;
+      font-family: "Source Serif 4", Georgia, serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 22px;
+    }
+
+    .brand-mark {
+      display: inline-grid;
+      place-items: center;
+      height: 28px;
+      min-width: 46px;
+      padding: 0 8px;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: #fff;
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      color: #334155;
+    }
+
+    .brand-mark--visa { color: #1a1f71; }
+    .brand-mark--mc { color: #eb001b; }
+    .brand-mark--disc { color: #ff6000; }
+    .brand-mark--amex { color: #2e77bb; }
+    .brand-mark--up { color: #e21836; }
+
+    .card-form {
+      display: grid;
+      gap: 16px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field label {
+      color: #6b7280;
+      font-size: 0.84rem;
+      font-weight: 600;
+    }
+
+    .field label .req {
+      color: #b42318;
+      margin-left: 1px;
+    }
+
+    .field input {
+      width: 100%;
+      min-height: 48px;
+      padding: 12px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+      transition: border-color 140ms ease, box-shadow 140ms ease;
+    }
+
+    .field input::placeholder {
+      color: #9ca3af;
+      font-weight: 400;
+    }
+
+    .field input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(30, 91, 215, 0.12);
+      outline: none;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+      gap: 16px;
+      align-items: end;
+    }
+
+    .cvv-wrap {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .cvv-hint {
+      width: 72px;
+      height: 46px;
+      border-radius: 6px;
+      background: linear-gradient(180deg, #e8edf5 0%, #d9e0ec 100%);
+      border: 1px solid #c5cedc;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .cvv-hint::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 10px;
+      height: 10px;
+      background: #4b5563;
+    }
+
+    .cvv-hint::after {
+      content: "123";
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      padding: 1px 5px;
+      border-radius: 2px;
+      background: #f97316;
+      color: #fff;
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      font-family: Inter, sans-serif;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 28px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .actions .back {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .actions .pay {
+      appearance: none;
+      min-height: 46px;
+      min-width: 160px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--green);
+      color: #fff;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 12px 24px rgba(78, 140, 115, 0.2);
+    }
+
+    .actions .pay:hover { background: #3e7a63; }
+
+    .aside .panel {
+      padding: 18px;
+    }
+
+    .aside h2 {
+      margin: 0 0 12px;
+      font-size: 0.95rem;
+    }
+
+    .kv {
+      display: grid;
+      gap: 0;
+      margin: 0;
+    }
+
+    .kv div {
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr);
+      gap: 8px;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--line);
+      align-items: baseline;
+    }
+
+    .kv div:last-child { border-bottom: 0; }
+
+    .kv dt {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .kv dd {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 650;
+      word-break: break-word;
+    }
+
+    .notes {
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+      grid-column: 1 / -1;
+    }
+
+    .notes li {
+      padding: 12px 14px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: 1fr; }
+      .wallet-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .field-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="proto-note">
+      <strong>Prototype</strong> — clean payment details screen (inspired by your reference).
+      Stacked labels, card brand strip, monospace inputs, CVV hint. Confirm before wiring into <code>book.html</code>.
+      · <a href="index.html">Back to prototypes</a>
+    </div>
+
+    <div class="layout">
+      <section class="panel pay-stage" aria-label="Payment">
+        <p class="step-kicker">Step 3</p>
+        <h1>Payment options</h1>
+
+        <div class="wallet-row" role="group" aria-label="Wallet and UPI">
+          <button type="button" class="phonepe" data-wallet>PhonePe</button>
+          <button type="button" class="gpay" data-wallet>Google Pay</button>
+          <button type="button" class="paytm" data-wallet>Paytm</button>
+          <button type="button" class="upi" data-wallet>UPI</button>
+        </div>
+
+        <p class="divider">Or pay with card</p>
+
+        <div class="card-details">
+          <h2 class="card-details__title">Payment details</h2>
+
+          <div class="brand-row" aria-label="Accepted cards">
+            <span class="brand-mark brand-mark--visa">VISA</span>
+            <span class="brand-mark brand-mark--mc">MC</span>
+            <span class="brand-mark brand-mark--disc">DISC</span>
+            <span class="brand-mark brand-mark--amex">AMEX</span>
+            <span class="brand-mark brand-mark--up">银联</span>
+          </div>
+
+          <form class="card-form" id="card-form" autocomplete="on" novalidate>
+            <div class="field">
+              <label for="card-number">Card Number<span class="req" aria-hidden="true">*</span></label>
+              <input id="card-number" name="cardNumber" inputmode="numeric" autocomplete="cc-number" placeholder="Enter Card Number" required>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="card-exp">Expiration Date<span class="req" aria-hidden="true">*</span></label>
+                <input id="card-exp" name="cardExp" autocomplete="cc-exp" placeholder="MM/YY" required>
+              </div>
+
+              <div class="field">
+                <label for="card-cvv">Security Code<span class="req" aria-hidden="true">*</span></label>
+                <div class="cvv-wrap">
+                  <input id="card-cvv" name="cardCvv" inputmode="numeric" autocomplete="cc-csc" placeholder="XXX" maxlength="4" required>
+                  <div class="cvv-hint" title="3-digit code on the back of your card" aria-hidden="true"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="card-name">Card Holder Name<span class="req" aria-hidden="true">*</span></label>
+              <input id="card-name" name="cardName" autocomplete="cc-name" placeholder="Enter Card Holder Name" required>
+            </div>
+          </form>
+        </div>
+
+        <div class="actions">
+          <button class="back" type="button">← Customer Details</button>
+          <button class="pay" type="submit" form="card-form">Pay now</button>
+        </div>
+      </section>
+
+      <aside class="aside" aria-label="Order summary">
+        <div class="panel">
+          <h2>Selected tests</h2>
+          <dl class="kv">
+            <div><dt>Items</dt><dd>5 tests</dd></div>
+            <div><dt>Total</dt><dd>₹238</dd></div>
+          </dl>
+        </div>
+        <div class="panel" style="margin-top:12px">
+          <h2>Customer</h2>
+          <dl class="kv">
+            <div><dt>Name</dt><dd>Madhu Karnati</dd></div>
+            <div><dt>Phone</dt><dd>9848094942</dd></div>
+            <div><dt>When</dt><dd>Today · Morning</dd></div>
+          </dl>
+        </div>
+      </aside>
+
+      <ul class="notes">
+        <li><strong>Layout:</strong> Labels above fields (not side-by-side). One quiet white card — no nested grey box.</li>
+        <li><strong>Card strip:</strong> Visa / Mastercard / Discover / Amex / UnionPay as compact brand marks under the title.</li>
+        <li><strong>Security code:</strong> Short field + mini card-back hint (orange CVV cue), matching your reference.</li>
+        <li><strong>Wallets:</strong> PhonePe / GPay / Paytm / UPI stay as quick alternatives above; choosing one can hide the card block in live checkout.</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll("[data-wallet]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("[data-wallet]").forEach((b) => b.classList.remove("is-on"));
+        btn.classList.add("is-on");
+      });
+    });
+
+    document.getElementById("card-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      alert("Prototype only — card form validated visually. Wire to live checkout when approved.");
+    });
+  </script>
+</body>
+</html>

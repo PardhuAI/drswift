@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Book a test | Dr.Swift Diagnostics</title>
-    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/styles.css?v=card-limits-1">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
   <body class="auth-page">
@@ -14,135 +14,529 @@
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu"><span class="sr-only">Menu</span><span></span><span></span><span></span></button>
         <div class="nav-menu" id="primary-menu">
           <div class="nav-links"><a href="tests.html">Tests</a><a href="reports.html">Reports</a><a href="about.html">About</a></div>
-          <div class="nav-actions"><a class="cart-link" href="cart.html" aria-label="View cart"><svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-cart"></use></svg><span>Cart</span><span class="cart-count" data-cart-count hidden>0</span></a><a class="button primary nav-cta" href="tests.html">Shop tests</a></div>
+          <div class="nav-actions"><a class="cart-link" href="cart.html" aria-label="View cart"><svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-cart"></use></svg><span>Cart</span><span class="cart-count" data-cart-count hidden>0</span></a><a class="button primary nav-cta" href="login.html">My Account</a></div>
         </div>
       </nav>
     </header>
     <main class="auth-shell">
-      <div class="container container--centered">
-        <div class="auth-card auth-card--wide">
+      <div class="checkout-frame">
+        <div class="checkout-wire-shell">
           <div class="auth-card__header">
-            <p class="eyebrow">At-home collection</p>
-            <h1>Schedule your collection</h1>
-            <p>Confirm the patient details, preferred slot, and contact method. Our care team will lock the appointment and payment link.</p>
+            <p class="eyebrow">Checkout</p>
+            <h1>Complete your booking</h1>
+            <p>Confirm collection details, pay securely, and receive booking confirmation.</p>
           </div>
-          <ol class="booking-steps" aria-label="Booking steps">
-            <li><span>1</span>Review tests</li>
-            <li><span>2</span>Choose slot</li>
-            <li><span>3</span>Confirm payment</li>
-          </ol>
-          <div class="booking-cart-summary booking-cart-summary--panel" data-booking-cart hidden></div>
-          <form class="auth-form" data-auth-form id="book-form" novalidate>
-            <p class="secure-note">Booking details are used to schedule sample collection and send report updates securely.</p>
-            <div class="form-field">
-              <label for="book-test">Select test</label>
-              <select id="book-test" name="test" required>
-                <option value="">Choose a panel</option>
-                <option>Complete Blood Count</option>
-                <option>Lipid Profile</option>
-                <option>Thyroid Profile</option>
-                <option>Vitamin D Test</option>
-                <option>Full Body Checkup</option>
-                <option>HbA1c &amp; Glucose</option>
-                <option>Women's Hormone Panel</option>
-                <option>Kidney Function Panel</option>
-                <option>Tuberculosis (TB) Blood Test</option>
-              </select>
+
+          <div class="checkout-wire-layout" data-checkout-flow>
+            <div class="checkout-wire-main">
+              <section class="checkout-wire-panel is-active" data-checkout-stage="details">
+                <div class="checkout-wire-head">
+                  <span class="checkout-step-badge">2</span>
+                  <div>
+                    <p class="checkout-step-kicker">Step 2</p>
+                    <h2>Who is this booking for?</h2>
+                  </div>
+                </div>
+                <form class="checkout-wire-form" data-checkout-form id="book-form" novalidate>
+                  <div class="checkout-time-row">
+                    <strong>Sample Collection Date/Time</strong>
+                    <div class="checkout-segments" role="group" aria-label="Sample collection day">
+                      <input id="book-day-today" type="radio" name="sampleDay" value="Today" checked>
+                      <label for="book-day-today">Today</label>
+                      <input id="book-day-tomorrow" type="radio" name="sampleDay" value="Tomorrow">
+                      <label for="book-day-tomorrow">Tomorrow</label>
+
+                      <span class="checkout-date-chip" data-date-chip hidden>
+                        <span data-date-chip-label></span>
+                        <button type="button" aria-label="Clear selected date" data-clear-date>×</button>
+                      </span>
+
+                      <button
+                        class="checkout-select-date-btn"
+                        type="button"
+                        aria-haspopup="dialog"
+                        aria-expanded="false"
+                        aria-controls="collection-calendar"
+                        data-cal-trigger
+                      >
+                        Select date
+                      </button>
+
+                      <input id="book-day-custom" type="radio" name="sampleDay" value="" data-custom-day hidden>
+
+                      <div
+                        class="cal-popover"
+                        id="collection-calendar"
+                        role="dialog"
+                        aria-modal="false"
+                        aria-label="Choose collection date"
+                        hidden
+                        data-cal-popover
+                      >
+                        <div class="cal-popover__head">
+                          <p class="cal-popover__title" data-cal-month>Month</p>
+                          <div class="cal-nav">
+                            <button type="button" aria-label="Previous month" data-cal-prev>‹</button>
+                            <button type="button" aria-label="Next month" data-cal-next>›</button>
+                          </div>
+                        </div>
+                        <div class="cal-weekdays" aria-hidden="true">
+                          <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                        </div>
+                        <div class="cal-grid" data-cal-grid role="grid" aria-label="Calendar dates"></div>
+                        <div class="cal-popover__foot">
+                          <p class="cal-popover__hint">Past dates disabled.<br>Book up to 30 days ahead.</p>
+                          <button class="button secondary" type="button" data-cal-close>Close</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="checkout-segments checkout-segments--time" role="group" aria-label="Sample collection window">
+                      <input id="book-time-morning" type="radio" name="sampleWindow" value="Morning" checked>
+                      <label for="book-time-morning">Morning</label>
+                      <input id="book-time-afternoon" type="radio" name="sampleWindow" value="Afternoon">
+                      <label for="book-time-afternoon">Afternoon</label>
+                      <input id="book-time-evening" type="radio" name="sampleWindow" value="Evening">
+                      <label for="book-time-evening">Evening</label>
+                    </div>
+                    <p class="checkout-when-confirm" data-when-confirm aria-live="polite">
+                      <span class="checkout-when-confirm__tick" aria-hidden="true">✓</span>
+                      <strong data-when-confirm-value>Today · Morning</strong>
+                    </p>
+                  </div>
+
+                  <div class="checkout-wire-field checkout-wire-field--wide">
+                    <label for="book-name">Name</label>
+                    <input id="book-name" type="text" name="name" autocomplete="name" required>
+                  </div>
+                  <div class="checkout-gender-age-row">
+                    <span class="checkout-gender-age-row__label" id="book-gender-label">Gender</span>
+                    <div class="checkout-segments" role="radiogroup" aria-labelledby="book-gender-label">
+                      <input id="book-gender-male" type="radio" name="gender" value="Male" checked required>
+                      <label for="book-gender-male">Male</label>
+                      <input id="book-gender-female" type="radio" name="gender" value="Female">
+                      <label for="book-gender-female">Female</label>
+                    </div>
+                    <label for="book-age">Age</label>
+                    <input id="book-age" type="number" name="age" inputmode="numeric" min="0" max="120">
+                  </div>
+                  <div class="checkout-wire-field checkout-wire-field--phone">
+                    <label for="book-phone">Phone</label>
+                    <div class="phone-verify-row">
+                      <input id="book-phone" type="tel" name="phone" autocomplete="tel" inputmode="numeric" placeholder="10-digit mobile" maxlength="10" pattern="[0-9]{10}" required>
+                      <button class="button secondary" type="button" data-otp-send disabled>Send OTP</button>
+                      <p class="phone-verified-badge" data-phone-verified-badge hidden>✓ Verified</p>
+                    </div>
+                  </div>
+                  <div class="checkout-wire-field checkout-otp" data-otp-block hidden>
+                    <label for="book-otp">Verify OTP</label>
+                    <div class="phone-verify-row">
+                      <input id="book-otp" type="text" name="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code">
+                      <button class="button secondary" type="button" data-otp-verify>Verify</button>
+                    </div>
+                  </div>
+                  <p class="checkout-status" data-checkout-status hidden aria-live="polite"></p>
+                  <div class="checkout-wire-field">
+                    <label for="book-city">City/Town/Village</label>
+                    <input
+                      id="book-city"
+                      type="text"
+                      name="city"
+                      autocomplete="address-level2"
+                      maxlength="99"
+                      minlength="3"
+                      pattern="[A-Za-z].{2,98}"
+                      title="Must start with a letter, include at least 3 letters, and be under 100 characters"
+                      required
+                    >
+                  </div>
+                  <div class="checkout-wire-field checkout-wire-field--address">
+                    <label for="book-address">Address</label>
+                    <textarea id="book-address" name="address" autocomplete="street-address" required></textarea>
+                  </div>
+                  <div class="checkout-wire-actions">
+                    <a class="checkout-back-link" href="cart.html" aria-label="View cart">
+                      <span aria-hidden="true">←</span> View Cart
+                    </a>
+                    <button class="checkout-next-link" type="submit" disabled>Continue to payment</button>
+                  </div>
+                </form>
+              </section>
+
+              <section class="checkout-wire-panel" data-checkout-stage="pay-choose" hidden>
+                <div class="checkout-wire-head">
+                  <span class="checkout-step-badge">3</span>
+                  <div>
+                    <p class="checkout-step-kicker">Step 3</p>
+                    <h2>Choose Payment option</h2>
+                  </div>
+                </div>
+                <div class="pay-method-list">
+                  <button class="pay-method" type="button" data-pay-go="pay-card">
+                    <span class="pay-method__left">
+                      <span class="pay-ico pay-ico--card" aria-hidden="true">
+                        <img src="assets/images/pay/card.svg" alt="" width="22" height="22">
+                      </span>
+                      Debit / Credit card
+                    </span>
+                  </button>
+                  <button class="pay-method" type="button" data-pay-go="pay-bank">
+                    <span class="pay-method__left">
+                      <span class="pay-ico pay-ico--bank" aria-hidden="true">
+                        <img src="assets/images/pay/bank.svg" alt="" width="22" height="22">
+                      </span>
+                      Internet Banking
+                    </span>
+                  </button>
+                  <button class="pay-method" type="button" data-pay-go="pay-qr" data-brand="gpay">
+                    <span class="pay-method__left">
+                      <span class="pay-ico pay-ico--gpay" aria-hidden="true">
+                        <img src="assets/images/pay/gpay.svg" alt="" width="26" height="26">
+                      </span>
+                      G Pay
+                    </span>
+                    <span class="pay-badge">UPI</span>
+                  </button>
+                  <button class="pay-method" type="button" data-pay-go="pay-qr" data-brand="phonepe">
+                    <span class="pay-method__left">
+                      <span class="pay-ico pay-ico--phonepe" aria-hidden="true">
+                        <img src="assets/images/pay/phonepe.svg" alt="" width="26" height="26">
+                      </span>
+                      PhonePe
+                    </span>
+                    <span class="pay-badge">RuPay</span>
+                  </button>
+                  <button class="pay-method" type="button" data-pay-go="pay-qr" data-brand="upi">
+                    <span class="pay-method__left">
+                      <span class="pay-ico pay-ico--upi" aria-hidden="true">
+                        <img src="assets/images/pay/upi.svg" alt="" width="26" height="26">
+                      </span>
+                      Other UPI apps
+                    </span>
+                  </button>
+                </div>
+                <div class="checkout-wire-actions">
+                  <button class="checkout-back-link" type="button" data-checkout-back="details">
+                    <span aria-hidden="true">←</span> Customer details
+                  </button>
+                </div>
+              </section>
+
+              <section class="checkout-wire-panel" data-checkout-stage="pay-card" hidden>
+                <div class="checkout-wire-head">
+                  <span class="checkout-step-badge">3</span>
+                  <div>
+                    <p class="checkout-step-kicker">Payment</p>
+                    <h2>Debit / Credit Card</h2>
+                  </div>
+                </div>
+                <div class="pay-tabs" role="tablist">
+                  <button type="button" class="is-on" data-card-tab>Debit Card</button>
+                  <button type="button" data-card-tab>Credit Card</button>
+                </div>
+                <form class="pay-card-form" id="checkout-card-form" data-card-pay-form novalidate>
+                  <div class="field">
+                    <label for="cc-number">Card Number</label>
+                    <input
+                      id="cc-number"
+                      name="cardNumber"
+                      inputmode="numeric"
+                      autocomplete="cc-number"
+                      placeholder="XXXX XXXX XXXX XXXX"
+                      maxlength="19"
+                      pattern="[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}"
+                      title="Enter a 16-digit card number"
+                      required
+                      data-card-number
+                    >
+                  </div>
+                  <div class="pay-card-row">
+                    <div class="field">
+                      <label>Expiry date</label>
+                      <div class="pay-exp-row">
+                        <select name="expMonth" required aria-label="Month" data-card-exp-month>
+                          <option value="">Month</option>
+                          <option value="01">01</option><option value="02">02</option><option value="03">03</option><option value="04">04</option>
+                          <option value="05">05</option><option value="06">06</option><option value="07">07</option><option value="08">08</option>
+                          <option value="09">09</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                        </select>
+                        <select name="expYear" required aria-label="Year" data-card-exp-year>
+                          <option value="">Year</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="field">
+                      <label for="cc-cvv">CVV</label>
+                      <input
+                        id="cc-cvv"
+                        name="cvv"
+                        inputmode="numeric"
+                        autocomplete="cc-csc"
+                        maxlength="4"
+                        minlength="3"
+                        pattern="[0-9]{3,4}"
+                        placeholder="XXX"
+                        title="Enter 3 or 4 digit CVV"
+                        required
+                        data-card-cvv
+                      >
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="cc-name">Name</label>
+                    <input
+                      id="cc-name"
+                      name="cardName"
+                      autocomplete="cc-name"
+                      placeholder="Name on card"
+                      maxlength="60"
+                      minlength="2"
+                      pattern="[A-Za-z][A-Za-z .'-]{1,59}"
+                      title="Enter the name printed on the card"
+                      required
+                      data-card-name
+                    >
+                  </div>
+                  <fieldset class="pay-billing">
+                    <legend>Billing address</legend>
+                    <div class="pay-address-list" role="radiogroup" aria-label="Billing address">
+                      <label class="pay-address-card is-selected">
+                        <input
+                          type="radio"
+                          name="billingAddress"
+                          value="customer"
+                          checked
+                          data-billing-choice="customer"
+                        >
+                        <span class="pay-address-card__body">
+                          <span class="pay-address-card__top">
+                            <span class="pay-address-card__title">Collection address</span>
+                            <span class="pay-address-card__badge">Default</span>
+                          </span>
+                          <span class="pay-address-card__line" data-billing-customer-address>—</span>
+                          <span class="pay-address-card__meta" data-billing-customer-city>—</span>
+                        </span>
+                      </label>
+
+                      <label class="pay-address-card">
+                        <input
+                          type="radio"
+                          name="billingAddress"
+                          value="new"
+                          data-billing-choice="new"
+                        >
+                        <span class="pay-address-card__body">
+                          <span class="pay-address-card__top">
+                            <span class="pay-address-card__title">Use a different address</span>
+                          </span>
+                          <span class="pay-address-card__hint">Enter a billing address that differs from collection</span>
+                        </span>
+                      </label>
+                    </div>
+
+                    <div class="pay-address-form" data-billing-new hidden>
+                      <div class="pay-address-form__row">
+                        <label for="billing-street">Street address</label>
+                        <input
+                          id="billing-street"
+                          type="text"
+                          name="billingStreet"
+                          autocomplete="street-address"
+                          placeholder="House no., street, landmark"
+                          data-billing-street
+                        >
+                      </div>
+                      <div class="pay-address-form__grid">
+                        <div class="pay-address-form__row">
+                          <label for="billing-city">City / Town / Village</label>
+                          <input
+                            id="billing-city"
+                            type="text"
+                            name="billingCity"
+                            autocomplete="address-level2"
+                            maxlength="99"
+                            minlength="3"
+                            pattern="[A-Za-z].{2,98}"
+                            placeholder="Hyderabad"
+                            data-billing-city
+                          >
+                        </div>
+                        <div class="pay-address-form__row">
+                          <label for="billing-pin">PIN code</label>
+                          <input
+                            id="billing-pin"
+                            type="text"
+                            name="billingPin"
+                            inputmode="numeric"
+                            maxlength="6"
+                            pattern="[0-9]{6}"
+                            placeholder="500001"
+                            data-billing-pin
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </fieldset>
+                </form>
+                <div class="checkout-wire-actions">
+                  <button class="checkout-back-link checkout-change-pay" type="button" data-checkout-back="pay-choose">
+                    <svg class="checkout-change-pay__icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+                      <path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M19 12H5M11 6l-6 6 6 6"/>
+                    </svg>
+                    Select Different Payment Method
+                  </button>
+                  <button class="checkout-next-link" type="submit" form="checkout-card-form">Pay Now</button>
+                </div>
+              </section>
+
+              <section class="checkout-wire-panel" data-checkout-stage="pay-qr" hidden>
+                <div class="checkout-wire-head">
+                  <span class="checkout-step-badge">3</span>
+                  <div>
+                    <p class="checkout-step-kicker">Payment</p>
+                    <h2 data-qr-title>Scan &amp; Pay</h2>
+                  </div>
+                </div>
+                <div class="pay-qr">
+                  <div class="pay-qr__brand" data-qr-brand>G Pay · UPI</div>
+                  <p class="pay-qr__amount" data-pay-total>₹0</p>
+                  <div class="pay-qr__card" aria-label="Payment QR code">
+                    <svg viewBox="0 0 120 120" aria-hidden="true">
+                      <rect width="120" height="120" fill="#fff"/>
+                      <g fill="#162033">
+                        <rect x="8" y="8" width="34" height="34" rx="3"/>
+                        <rect x="14" y="14" width="22" height="22" fill="#fff"/>
+                        <rect x="18" y="18" width="14" height="14"/>
+                        <rect x="78" y="8" width="34" height="34" rx="3"/>
+                        <rect x="84" y="14" width="22" height="22" fill="#fff"/>
+                        <rect x="88" y="18" width="14" height="14"/>
+                        <rect x="8" y="78" width="34" height="34" rx="3"/>
+                        <rect x="14" y="84" width="22" height="22" fill="#fff"/>
+                        <rect x="18" y="88" width="14" height="14"/>
+                        <rect x="50" y="8" width="8" height="8"/><rect x="62" y="20" width="8" height="8"/>
+                        <rect x="50" y="32" width="8" height="8"/><rect x="8" y="50" width="8" height="8"/>
+                        <rect x="20" y="50" width="8" height="8"/><rect x="44" y="50" width="8" height="8"/>
+                        <rect x="68" y="50" width="8" height="8"/><rect x="92" y="50" width="8" height="8"/>
+                        <rect x="52" y="52" width="16" height="16" rx="2"/>
+                        <rect x="74" y="74" width="8" height="8"/><rect x="98" y="74" width="8" height="8"/>
+                        <rect x="50" y="98" width="8" height="8"/><rect x="74" y="98" width="8" height="8"/>
+                      </g>
+                    </svg>
+                  </div>
+                  <p class="pay-qr__upi">drswift@okaxis</p>
+                  <p class="pay-qr__help" data-qr-help>Open your UPI app and scan this QR to complete payment.</p>
+                </div>
+                <div class="checkout-wire-actions">
+                  <button class="checkout-back-link checkout-change-pay" type="button" data-checkout-back="pay-choose">
+                    <svg class="checkout-change-pay__icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+                      <path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M19 12H5M11 6l-6 6 6 6"/>
+                    </svg>
+                    Select Different Payment Method
+                  </button>
+                  <button class="checkout-next-link" type="button" data-complete-pay="UPI">I’ve paid</button>
+                </div>
+              </section>
+
+              <section class="checkout-wire-panel" data-checkout-stage="pay-bank" hidden>
+                <div class="checkout-wire-head">
+                  <span class="checkout-step-badge">3</span>
+                  <div>
+                    <p class="checkout-step-kicker">Payment</p>
+                    <h2>Internet Banking</h2>
+                  </div>
+                </div>
+                <div class="bank-list">
+                  <button type="button" data-bank>HDFC Bank</button>
+                  <button type="button" data-bank>ICICI Bank</button>
+                  <button type="button" data-bank>SBI</button>
+                  <button type="button" data-bank>Axis Bank</button>
+                  <button type="button" data-bank>Kotak Mahindra</button>
+                </div>
+                <div class="checkout-wire-actions">
+                  <button class="checkout-back-link checkout-change-pay" type="button" data-checkout-back="pay-choose">
+                    <svg class="checkout-change-pay__icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+                      <path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M19 12H5M11 6l-6 6 6 6"/>
+                    </svg>
+                    Select Different Payment Method
+                  </button>
+                  <button class="checkout-next-link" type="button" data-bank-continue disabled>Continue</button>
+                </div>
+              </section>
+
+              <section class="checkout-wire-panel checkout-wire-panel--confirmation" data-checkout-stage="confirmation" hidden>
+                <div class="checkout-wire-head">
+                  <span class="checkout-step-badge">4</span>
+                  <div>
+                    <p class="checkout-step-kicker">Step 4</p>
+                    <h2>Booking confirmed</h2>
+                  </div>
+                </div>
+                <div class="confirmation-message">
+                  <div class="checkout-confirmation-icon" aria-hidden="true">
+                    <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-shield-check"></use></svg>
+                  </div>
+                  <p>Confirmed</p>
+                  <strong>Our phlebo will call you and arrive at your address on or before your selected collection time.</strong>
+                  <span>If you need help anytime, contact customer support at 9848094942.</span>
+                </div>
+                <div class="checkout-wire-actions">
+                  <a class="checkout-back-link" href="account.html">My Account</a>
+                  <a class="checkout-next-link" href="tests.html">Shop All Tests</a>
+                </div>
+              </section>
             </div>
-            <div class="form-field">
-              <label for="book-name">Full name</label>
-              <input id="book-name" type="text" name="name" required>
-            </div>
-            <div class="form-field">
-              <label for="book-phone">Phone</label>
-              <input id="book-phone" type="tel" name="phone" required>
-            </div>
-            <div class="form-field">
-              <label for="book-address">Collection address</label>
-              <textarea id="book-address" name="address" required></textarea>
-            </div>
-            <div class="form-row-split form-row-split--fields">
-              <div class="form-field">
-                <label for="book-date">Preferred date</label>
-                <input id="book-date" type="date" name="date" required>
-              </div>
-              <div class="form-field">
-                <label for="book-window">Preferred time</label>
-                <select id="book-window" name="window" required>
-                  <option value="">Choose a slot</option>
-                  <option>7:00 AM - 9:00 AM</option>
-                  <option>9:00 AM - 11:00 AM</option>
-                  <option>11:00 AM - 1:00 PM</option>
-                  <option>4:00 PM - 6:00 PM</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-field">
-              <label for="book-contact">Preferred confirmation method</label>
-              <select id="book-contact" name="contact" required>
-                <option value="">Choose a method</option>
-                <option>WhatsApp</option>
-                <option>Phone call</option>
-                <option>SMS</option>
-                <option>Email</option>
-              </select>
-            </div>
-            <label class="form-check" for="book-consent">
-              <input id="book-consent" type="checkbox" name="consent" required>
-              <span>I confirm these details are correct and understand the care team will confirm payment and final collection timing.</span>
-            </label>
-            <button class="button primary full" type="submit">Request booking</button>
-            <p class="auth-success" data-auth-success aria-live="polite" hidden>Booking request received. We will confirm the collection slot and payment link shortly.</p>
-          </form>
-          <p class="auth-alt">Or <a href="whatsapp.html">book via WhatsApp</a> · <a href="login.html">Sign in</a> for faster checkout</p>
+
+            <aside class="checkout-wire-aside" aria-label="Checkout summary">
+              <section class="checkout-summary-panel">
+                <div class="checkout-summary-title">
+                  <span class="checkout-step-badge">1</span>
+                  <h2>Selected Tests</h2>
+                </div>
+                <div class="booking-cart-summary" data-booking-cart hidden></div>
+              </section>
+              <section class="checkout-summary-panel" data-summary-customer hidden>
+                <div class="checkout-summary-title">
+                  <span class="checkout-step-badge">2</span>
+                  <h2>Customer details</h2>
+                </div>
+                <dl class="checkout-kv" data-inline-payment-patient></dl>
+              </section>
+              <section class="checkout-summary-panel" data-summary-payment hidden>
+                <div class="checkout-summary-title">
+                  <span class="checkout-step-badge">3</span>
+                  <h2>Payment</h2>
+                </div>
+                <p class="payment-success-mark">✓ Payment successful</p>
+                <dl class="checkout-kv" data-inline-confirm-summary hidden></dl>
+              </section>
+            </aside>
+          </div>
         </div>
       </div>
     </main>
     <footer class="site-footer"><div class="container footer-bottom footer-bottom--plain"><p>&copy; 2026 Dr.Swift Diagnostics</p></div></footer>
     <script src="assets/js/panel-catalog.js"></script>
     <script src="assets/js/test-data.js"></script>
-    <script src="assets/js/api.js"></script>
-    <script src="assets/js/main.js?v=detail-1"></script>
-    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/api.js?v=booking-prep-1"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
+    <script src="assets/js/firebase-config.js?v=3"></script>
+    <script src="assets/js/google-auth.js?v=6"></script>
+    <script src="assets/js/main.js?v=cart-qty-1"></script>
+    <script src="assets/js/checkout.js?v=card-limits-1"></script>
     <script>
       async function initBookingPage() {
         if (typeof window.DRSWIFT_BOOTSTRAP_CATALOG === "function") {
           await window.DRSWIFT_BOOTSTRAP_CATALOG();
         }
         const params = new URLSearchParams(location.search);
-        const test = params.get("test");
-        const select = document.getElementById("book-test");
         const tests = Array.isArray(window.DRSWIFT_TESTS) ? window.DRSWIFT_TESTS : [];
-
-        if (select && tests.length) {
-          const existing = new Set([...select.options].map((opt) => opt.text.trim().toLowerCase()));
-          tests.forEach((entry) => {
-            const label = entry.name || "";
-            if (!label || existing.has(label.toLowerCase())) {
-              return;
-            }
-            const option = document.createElement("option");
-            option.value = entry.slug || label;
-            option.textContent = label;
-            select.appendChild(option);
-          });
-        }
-
-        if (test && select) {
-          [...select.options].forEach((opt) => {
-            if (opt.text.toLowerCase().includes(test.toLowerCase()) || opt.value === test) {
-              opt.selected = true;
-            }
-          });
-        }
-
         const cartSummary = document.querySelector("[data-booking-cart]");
         if (params.get("cart") === "checkout" && cartSummary && tests.length) {
           try {
             const cart = JSON.parse(localStorage.getItem("drswift.cart.v1") || "[]");
             const items = cart
               .map((item) => ({
-                quantity: Math.max(1, Number(item.quantity) || 1),
+                quantity: 1,
                 test: tests.find((entry) => entry.slug === item.slug),
                 customPanels: item.customPanels
               }))
@@ -160,15 +554,8 @@
               }, 0);
               cartSummary.hidden = false;
               cartSummary.innerHTML = `<strong>Order summary</strong><ul>${items
-                .map((item) => `<li>${item.test.name} x ${item.quantity}</li>`)
+                .map((item) => `<li>${item.test.name}</li>`)
                 .join("")}</ul><p class="booking-cart-summary__total">Estimated total: ₹${total.toLocaleString("en-IN")}</p>`;
-              if (items.length === 1 && select) {
-                [...select.options].forEach((opt) => {
-                  if (opt.text === items[0].test.name || opt.value === items[0].test.slug) {
-                    opt.selected = true;
-                  }
-                });
-              }
             }
           } catch {
             cartSummary.hidden = true;

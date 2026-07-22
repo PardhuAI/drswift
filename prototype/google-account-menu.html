@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prototype — Google account menu | Dr.Swift</title>
+  <style>
+    :root {
+      --ink: #162033;
+      --muted: #657084;
+      --line: #dce3ee;
+      --panel: #ffffff;
+      --soft: #f6f8fb;
+      --blue: #1e5bd7;
+      --error: #b42318;
+      --error-soft: #fff4f2;
+      --error-border: #f3c1bb;
+      --shadow: 0 10px 28px rgba(22, 32, 51, 0.12);
+      --radius: 12px;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(900px 400px at 10% -10%, #edf4ff 0%, transparent 55%),
+        radial-gradient(700px 360px at 100% 0%, #fff4f2 0%, transparent 50%),
+        var(--soft);
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 40px 20px 64px;
+    }
+
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0 0 8px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 1.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    .lede {
+      margin: 0 0 28px;
+      color: var(--muted);
+      max-width: 42rem;
+      line-height: 1.5;
+    }
+
+    /* Fake site chrome */
+    .mock-header {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      color: var(--blue);
+    }
+
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #1e5bd7, #5a2d8f);
+    }
+
+    .mock-links {
+      display: none;
+      gap: 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (min-width: 720px) {
+      .mock-links { display: flex; }
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-cta {
+      appearance: none;
+      border: 0;
+      background: var(--blue);
+      color: #fff;
+      font: inherit;
+      font-weight: 600;
+      font-size: 13px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      cursor: default;
+    }
+
+    /* === Concept: single control === */
+    .nav-google-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      width: 36px;
+      height: 36px;
+    }
+
+    .nav-google {
+      appearance: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      cursor: pointer;
+      transition: box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+
+    .nav-google:hover,
+    .nav-google:focus-visible {
+      border-color: rgba(66, 133, 244, 0.45);
+      box-shadow: 0 0 0 1px rgba(66, 133, 244, 0.2), 0 2px 8px rgba(33, 49, 78, 0.1);
+      outline: none;
+    }
+
+    .nav-google[aria-expanded="true"] {
+      border-color: rgba(66, 133, 244, 0.55);
+      box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.18);
+    }
+
+    .nav-google__icon {
+      display: block;
+      width: 20px;
+      height: 20px;
+    }
+
+    .nav-google__avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .nav-google__initial {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--blue);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    /* Account popover */
+    .nav-google-menu {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      width: 220px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 10px;
+      z-index: 40;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-4px) scale(0.98);
+      transform-origin: top right;
+      transition: opacity 0.14s ease, transform 0.14s ease, visibility 0.14s;
+    }
+
+    .nav-google-menu.is-open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+
+    .nav-google-menu__user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 6px 10px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 8px;
+    }
+
+    .nav-google-menu__user img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .nav-google-menu__meta {
+      min-width: 0;
+    }
+
+    .nav-google-menu__name {
+      font-size: 13px;
+      font-weight: 650;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nav-google-menu__email {
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nav-google-menu__actions {
+      display: grid;
+      gap: 6px;
+    }
+
+    .menu-btn {
+      appearance: none;
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 12px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    /* Sign out — red + highlighted (primary action) */
+    .menu-btn--signout {
+      background: var(--error);
+      color: #fff;
+      border-color: var(--error);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12) inset, 0 6px 14px rgba(180, 35, 24, 0.22);
+    }
+
+    .menu-btn--signout:hover,
+    .menu-btn--signout:focus-visible {
+      background: #9a1d15;
+      outline: none;
+    }
+
+    /* Cancel — not highlighted */
+    .menu-btn--cancel {
+      background: transparent;
+      color: var(--muted);
+      border-color: transparent;
+      font-weight: 500;
+    }
+
+    .menu-btn--cancel:hover,
+    .menu-btn--cancel:focus-visible {
+      background: var(--soft);
+      color: var(--ink);
+      outline: none;
+    }
+
+    /* Prototype controls */
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 16px rgba(22, 32, 51, 0.04);
+    }
+
+    .panel h2 {
+      margin: 0 0 6px;
+      font-size: 1.05rem;
+    }
+
+    .panel p {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .toggles {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .toggle {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .toggle.is-active {
+      border-color: var(--blue);
+      background: #edf4ff;
+      color: var(--blue);
+      font-weight: 600;
+    }
+
+    .spec {
+      margin: 0;
+      padding-left: 1.1rem;
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .spec li + li { margin-top: 6px; }
+
+    .status {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--muted);
+      min-height: 1.2em;
+    }
+
+    .status strong { color: var(--ink); }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <p class="eyebrow">Prototype · confirm before implement</p>
+    <h1>Google account control</h1>
+    <p class="lede">
+      One control in the nav: Google icon when signed out; profile photo when signed in.
+      Clicking the photo opens a compact menu — <strong>Sign out</strong> is the red highlighted action;
+      <strong>Cancel</strong> closes the menu without emphasis.
+    </p>
+
+    <div class="mock-header" aria-label="Mock site header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        Dr.Swift
+      </div>
+      <div class="mock-links" aria-hidden="true">
+        <span>Tests</span>
+        <span>Reports</span>
+        <span>About</span>
+      </div>
+      <div class="nav-actions">
+        <!-- Single wrap: only one visible control at a time -->
+        <div class="nav-google-wrap" id="google-wrap">
+          <button
+            type="button"
+            class="nav-google"
+            id="google-btn"
+            aria-label="Sign in with Google"
+            aria-haspopup="menu"
+            aria-expanded="false"
+            aria-controls="google-menu"
+          >
+            <!-- filled by JS -->
+          </button>
+
+          <div class="nav-google-menu" id="google-menu" role="menu" hidden>
+            <div class="nav-google-menu__user">
+              <img id="menu-avatar" alt="" width="32" height="32">
+              <div class="nav-google-menu__meta">
+                <div class="nav-google-menu__name" id="menu-name">Madhu Karnati</div>
+                <div class="nav-google-menu__email" id="menu-email">madhu@example.com</div>
+              </div>
+            </div>
+            <div class="nav-google-menu__actions">
+              <button type="button" class="menu-btn menu-btn--signout" role="menuitem" id="btn-signout">
+                Sign out
+              </button>
+              <button type="button" class="menu-btn menu-btn--cancel" role="menuitem" id="btn-cancel">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="nav-cta" tabindex="-1">Book a test</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Try the states</h2>
+      <p>Use the toggles, then click the control in the header mock above.</p>
+      <div class="toggles" role="group" aria-label="Auth state">
+        <button type="button" class="toggle is-active" data-state="signed-out">Signed out</button>
+        <button type="button" class="toggle" data-state="signed-in">Signed in (with photo)</button>
+        <button type="button" class="toggle" data-state="signed-in-initial">Signed in (initial fallback)</button>
+      </div>
+
+      <ol class="spec">
+        <li><strong>Signed out</strong> — single Google “G” icon. Click → mock sign-in (no confirm dialog).</li>
+        <li><strong>Signed in</strong> — only the Google profile photo (same 36×36 control). Click → open menu.</li>
+        <li><strong>Menu</strong> — name + email, then <span style="color:#b42318;font-weight:700">Sign out</span> (red / primary) and Cancel (quiet).</li>
+        <li><strong>Cancel / outside click / Escape</strong> — closes menu; stays signed in.</li>
+        <li><strong>Sign out</strong> — closes menu and returns to Google icon.</li>
+      </ol>
+
+      <p class="status" id="status" aria-live="polite">State: <strong>signed out</strong></p>
+    </div>
+  </div>
+
+  <script>
+    const GOOGLE_ICON = `
+      <svg class="nav-google__icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>`;
+
+    const DEMO_USER = {
+      name: "Madhu Karnati",
+      email: "madhu@example.com",
+      photoURL: "https://i.pravatar.cc/96?img=12",
+    };
+
+    const btn = document.getElementById("google-btn");
+    const menu = document.getElementById("google-menu");
+    const statusEl = document.getElementById("status");
+    const menuAvatar = document.getElementById("menu-avatar");
+    const menuName = document.getElementById("menu-name");
+    const menuEmail = document.getElementById("menu-email");
+
+    let authState = "signed-out"; // signed-out | signed-in | signed-in-initial
+
+    function setStatus(text) {
+      statusEl.innerHTML = text;
+    }
+
+    function closeMenu() {
+      menu.classList.remove("is-open");
+      menu.hidden = true;
+      btn.setAttribute("aria-expanded", "false");
+    }
+
+    function openMenu() {
+      menu.hidden = false;
+      requestAnimationFrame(() => menu.classList.add("is-open"));
+      btn.setAttribute("aria-expanded", "true");
+    }
+
+    function renderControl() {
+      closeMenu();
+      if (authState === "signed-out") {
+        btn.innerHTML = GOOGLE_ICON;
+        btn.setAttribute("aria-label", "Sign in with Google");
+        btn.title = "Sign in with Google";
+        setStatus('State: <strong>signed out</strong> — Google icon only');
+        return;
+      }
+
+      menuName.textContent = DEMO_USER.name;
+      menuEmail.textContent = DEMO_USER.email;
+      menuAvatar.src = DEMO_USER.photoURL;
+
+      if (authState === "signed-in") {
+        btn.innerHTML = `<img class="nav-google__avatar" src="${DEMO_USER.photoURL}" alt="" width="28" height="28">`;
+        btn.setAttribute("aria-label", `Account menu for ${DEMO_USER.name}`);
+        btn.title = DEMO_USER.name;
+        setStatus('State: <strong>signed in</strong> — profile photo only. Click it to open the menu.');
+      } else {
+        const initial = DEMO_USER.name.charAt(0).toUpperCase();
+        btn.innerHTML = `<span class="nav-google__initial" aria-hidden="true">${initial}</span>`;
+        btn.setAttribute("aria-label", `Account menu for ${DEMO_USER.name}`);
+        btn.title = DEMO_USER.name;
+        setStatus('State: <strong>signed in (fallback)</strong> — letter initial if photo is missing.');
+      }
+    }
+
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (authState === "signed-out") {
+        authState = "signed-in";
+        document.querySelectorAll(".toggle").forEach((t) => {
+          t.classList.toggle("is-active", t.dataset.state === "signed-in");
+        });
+        renderControl();
+        setStatus('Signed in (mock). State: <strong>signed in</strong>');
+        return;
+      }
+      if (menu.classList.contains("is-open")) closeMenu();
+      else openMenu();
+    });
+
+    document.getElementById("btn-cancel").addEventListener("click", () => {
+      closeMenu();
+      setStatus('Menu closed via <strong>Cancel</strong> — still signed in.');
+    });
+
+    document.getElementById("btn-signout").addEventListener("click", () => {
+      authState = "signed-out";
+      document.querySelectorAll(".toggle").forEach((t) => {
+        t.classList.toggle("is-active", t.dataset.state === "signed-out");
+      });
+      renderControl();
+      setStatus('Signed out via <strong>Sign out</strong>.');
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!document.getElementById("google-wrap").contains(e.target)) closeMenu();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeMenu();
+    });
+
+    document.querySelectorAll(".toggle").forEach((toggle) => {
+      toggle.addEventListener("click", () => {
+        authState = toggle.dataset.state;
+        document.querySelectorAll(".toggle").forEach((t) => t.classList.remove("is-active"));
+        toggle.classList.add("is-active");
+        renderControl();
+      });
+    });
+
+    renderControl();
+  </script>
+</body>
+</html>

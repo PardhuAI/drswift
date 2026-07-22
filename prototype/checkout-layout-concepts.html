@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prototype — Checkout layout concepts | Dr.Swift</title>
+  <style>
+    :root {
+      --ink: #162033;
+      --muted: #657084;
+      --line: #dce3ee;
+      --panel: #fff;
+      --soft: #f6f8fb;
+      --blue: #1e5bd7;
+      --green: #4e8c73;
+      --shadow: 0 12px 28px rgba(33, 49, 78, 0.1);
+      --radius: 10px;
+      font-family: Inter, "Segoe UI", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scrollbar-gutter: stable; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(900px 420px at 8% -8%, #edf4ff 0%, transparent 55%),
+        var(--soft);
+      min-height: 100vh;
+    }
+    .page { max-width: 1180px; margin: 0 auto; padding: 28px 18px 80px; }
+    .eyebrow {
+      margin: 0 0 6px; font-size: 12px; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--muted); font-weight: 700;
+    }
+    h1 { margin: 0 0 8px; font-size: 1.65rem; letter-spacing: -0.02em; }
+    .lede { margin: 0 0 22px; color: var(--muted); max-width: 46rem; line-height: 1.5; }
+
+    .concept-nav {
+      display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px;
+    }
+    .concept-nav button {
+      appearance: none; border: 1px solid var(--line); background: #fff;
+      color: var(--ink); font: inherit; font-weight: 700; font-size: 0.9rem;
+      padding: 10px 14px; border-radius: 999px; cursor: pointer;
+    }
+    .concept-nav button.is-active {
+      color: #fff; background: var(--blue); border-color: var(--blue);
+    }
+
+    .concept { display: none; }
+    .concept.is-active { display: block; }
+
+    .concept-card {
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: 16px; box-shadow: var(--shadow); padding: 18px 18px 22px;
+      margin-bottom: 18px;
+    }
+    .concept-card h2 { margin: 0 0 6px; font-size: 1.15rem; }
+    .concept-card p { margin: 0; color: var(--muted); line-height: 1.5; }
+    .pros {
+      display: grid; gap: 8px; margin: 14px 0 0; padding: 0; list-style: none;
+    }
+    .pros li {
+      padding: 10px 12px; background: var(--soft); border-radius: 8px;
+      font-size: 0.92rem; line-height: 1.4;
+    }
+    .pros strong { color: var(--ink); }
+
+    .demo-toolbar {
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+      margin: 0 0 14px;
+    }
+    .demo-toolbar span { color: var(--muted); font-size: 0.85rem; font-weight: 700; }
+    .demo-toolbar button {
+      appearance: none; border: 1px solid var(--line); background: #fff;
+      font: inherit; font-weight: 700; font-size: 0.82rem; padding: 8px 12px;
+      border-radius: 8px; cursor: pointer;
+    }
+    .demo-toolbar button.is-active {
+      background: var(--green); border-color: var(--green); color: #fff;
+    }
+
+    /* Shared stage chrome */
+    .stage-shell {
+      width: 100%;
+      max-width: 1080px;
+      margin-inline: auto;
+    }
+    .stage-head { margin-bottom: 14px; }
+    .stage-head h3 { margin: 0; font-size: 1.25rem; }
+    .stage-head p { margin: 4px 0 0; color: var(--muted); font-size: 0.9rem; }
+
+    .panel {
+      background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 18px;
+      width: 100%; min-width: 0;
+    }
+    .panel h4 { margin: 0 0 12px; font-size: 1rem; }
+    .field { display: grid; grid-template-columns: 100px minmax(0, 1fr); gap: 10px; align-items: center; margin-bottom: 10px; }
+    .field label { color: var(--muted); font-size: 0.82rem; font-weight: 800; }
+    .field input, .field select, .field textarea {
+      width: 100%; min-height: 40px; border: 1px solid var(--line);
+      border-radius: 8px; padding: 8px 10px; font: inherit;
+    }
+    .actions { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .actions button {
+      appearance: none; border: 1px solid var(--line); background: #fff;
+      font: inherit; font-weight: 800; padding: 10px 14px; border-radius: 8px; cursor: pointer;
+    }
+    .actions .primary { background: var(--green); border-color: var(--green); color: #fff; }
+    .summary-line { display: flex; justify-content: space-between; gap: 8px; font-size: 0.88rem; margin: 6px 0; }
+    .summary-line strong { font-weight: 800; }
+    .muted { color: var(--muted); font-size: 0.84rem; }
+    .badge {
+      display: inline-grid; place-items: center; width: 28px; height: 28px;
+      border-radius: 50%; background: var(--green); color: #fff; font-weight: 800; font-size: 0.8rem;
+      margin-right: 8px;
+    }
+
+    /* —— Concept A: Fixed two-column stage frame —— */
+    .a-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 18px;
+      align-items: start;
+      width: 100%;
+    }
+    .a-main { min-width: 0; width: 100%; }
+    .a-aside { display: grid; gap: 12px; position: sticky; top: 16px; }
+    .a-stage { display: none; min-height: 360px; }
+    .a-stage.is-active { display: block; }
+    .a-progress {
+      display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;
+    }
+    .a-progress span {
+      font-size: 0.78rem; font-weight: 800; color: var(--muted);
+      padding: 6px 10px; border-radius: 999px; background: var(--soft); border: 1px solid var(--line);
+    }
+    .a-progress span.is-on { color: #fff; background: var(--blue); border-color: var(--blue); }
+
+    /* —— Concept B: Single column + sticky progress bar —— */
+    .b-progress {
+      position: sticky; top: 0; z-index: 5;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+      padding: 10px; margin-bottom: 14px;
+      background: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
+      border: 1px solid var(--line); border-radius: 12px;
+    }
+    .b-progress button {
+      appearance: none; border: 0; background: var(--soft); color: var(--muted);
+      font: inherit; font-weight: 800; font-size: 0.78rem; padding: 10px 8px;
+      border-radius: 8px; cursor: pointer;
+    }
+    .b-progress button.is-on { background: var(--blue); color: #fff; }
+    .b-stack { display: grid; gap: 14px; max-width: 720px; margin-inline: auto; width: 100%; }
+    .b-stage { display: none; }
+    .b-stage.is-active { display: block; }
+    .b-summary-strip {
+      display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center;
+      padding: 12px 14px; background: #edf4ff; border: 1px solid #c9dbff; border-radius: 10px;
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 860px) {
+      .a-layout { grid-template-columns: 1fr; }
+      .a-aside { position: static; order: -1; }
+      .field { grid-template-columns: 1fr; gap: 4px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <p class="eyebrow">Prototype</p>
+    <h1>Checkout alignment &amp; UX concepts</h1>
+    <p class="lede">
+      Live checkout had a DOM close-tag bug plus a shrink-to-fit centered shell, so step 3 looked left-shifted.
+      Below: two layout concepts that keep the frame stable while the user moves through details → payment → confirmation.
+    </p>
+
+    <div class="concept-nav" role="tablist" aria-label="Checkout concepts">
+      <button type="button" class="is-active" data-show="a">Concept A — Fixed two-column frame</button>
+      <button type="button" data-show="b">Concept B — Single column + sticky progress</button>
+    </div>
+
+    <!-- Concept A -->
+    <section class="concept is-active" data-concept="a" aria-label="Concept A">
+      <div class="concept-card">
+        <h2>Concept A — Fixed two-column stage frame</h2>
+        <p>
+          One permanent grid: form column left, summary column right. Steps swap <em>inside</em> the left column only.
+          Shell width never changes, so summary and fields stay aligned across steps.
+        </p>
+        <ul class="pros">
+          <li><strong>Best for desktop booking.</strong> Cart + customer + payment status stay visible while paying.</li>
+          <li><strong>No horizontal jump.</strong> Grid tracks are fixed; only panel content swaps.</li>
+          <li><strong>Trade-off:</strong> On narrow screens summary stacks above the form (order: summary → step).</li>
+        </ul>
+      </div>
+
+      <div class="demo-toolbar">
+        <span>Try steps:</span>
+        <button type="button" class="is-active" data-a-step="1">1 · Details</button>
+        <button type="button" data-a-step="2">2 · Payment</button>
+        <button type="button" data-a-step="3">3 · Confirmed</button>
+      </div>
+
+      <div class="stage-shell">
+        <div class="stage-head">
+          <h3>Complete your booking</h3>
+          <p>Confirm collection details, pay securely, receive confirmation.</p>
+        </div>
+        <div class="a-progress" aria-hidden="true">
+          <span class="is-on" data-a-pip="1">Details</span>
+          <span data-a-pip="2">Payment</span>
+          <span data-a-pip="3">Done</span>
+        </div>
+        <div class="a-layout">
+          <div class="a-main">
+            <div class="panel a-stage is-active" data-a-panel="1">
+              <h4><span class="badge">2</span>Who is this booking for?</h4>
+              <div class="field"><label>Name</label><input value="Madhu Karnati"></div>
+              <div class="field"><label>Gender</label><select><option>Male</option></select></div>
+              <div class="field"><label>Age</label><input value="34"></div>
+              <div class="field"><label>Phone</label><input value="9848094942"></div>
+              <div class="field"><label>Address</label><textarea rows="2">12 Lake View, Hyderabad</textarea></div>
+              <div class="actions">
+                <button type="button">← View cart</button>
+                <button type="button" class="primary" data-a-step="2">Continue to payment</button>
+              </div>
+            </div>
+            <div class="panel a-stage" data-a-panel="2">
+              <h4><span class="badge">3</span>Payment options</h4>
+              <div class="field"><label>Card</label><input placeholder="ACCT-000015"></div>
+              <div class="field"><label>Exp / CVV</label><input placeholder="12/28 · 123"></div>
+              <div class="field"><label>Name</label><input value="Madhu Karnati"></div>
+              <div class="actions">
+                <button type="button" data-a-step="1">← Customer details</button>
+                <button type="button" class="primary" data-a-step="3">Submit</button>
+              </div>
+            </div>
+            <div class="panel a-stage" data-a-panel="3">
+              <h4><span class="badge">4</span>Booking confirmed</h4>
+              <p class="muted" style="margin:0 0 12px">Our phlebo will call before arriving at your selected collection window.</p>
+              <p style="margin:0;color:var(--green);font-weight:800">Confirmed · Ref DRS-24081</p>
+              <div class="actions">
+                <button type="button">My account</button>
+                <button type="button" class="primary">Shop tests</button>
+              </div>
+            </div>
+          </div>
+          <aside class="a-aside">
+            <div class="panel">
+              <h4><span class="badge">1</span>Selected tests</h4>
+              <div class="summary-line"><span>Complete Blood Count</span><strong>₹499</strong></div>
+              <div class="summary-line"><span>Thyroid Profile</span><strong>₹799</strong></div>
+              <div class="summary-line" style="margin-top:10px;padding-top:8px;border-top:1px solid var(--line)">
+                <span>Estimated total</span><strong>₹1,298</strong>
+              </div>
+            </div>
+            <div class="panel" data-a-sum="customer" hidden>
+              <h4><span class="badge">2</span>Customer</h4>
+              <div class="summary-line"><span>Madhu · 34 · Male</span></div>
+              <div class="summary-line muted"><span>Today · Morning · Hyderabad</span></div>
+            </div>
+            <div class="panel" data-a-sum="pay" hidden>
+              <h4><span class="badge">3</span>Payment</h4>
+              <p style="margin:0;color:var(--green);font-weight:800">✓ Payment successful</p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- Concept B -->
+    <section class="concept" data-concept="b" aria-label="Concept B">
+      <div class="concept-card">
+        <h2>Concept B — Single centered column + sticky progress</h2>
+        <p>
+          One narrow, always-centered column. A sticky step bar anchors orientation; a compact order strip sits above the form.
+          Ideal when you want focus and identical alignment on phone and desktop.
+        </p>
+        <ul class="pros">
+          <li><strong>Best for mobile-first.</strong> No two-column reflow surprises.</li>
+          <li><strong>Seamless step feel.</strong> Progress is always in the same place; content swaps below.</li>
+          <li><strong>Trade-off:</strong> Less room for a rich live summary beside payment (summary becomes a strip).</li>
+        </ul>
+      </div>
+
+      <div class="demo-toolbar">
+        <span>Try steps:</span>
+        <button type="button" class="is-active" data-b-step="1">1 · Details</button>
+        <button type="button" data-b-step="2">2 · Payment</button>
+        <button type="button" data-b-step="3">3 · Confirmed</button>
+      </div>
+
+      <div class="stage-shell">
+        <div class="b-progress" role="tablist" aria-label="Checkout progress">
+          <button type="button" class="is-on" data-b-step="1">1 Details</button>
+          <button type="button" data-b-step="2">2 Payment</button>
+          <button type="button" data-b-step="3">3 Done</button>
+        </div>
+        <div class="b-stack">
+          <div class="b-summary-strip">
+            <strong>2 tests</strong>
+            <span class="muted">CBC + Thyroid</span>
+            <strong style="margin-left:auto">₹1,298</strong>
+          </div>
+          <div class="panel b-stage is-active" data-b-panel="1">
+            <h4>Who is this booking for?</h4>
+            <div class="field"><label>Name</label><input value="Madhu Karnati"></div>
+            <div class="field"><label>Phone</label><input value="9848094942"></div>
+            <div class="field"><label>Address</label><textarea rows="2">12 Lake View, Hyderabad</textarea></div>
+            <div class="actions">
+              <button type="button">← Cart</button>
+              <button type="button" class="primary" data-b-step="2">Continue</button>
+            </div>
+          </div>
+          <div class="panel b-stage" data-b-panel="2">
+            <h4>Payment</h4>
+            <div class="field"><label>Card</label><input placeholder="Card number"></div>
+            <div class="field"><label>Billing</label><textarea rows="2">Same as collection address</textarea></div>
+            <div class="actions">
+              <button type="button" data-b-step="1">← Back</button>
+              <button type="button" class="primary" data-b-step="3">Pay now</button>
+            </div>
+          </div>
+          <div class="panel b-stage" data-b-panel="3">
+            <h4>You’re booked</h4>
+            <p style="margin:0 0 8px;color:var(--green);font-weight:800">Confirmed · Ref DRS-24081</p>
+            <p class="muted" style="margin:0">Phlebo will call before arrival. Support: 9848094942</p>
+            <div class="actions">
+              <button type="button">Account</button>
+              <button type="button" class="primary">Browse tests</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const showConcept = (id) => {
+      document.querySelectorAll("[data-concept]").forEach((el) => {
+        el.classList.toggle("is-active", el.getAttribute("data-concept") === id);
+      });
+      document.querySelectorAll(".concept-nav button").forEach((btn) => {
+        btn.classList.toggle("is-active", btn.getAttribute("data-show") === id);
+      });
+    };
+
+    document.querySelectorAll(".concept-nav button").forEach((btn) => {
+      btn.addEventListener("click", () => showConcept(btn.getAttribute("data-show")));
+    });
+
+    const setA = (step) => {
+      document.querySelectorAll("[data-a-panel]").forEach((p) => {
+        p.classList.toggle("is-active", p.getAttribute("data-a-panel") === step);
+      });
+      document.querySelectorAll("[data-a-step]").forEach((b) => {
+        b.classList.toggle("is-active", b.getAttribute("data-a-step") === step);
+      });
+      document.querySelectorAll("[data-a-pip]").forEach((pip) => {
+        pip.classList.toggle("is-on", Number(pip.getAttribute("data-a-pip")) <= Number(step));
+      });
+      const customer = document.querySelector('[data-a-sum="customer"]');
+      const pay = document.querySelector('[data-a-sum="pay"]');
+      if (customer) customer.hidden = Number(step) < 2;
+      if (pay) pay.hidden = Number(step) < 3;
+    };
+
+    document.querySelectorAll("[data-a-step]").forEach((btn) => {
+      btn.addEventListener("click", () => setA(btn.getAttribute("data-a-step")));
+    });
+
+    const setB = (step) => {
+      document.querySelectorAll("[data-b-panel]").forEach((p) => {
+        p.classList.toggle("is-active", p.getAttribute("data-b-panel") === step);
+      });
+      document.querySelectorAll("[data-b-step]").forEach((b) => {
+        b.classList.toggle("is-active", b.getAttribute("data-b-step") === step);
+        b.classList.toggle("is-on", b.getAttribute("data-b-step") === step);
+      });
+    };
+
+    document.querySelectorAll("[data-b-step]").forEach((btn) => {
+      btn.addEventListener("click", () => setB(btn.getAttribute("data-b-step")));
+    });
+  </script>
+</body>
+</html>
