@@ -13,9 +13,9 @@
 
 @media (max-width: 959px) {
   .tests-toolbar {
-    position: sticky;
-    top: var(--scroll-header-offset, 84px);
-    z-index: 40;
+    position: relative;
+    top: auto;
+    z-index: 1;
     padding: 8px 0;
     background: #fff;
     box-shadow: 0 1px 0 var(--color-line);
