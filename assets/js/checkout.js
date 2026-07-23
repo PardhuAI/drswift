@@ -1,7 +1,7 @@
 /**
  * Booking / checkout form — guest allowed.
- * Required: name, gender, phone (10-digit mobile), address. Age optional.
- * OTP verification is optional and can be completed later for faster updates.
+ * Required: name, gender, phone (OTP verified), address. Age optional.
+ * Local demo OTP only (no backend) — code 123456.
  */
 (function () {
   const VERIFY_STORAGE_KEY = "drswift.checkout.phoneVerified.v1";
@@ -10,6 +10,7 @@
   const HOUSEHOLD_STORAGE_KEY = "drswift.demoHousehold.v1";
   const PAYMENT_STORAGE_KEY = "drswift.checkout.payment.v1";
   const SERVICE_AREA_STORAGE_KEY = "drswift.serviceArea.v1";
+  const LOCAL_DEMO_OTP = "123456";
 
   function $(sel, root) {
     return (root || document).querySelector(sel);
@@ -59,68 +60,23 @@
     return letterCount >= 3;
   }
 
-  function syncContinueEnabled(form) {
-    const phoneInput = form.querySelector("#book-phone");
-    const consent = form.querySelector("#book-consent");
-    const submit = form.querySelector("[type='submit']");
-    if (!submit) return;
-    const digits = normalizedPhone(phoneInput?.value);
-    const consentOk = !consent || consent.checked;
-    submit.disabled = digits.length !== 10 || !consentOk;
-  }
-
-  function otpCopy() {
-    return window.DRSWIFT_SITE_CONTENT?.otp || {};
-  }
-
-  function mapOtpRequestError(response, fallback) {
-    const otp = otpCopy();
-    if (response?.status === 429) {
-      return otp.rateLimitCopy || "Too many OTP requests. Please wait a few minutes and try again.";
-    }
-    if (response && response.status >= 500) {
-      return otp.deliveryFailCopy || "We could not deliver the OTP. Check the number or try again in a moment.";
-    }
-    return fallback || otp.deliveryFailCopy || "We could not send a verification code.";
-  }
-
-  async function requestPhoneOtp(phone) {
-    const response = await fetch("/_drswift/auth/otp/request", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      credentials: "same-origin",
-      cache: "no-store",
-      body: JSON.stringify({ phone }),
-    });
-    if (!response.ok) {
-      throw new Error(
-        mapOtpRequestError(
-          response,
-          "We could not send a verification code. Please try again or book with our care team."
-        )
-      );
-    }
-  }
-
   function setPhoneVerifiedUi(form, verified, otpVisible = false) {
     const badge = form.querySelector("[data-phone-verified-badge]");
     const otpBlock = form.querySelector("[data-otp-block]");
+    const submit = form.querySelector("[type='submit']");
     const sendBtn = form.querySelector("[data-otp-send]");
     const phoneRow = form.querySelector(".checkout-wire-field--phone .phone-verify-row");
     if (badge) badge.hidden = !verified;
     if (otpBlock) otpBlock.hidden = verified || !otpVisible;
+    if (submit) submit.disabled = !verified;
     if (phoneRow) phoneRow.classList.toggle("is-verified", !!verified);
     if (sendBtn) {
       sendBtn.hidden = !!verified;
       sendBtn.setAttribute("aria-hidden", verified ? "true" : "false");
       if (verified) sendBtn.setAttribute("tabindex", "-1");
       else sendBtn.removeAttribute("tabindex");
-      sendBtn.textContent = otpVisible && !verified ? "Resend OTP" : "Verify OTP";
+      sendBtn.textContent = otpVisible && !verified ? "Resend OTP" : "Send OTP";
     }
-    syncContinueEnabled(form);
   }
 
   function syncOtpSendEnabled(form) {
@@ -129,7 +85,6 @@
     if (!phoneInput || !sendBtn) return;
     const digits = normalizedPhone(phoneInput.value);
     sendBtn.disabled = digits.length !== 10 || !!readVerified();
-    syncContinueEnabled(form);
   }
 
   function normalizedPhone(value) {
@@ -379,26 +334,6 @@
     return window.DrSwiftCheckoutApi || null;
   }
 
-  async function verifyPhoneOtp(phone, code) {
-    const response = await fetch("/_drswift/auth/otp/verify", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      credentials: "same-origin",
-      cache: "no-store",
-      body: JSON.stringify({ phone, code }),
-    });
-    if (!response.ok) {
-      const otp = otpCopy();
-      if (response.status === 429) {
-        throw new Error(otp.rateLimitCopy || "Too many verification attempts. Please wait and try again.");
-      }
-      throw new Error("That verification code could not be confirmed. Check the code and try again.");
-    }
-  }
-
   function cartTotalAmount() {
     return cartItemsWithTests().reduce((sum, item) => sum + itemPrice(item), 0);
   }
@@ -438,10 +373,10 @@
         run: null,
       },
       "pay-card": {
-        label: "Pay securely",
+        label: "Pay Now",
         disabled: false,
         run() {
-          document.querySelector("[data-pay-start='card']")?.click();
+          document.querySelector("[data-card-pay-form]")?.requestSubmit?.();
         },
       },
       "pay-qr": {
@@ -896,11 +831,33 @@
       });
     });
 
-    document.querySelector("[data-pay-start='card']")?.addEventListener("click", () => {
-      beginRedirectPayment(
-        { apiMethod: "card", method: "Credit / Debit card", brand: "card" },
-        "pay-card"
-      );
+    document.querySelectorAll("[data-card-tab]").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll("[data-card-tab]").forEach((t) => t.classList.remove("is-on"));
+        tab.classList.add("is-on");
+      });
+    });
+
+    const cardForm = document.querySelector("[data-card-pay-form]");
+    initCardFieldGuards(cardForm || document);
+    initBillingAddressUi(cardForm || document);
+    cardForm?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!validateCardFields(cardForm)) return;
+      const choice = cardForm.querySelector("[data-billing-choice]:checked")?.value;
+      if (choice === "new") {
+        const cityInput = cardForm.querySelector("[data-billing-city]");
+        if (cityInput && !isValidCityVillage(cityInput.value)) {
+          cityInput.setCustomValidity(
+            "City/Town/Village must start with a letter, include at least 3 letters, and be under 100 characters."
+          );
+          cityInput.reportValidity();
+          return;
+        }
+        cityInput?.setCustomValidity("");
+      }
+      if (!cardForm.reportValidity()) return;
+      completeLocalPayment("Credit / Debit card");
     });
 
     document.querySelector("[data-bank-continue]")?.addEventListener("click", () => {
@@ -929,19 +886,65 @@
     syncPayTotals();
   }
 
-  function formatSampleDayLabel(value) {
-    if (!value) return "";
-    if (value === "Today" || value === "Tomorrow") return value;
-    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-    if (!match) return value;
+  function completeLocalPayment(methodLabel) {
+    const details = readCheckoutDetails();
+    if (!details) {
+      activateDeckCard("details");
+      return;
+    }
+    const amount = cartItemsWithTests().reduce((sum, item) => sum + itemPrice(item), 0);
+    const payment = {
+      amount,
+      method: methodLabel || "Online",
+      reference: `DS-${Date.now().toString(36).toUpperCase()}`,
+      paidAt: new Date().toISOString(),
+    };
+    sessionStorage.setItem(PAYMENT_STORAGE_KEY, JSON.stringify(payment));
+    renderInlineConfirmation(details, payment);
+    try {
+      localStorage.removeItem("drswift.cart.v1");
+      window.dispatchEvent(new CustomEvent("drswift:cart-updated"));
+    } catch {
+      /* ignore */
+    }
+  }
+
+  function formatYmdDisplay(ymd) {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(ymd || ""));
+    if (!match) return "";
     const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
-    if (Number.isNaN(date.getTime())) return value;
+    if (Number.isNaN(date.getTime())) return "";
     return date.toLocaleDateString("en-IN", {
       weekday: "short",
       day: "numeric",
       month: "short",
       year: "numeric",
     });
+  }
+
+  function addDaysToYmd(ymd, days) {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(ymd || ""));
+    if (!match) return "";
+    const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]) + Number(days || 0));
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+
+  function formatSampleDayLabel(value) {
+    if (!value) return "";
+    if (value === "Today") {
+      const abs = formatYmdDisplay(getIstNow().ymd);
+      return abs ? `Today · ${abs}` : "Today";
+    }
+    if (value === "Tomorrow") {
+      const abs = formatYmdDisplay(addDaysToYmd(getIstNow().ymd, 1));
+      return abs ? `Tomorrow · ${abs}` : "Tomorrow";
+    }
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+    if (!match) return value;
+    return formatYmdDisplay(value) || value;
   }
 
   function updateWhenConfirm(form) {
@@ -1351,6 +1354,10 @@
       paymentSummary.hidden = name !== "confirmation";
     }
 
+    if (name === "pay-card") {
+      syncBillingAddress(readCheckoutDetails());
+    }
+
     /* Scroll the stable frame, not the stage node — avoids left/right jumps
        when panel height changes between steps. */
     const frame =
@@ -1395,7 +1402,169 @@
     }
 
     setPayStatus("", false);
+
+    const cardName = document.querySelector("#cc-name");
+    if (cardName && !cardName.value) {
+      cardName.value = details.name || "";
+    }
+    syncBillingAddress(details);
+
     activateDeckCard("pay-choose");
+  }
+
+  function syncBillingAddress(details) {
+    const addressEl = document.querySelector("[data-billing-customer-address]");
+    const cityEl = document.querySelector("[data-billing-customer-city]");
+    if (addressEl) addressEl.textContent = details?.address || "—";
+    if (cityEl) cityEl.textContent = details?.city || "—";
+  }
+
+  function digitsOnly(value) {
+    return String(value || "").replace(/\D/g, "");
+  }
+
+  function formatCardNumber(value) {
+    const digits = digitsOnly(value).slice(0, 16);
+    return digits.replace(/(\d{4})(?=\d)/g, "$1 ").trim();
+  }
+
+  function fillCardExpiryYears(select) {
+    if (!select || select.dataset.filled === "1") return;
+    const now = new Date();
+    const start = now.getFullYear();
+    for (let year = start; year <= start + 15; year += 1) {
+      const opt = document.createElement("option");
+      opt.value = String(year);
+      opt.textContent = String(year);
+      select.appendChild(opt);
+    }
+    select.dataset.filled = "1";
+  }
+
+  function initCardFieldGuards(root) {
+    const scope = root || document;
+    const number = scope.querySelector("[data-card-number]");
+    const cvv = scope.querySelector("[data-card-cvv]");
+    const name = scope.querySelector("[data-card-name]");
+    const expYear = scope.querySelector("[data-card-exp-year]");
+    const pin = scope.querySelector("[data-billing-pin]");
+
+    fillCardExpiryYears(expYear);
+
+    number?.addEventListener("input", () => {
+      number.value = formatCardNumber(number.value);
+      number.setCustomValidity("");
+    });
+    number?.addEventListener("blur", () => {
+      const digits = digitsOnly(number.value);
+      if (digits && digits.length !== 16) {
+        number.setCustomValidity("Enter a valid 16-digit card number.");
+      } else {
+        number.setCustomValidity("");
+      }
+    });
+
+    cvv?.addEventListener("input", () => {
+      cvv.value = digitsOnly(cvv.value).slice(0, 4);
+      cvv.setCustomValidity("");
+    });
+    cvv?.addEventListener("blur", () => {
+      const digits = digitsOnly(cvv.value);
+      if (digits && (digits.length < 3 || digits.length > 4)) {
+        cvv.setCustomValidity("CVV must be 3 or 4 digits.");
+      } else {
+        cvv.setCustomValidity("");
+      }
+    });
+
+    name?.addEventListener("input", () => {
+      name.value = name.value.replace(/[^A-Za-z .'-]/g, "").slice(0, 60);
+      name.setCustomValidity("");
+    });
+
+    pin?.addEventListener("input", () => {
+      pin.value = digitsOnly(pin.value).slice(0, 6);
+    });
+  }
+
+  function validateCardFields(form) {
+    if (!form) return true;
+    const number = form.querySelector("[data-card-number]");
+    const cvv = form.querySelector("[data-card-cvv]");
+    const month = form.querySelector("[data-card-exp-month]");
+    const year = form.querySelector("[data-card-exp-year]");
+
+    if (number) {
+      const digits = digitsOnly(number.value);
+      if (digits.length !== 16) {
+        number.setCustomValidity("Enter a valid 16-digit card number.");
+        number.reportValidity();
+        return false;
+      }
+      number.value = formatCardNumber(digits);
+      number.setCustomValidity("");
+    }
+
+    if (cvv) {
+      const digits = digitsOnly(cvv.value);
+      if (digits.length < 3 || digits.length > 4) {
+        cvv.setCustomValidity("CVV must be 3 or 4 digits.");
+        cvv.reportValidity();
+        return false;
+      }
+      cvv.setCustomValidity("");
+    }
+
+    if (month?.value && year?.value) {
+      const expMonth = Number(month.value);
+      const expYear = Number(year.value);
+      const now = new Date();
+      const expEnd = new Date(expYear, expMonth, 0, 23, 59, 59);
+      if (expEnd < now) {
+        month.setCustomValidity("Card expiry cannot be in the past.");
+        month.reportValidity();
+        return false;
+      }
+      month.setCustomValidity("");
+    }
+
+    return true;
+  }
+
+  function initBillingAddressUi(root) {
+    const scope = root || document;
+    const cards = scope.querySelectorAll(".pay-address-card");
+    const choices = scope.querySelectorAll("[data-billing-choice]");
+    const newForm = scope.querySelector("[data-billing-new]");
+    const street = scope.querySelector("[data-billing-street]");
+    const city = scope.querySelector("[data-billing-city]");
+    const pin = scope.querySelector("[data-billing-pin]");
+    if (!choices.length || !newForm) return;
+
+    function sync() {
+      const selected = scope.querySelector("[data-billing-choice]:checked");
+      const isNew = selected?.value === "new";
+      newForm.hidden = !isNew;
+      cards.forEach((card) => {
+        const input = card.querySelector("[data-billing-choice]");
+        card.classList.toggle("is-selected", !!input?.checked);
+      });
+      if (street) {
+        street.required = isNew;
+        if (!isNew) street.value = "";
+      }
+      if (city) {
+        city.required = isNew;
+        if (!isNew) city.value = "";
+      }
+      if (pin) {
+        pin.required = isNew;
+        if (!isNew) pin.value = "";
+      }
+    }
+
+    choices.forEach((input) => input.addEventListener("change", sync));
+    sync();
   }
 
   function renderInlineConfirmation(details, payment) {
@@ -1412,17 +1581,53 @@
       `;
     }
 
-    const refEl = document.querySelector("[data-confirm-ref]");
-    const slotEl = document.querySelector("[data-confirm-slot]");
+    const day = details.sampleDayLabel || formatSampleDayLabel(details.sampleDay) || "—";
+    const windowLabel = details.sampleWindow || "";
+    const slotLabel = windowLabel ? `${day} · ${windowLabel}` : day;
+    const ref = payment.reference || "Pending";
+    const dayParts = String(day)
+      .split("·")
+      .map((part) => part.trim())
+      .filter(Boolean);
+    const factLines = [...dayParts];
+    if (windowLabel) factLines.push(windowLabel);
+
+    document.querySelectorAll("[data-confirm-ref]").forEach((el) => {
+      el.textContent = ref;
+    });
+    document.querySelectorAll("[data-confirm-slot]").forEach((el) => {
+      el.textContent = slotLabel;
+    });
+    document.querySelectorAll("[data-confirm-slot-fact]").forEach((el) => {
+      el.replaceChildren(
+        ...factLines.map((line) => {
+          const span = document.createElement("span");
+          span.textContent = line;
+          return span;
+        })
+      );
+    });
+
     const leadEl = document.querySelector("[data-confirm-lead]");
-    if (refEl) refEl.textContent = payment.reference || "Pending";
-    if (slotEl) {
-      const day = details.sampleDayLabel || formatSampleDayLabel(details.sampleDay) || "—";
-      const windowLabel = details.sampleWindow || "—";
-      slotEl.textContent = `${day} · ${windowLabel}`;
-    }
     if (leadEl) {
-      leadEl.textContent = "Payment received. We’ll collect your sample at home and send reports when ready.";
+      leadEl.textContent =
+        "We’ll collect your sample at home and let you know when your reports are ready.";
+    }
+
+    const copyBtn = document.querySelector("[data-confirm-copy]");
+    if (copyBtn && !copyBtn.dataset.bound) {
+      copyBtn.dataset.bound = "1";
+      copyBtn.addEventListener("click", async () => {
+        const value = document.querySelector("[data-confirm-ref]")?.textContent?.trim() || "";
+        if (!value) return;
+        try {
+          await navigator.clipboard.writeText(value);
+          copyBtn.setAttribute("aria-label", "Booking ID copied");
+          setTimeout(() => copyBtn.setAttribute("aria-label", "Copy booking ID"), 1600);
+        } catch {
+          /* ignore */
+        }
+      });
     }
 
     activateDeckCard("confirmation");
@@ -1536,7 +1741,22 @@
     if (!form) return;
 
     const params = new URLSearchParams(location.search);
+    const confirmPreview = params.get("confirm") === "preview";
     const fromCart = params.get("cart") === "checkout";
+    if (confirmPreview) {
+      const tomorrowLabel = formatSampleDayLabel("Tomorrow") || "Tomorrow";
+      renderInlineConfirmation(
+        {
+          name: "Preview Guest",
+          phone: "9000424591",
+          sampleDay: "Tomorrow",
+          sampleDayLabel: tomorrowLabel,
+          sampleWindow: "Morning",
+        },
+        { method: "UPI", amount: 1499, reference: "DS-MRWHJSWS" }
+      );
+      return;
+    }
     if (fromCart && !cartItemsWithTests().length) {
       const paid = (() => {
         try {
@@ -1623,12 +1843,7 @@
     syncOtpSendEnabled(form);
     saveDraft(form);
 
-    form.querySelector("#book-consent")?.addEventListener("change", () => {
-      syncContinueEnabled(form);
-      saveDraft(form);
-    });
-
-    sendBtn?.addEventListener("click", async () => {
+    sendBtn?.addEventListener("click", () => {
       setStatus(statusEl, "", false);
       const digits = normalizedPhone(phoneInput?.value);
       if (digits.length !== 10) {
@@ -1637,25 +1852,17 @@
         return;
       }
       if (phoneInput) phoneInput.value = digits;
-      sendBtn.disabled = true;
-      try {
-        await requestPhoneOtp(digits);
-        setPhoneVerifiedUi(form, false, true);
-        const hint = otpCopy().hint || "Enter the 6-digit code sent to this mobile number.";
-        setStatus(statusEl, hint, false);
-        if (otpInput) {
-          otpInput.value = "";
-          otpInput.focus();
-        }
-      } catch (error) {
-        setPhoneVerifiedUi(form, false, false);
-        setStatus(statusEl, error.message || "We could not send a verification code.", true);
-      } finally {
-        syncOtpSendEnabled(form);
+      // Local demo only — no backend OTP API call.
+      setPhoneVerifiedUi(form, false, true);
+      setStatus(statusEl, `Enter OTP ${LOCAL_DEMO_OTP} to verify.`, false);
+      if (otpInput) {
+        otpInput.value = "";
+        otpInput.focus();
       }
+      syncOtpSendEnabled(form);
     });
 
-    verifyBtn?.addEventListener("click", async () => {
+    verifyBtn?.addEventListener("click", () => {
       setStatus(statusEl, "", false);
       const digits = normalizedPhone(phoneInput?.value);
       if (digits.length !== 10) {
@@ -1664,25 +1871,16 @@
         return;
       }
       const code = String(otpInput?.value || "").replace(/\D/g, "");
-      if (!/^\d{6}$/.test(code)) {
-        setStatus(statusEl, "Enter the 6-digit code sent to your mobile number.", true);
+      if (code !== LOCAL_DEMO_OTP) {
+        setStatus(statusEl, `Invalid OTP. Enter ${LOCAL_DEMO_OTP}.`, true);
         otpInput?.focus();
         return;
       }
-      verifyBtn.disabled = true;
-      try {
-        await verifyPhoneOtp(digits, code);
-        if (phoneInput) phoneInput.value = digits;
-        writeVerified(digits);
-        setPhoneVerifiedUi(form, true);
-        setStatus(statusEl, "", false);
-        saveDraft(form);
-      } catch (error) {
-        setStatus(statusEl, error.message || "That verification code could not be confirmed.", true);
-        otpInput?.focus();
-      } finally {
-        verifyBtn.disabled = false;
-      }
+      if (phoneInput) phoneInput.value = digits;
+      writeVerified(digits);
+      setPhoneVerifiedUi(form, true);
+      setStatus(statusEl, "", false);
+      saveDraft(form);
     });
 
     form.addEventListener("submit", async (event) => {
@@ -1690,15 +1888,12 @@
       setStatus(statusEl, "", false);
       if (successEl) successEl.hidden = true;
 
-      const digits = normalizedPhone(phoneInput?.value);
-      if (digits.length !== 10) {
-        setStatus(statusEl, "Enter a valid 10-digit mobile number to continue.", true);
+      const verified = readVerified();
+      if (!verified) {
+        setStatus(statusEl, "Verify your phone number to continue to payment.", true);
         phoneInput?.focus();
         return;
       }
-
-      const verified = readVerified();
-      const phone = verified?.phone || digits;
 
       if (!form.checkValidity()) {
         form.reportValidity();
@@ -1720,8 +1915,8 @@
           || form.querySelector("#book-gender")?.value
           || "",
         age: form.querySelector("#book-age")?.value || "",
-        phone,
-        phoneVerified: Boolean(verified),
+        phone: verified.phone,
+        phoneVerified: true,
         firebaseUid: window.DRSWIFT_USER?.uid || null,
         sampleDay: form.querySelector("input[name='sampleDay']:checked")?.value || "",
         sampleDayLabel: formatSampleDayLabel(
