@@ -1,16 +1,16 @@
 /**
- * Login card: Customer ↔ Doctor, Phone ↔ Mail (one form at a time).
- * Phone OTP: Send → 30s cooldown → Resend; OTP field appears after first send.
+ * Login card: Customer ↔ Doctor, Phone ↔ Mail.
+ * After phone OTP / identity: existing users go to account;
+ * new users see complete-profile (name, age, gender).
  */
 (function () {
   const RESEND_SECONDS = Number(window.DRSWIFT_SITE_CONTENT?.otp?.resendCooldownSec) || 30;
-  const DEMO_ACCOUNT_KEY = "drswift.demoAccount.v1";
-  const DEMO_SESSION_KEY = "drswift.demoSession.v1";
-  const HOUSEHOLD_KEY = "drswift.demoHousehold.v1";
+  const DEMO_OTP = "123456";
   const card = document.querySelector("[data-login-card]");
   if (!card) return;
 
   const v = window.DrSwiftFormValidation;
+  const auth = window.DrSwiftAuth;
 
   const audienceTabs = card.querySelectorAll("[data-audience]");
   const panels = {
@@ -22,6 +22,11 @@
     phone: card.querySelector('[data-login-method="phone"]'),
     mail: card.querySelector('[data-login-method="mail"]'),
   };
+
+  const chromeEls = card.querySelectorAll("[data-login-chrome]");
+  const profilePanel = card.querySelector("[data-complete-profile]");
+  const profileForm = card.querySelector("[data-complete-profile-form]");
+  const profileSubtitle = card.querySelector("[data-complete-profile-subtitle]");
 
   const phoneInput = card.querySelector("#cust-phone");
   const otpInput = card.querySelector("#cust-otp");
@@ -99,6 +104,61 @@
     if (success) success.hidden = true;
   }
 
+  function showLoginChrome() {
+    chromeEls.forEach((el) => {
+      if (el.hasAttribute("data-panel")) {
+        const isCustomer = el.getAttribute("data-panel") === "customer";
+        el.hidden = !isCustomer;
+        el.classList.toggle("is-active", isCustomer);
+      } else {
+        el.hidden = false;
+      }
+    });
+    if (profilePanel) profilePanel.hidden = true;
+    setAudience("customer");
+  }
+
+  function showCompleteProfile(identity, partial) {
+    chromeEls.forEach((el) => {
+      el.hidden = true;
+      el.classList.remove("is-active");
+    });
+    if (!profilePanel || !profileForm) return;
+
+    profilePanel.hidden = false;
+    profilePanel.classList.add("is-active");
+
+    const phone = auth?.digitsPhone?.(identity?.phone) || identity?.phone || "";
+    const email = identity?.email || "";
+    if (profileSubtitle) {
+      if (phone) {
+        profileSubtitle.textContent = `Verified +91 ${phone}. Add your details once — next time you’ll go straight in.`;
+      } else if (email) {
+        profileSubtitle.textContent = `Signed in as ${email}. Add your details once — next time you’ll go straight in.`;
+      } else {
+        profileSubtitle.textContent =
+          "You’re verified. Add a few details so we can personalize bookings and reports.";
+      }
+    }
+
+    const nameInput = profileForm.querySelector("[name='name']");
+    const ageInput = profileForm.querySelector("[name='age']");
+    const genderInput = profileForm.querySelector("[name='gender']");
+    const emailInput = profileForm.querySelector("[name='email']");
+
+    if (nameInput) nameInput.value = partial?.name || identity?.displayName || "";
+    if (ageInput) ageInput.value = partial?.age || "";
+    if (genderInput) genderInput.value = partial?.gender || "";
+    if (emailInput) emailInput.value = partial?.email || email || "";
+
+    nameInput?.focus();
+  }
+
+  window.DrSwiftLoginUi = {
+    showCompleteProfile,
+    showLoginChrome,
+  };
+
   function setAudience(audience) {
     audienceTabs.forEach((tab) => {
       const on = tab.dataset.audience === audience;
@@ -173,14 +233,14 @@
     if (otpBlock) otpBlock.hidden = false;
     otpInput?.focus();
     const hint = window.DRSWIFT_SITE_CONTENT?.otp?.hint || "OTP sent. Enter the 6-digit code below.";
-    setStatus(`OTP sent. ${hint}`);
+    setStatus(`OTP sent. ${hint} (demo code ${DEMO_OTP})`);
     startCooldown();
   });
 
   card.querySelector("[data-otp-verify]")?.addEventListener("click", () => {
     const form = methodForms.phone;
     const success = form?.querySelector("[data-auth-success]");
-    if (!form || !otpInput) return;
+    if (!form || !otpInput || !auth) return;
 
     if (!otpSentOnce) {
       setStatus("Send an OTP first.", true);
@@ -191,48 +251,91 @@
       return;
     }
 
+    if (otpInput.value !== DEMO_OTP) {
+      setStatus("Incorrect OTP. Use the demo code 123456.", true);
+      otpInput.focus();
+      return;
+    }
+
     setStatus("");
-    if (success) {
-      success.hidden = false;
-      success.textContent = "Phone verified. Redirecting to your account…";
+    const identity = {
+      method: "phone",
+      phone: phoneInput.value,
+    };
+
+    const result = auth.continueAfterIdentity(identity, {
+      onExisting() {
+        if (success) {
+          success.hidden = false;
+          success.textContent = "Welcome back. Opening your account…";
+        }
+        clearCooldown();
+        if (sendBtn) sendBtn.disabled = true;
+        window.setTimeout(() => {
+          window.location.href = "account.html";
+        }, 500);
+      },
+      onNew(pendingIdentity, partial) {
+        if (success) success.hidden = true;
+        clearCooldown();
+        showCompleteProfile(pendingIdentity, partial);
+      },
+    });
+
+    if (result.status === "needs_profile") {
+      /* handled in onNew */
     }
-    try {
-      const storedHousehold =
-        JSON.parse(localStorage.getItem(HOUSEHOLD_KEY) || "null") ||
-        JSON.parse(sessionStorage.getItem(HOUSEHOLD_KEY) || "null");
-      const storedAccount =
-        storedHousehold?.owner ||
-        JSON.parse(localStorage.getItem(DEMO_ACCOUNT_KEY) || "null") ||
-        JSON.parse(sessionStorage.getItem(DEMO_ACCOUNT_KEY) || "null") ||
-        null;
-      const account = {
-        name: storedAccount?.name || "Account holder",
-        email: storedAccount?.email || "",
-        phone: phoneInput.value || storedAccount?.phone || "",
-        method: "phone",
-        createdAt: new Date().toISOString(),
-      };
-      const payload = JSON.stringify(account);
-      sessionStorage.setItem(DEMO_ACCOUNT_KEY, payload);
-      localStorage.setItem(DEMO_ACCOUNT_KEY, payload);
-      const session = JSON.stringify({
-        ownerId: storedHousehold?.owner?.id || "",
-        method: "phone",
-        signedInAt: new Date().toISOString(),
-      });
-      sessionStorage.setItem(DEMO_SESSION_KEY, session);
-      localStorage.setItem(DEMO_SESSION_KEY, session);
-    } catch {
-      /* ignore demo session storage errors */
-    }
-    clearCooldown();
-    if (sendBtn) sendBtn.disabled = true;
-    window.setTimeout(() => {
-      window.location.href = "account.html";
-    }, 650);
   });
 
-  resetPhoneOtpUi();
-  setAudience("customer");
-  setMethod("phone");
+  profileForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (!auth || !v?.validateForm(profileForm)) return;
+
+    const success = profileForm.querySelector("[data-auth-success]");
+    const result = auth.completeProfile(
+      {
+        name: profileForm.querySelector("[name='name']")?.value?.trim(),
+        age: profileForm.querySelector("[name='age']")?.value,
+        gender: profileForm.querySelector("[name='gender']")?.value,
+        email: profileForm.querySelector("[name='email']")?.value?.trim(),
+      },
+      {
+        onComplete() {
+          if (success) {
+            success.hidden = false;
+            success.textContent = "Profile saved. Opening your account…";
+          }
+          profileForm.querySelectorAll("input, select, button").forEach((el) => {
+            if (el.tagName === "BUTTON") el.disabled = true;
+            else el.readOnly = true;
+          });
+          window.setTimeout(() => {
+            window.location.href = "account.html";
+          }, 550);
+        },
+      }
+    );
+
+    if (result.status === "error") {
+      setStatus(result.message, true);
+      showLoginChrome();
+    }
+  });
+
+  card.querySelector("[data-complete-profile-back]")?.addEventListener("click", () => {
+    auth?.clearPendingAuth?.();
+    resetPhoneOtpUi();
+    showLoginChrome();
+    phoneInput?.focus();
+  });
+
+  // Resume complete-profile if user refreshed mid-flow
+  const pending = auth?.getPendingAuth?.();
+  if (pending) {
+    showCompleteProfile(pending, null);
+  } else {
+    resetPhoneOtpUi();
+    setAudience("customer");
+    setMethod("phone");
+  }
 })();

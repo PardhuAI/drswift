@@ -1,5 +1,8 @@
 .tests-page {
   background: #fff;
+}
+
+.tests-page main {
   overflow-x: clip;
 }
 
@@ -833,14 +836,16 @@
   .tests-search-toggle {
     display: none;
   }
-  .tests-search-panel,
-  .tests-search-panel[hidden] {
+  .tests-search-panel:not([hidden]) {
     display: flex !important;
     grid-column: 1;
     grid-row: 3;
     align-self: center;
     width: auto;
     min-width: 0;
+  }
+  .tests-search-panel[hidden] {
+    display: none !important;
   }
   .tests-search-panel .tests-search {
     width: 100%;

@@ -38,11 +38,46 @@
   async function signInWithGoogle(auth, provider, triggerEl) {
     if (triggerEl) triggerEl.disabled = true;
     try {
-      await auth.signInWithPopup(provider);
-      // After login-page Google sign-in, open account
-      if (triggerEl?.hasAttribute("data-google-auth-primary") || document.querySelector("[data-login-card]")) {
-        window.location.href = "account.html";
+      const result = await auth.signInWithPopup(provider);
+      const firebaseUser = result?.user;
+      const onLoginSurface =
+        triggerEl?.hasAttribute("data-google-auth-primary") || document.querySelector("[data-login-card]");
+
+      if (!onLoginSurface) return;
+
+      const identity = {
+        method: "google",
+        email: firebaseUser?.email || "",
+        googleUid: firebaseUser?.uid || "",
+        displayName: firebaseUser?.displayName || "",
+      };
+
+      const session = window.DrSwiftAuth;
+      const ui = window.DrSwiftLoginUi;
+
+      if (session?.continueAfterIdentity) {
+        session.continueAfterIdentity(identity, {
+          onExisting() {
+            window.location.href = "account.html";
+          },
+          onNew(pendingIdentity, partial) {
+            if (ui?.showCompleteProfile) {
+              ui.showCompleteProfile(pendingIdentity, {
+                ...partial,
+                name: partial?.name || identity.displayName,
+                email: partial?.email || identity.email,
+              });
+            } else if (location.pathname.endsWith("signup.html")) {
+              window.location.href = "login.html";
+            } else {
+              window.location.href = "account.html";
+            }
+          },
+        });
+        return;
       }
+
+      window.location.href = "account.html";
     } catch (err) {
       if (isIgnorableAuthError(err)) {
         // User dismissed — no toast.

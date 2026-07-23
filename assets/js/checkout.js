@@ -1,6 +1,6 @@
 /**
  * Booking / checkout form — guest allowed.
- * Required: name, gender, phone (OTP verified), address. Age optional.
+ * Industry-style steps: Patient → Address → Slot → Payment → Done.
  * Local demo OTP only (no backend) — code 123456.
  */
 (function () {
@@ -63,12 +63,12 @@
   function setPhoneVerifiedUi(form, verified, otpVisible = false) {
     const badge = form.querySelector("[data-phone-verified-badge]");
     const otpBlock = form.querySelector("[data-otp-block]");
-    const submit = form.querySelector("[type='submit']");
+    const continueBtn = form.querySelector("[data-patient-continue]");
     const sendBtn = form.querySelector("[data-otp-send]");
     const phoneRow = form.querySelector(".checkout-wire-field--phone .phone-verify-row");
     if (badge) badge.hidden = !verified;
     if (otpBlock) otpBlock.hidden = verified || !otpVisible;
-    if (submit) submit.disabled = !verified;
+    if (continueBtn) continueBtn.disabled = !verified;
     if (phoneRow) phoneRow.classList.toggle("is-verified", !!verified);
     if (sendBtn) {
       sendBtn.hidden = !!verified;
@@ -350,7 +350,7 @@
     const cta = document.querySelector("[data-checkout-sticky-cta]");
     if (!bar || !cta) return;
 
-    const isNarrow = window.matchMedia("(max-width: 879px)").matches;
+    const isNarrow = window.matchMedia("(max-width: 900px)").matches;
     const hideStages = new Set(["confirmation", "pay-processing"]);
     const show = isNarrow && stageName && !hideStages.has(stageName);
     bar.hidden = !show;
@@ -360,8 +360,22 @@
     syncPayTotals();
 
     const configs = {
-      details: {
-        label: "Continue to payment",
+      patient: {
+        label: "Continue to address",
+        disabled: !readVerified(),
+        run() {
+          document.querySelector("[data-patient-continue]")?.click();
+        },
+      },
+      address: {
+        label: "Continue to slot",
+        disabled: false,
+        run() {
+          document.querySelector('[data-checkout-next="schedule"]')?.click();
+        },
+      },
+      schedule: {
+        label: "Review & pay",
         disabled: false,
         run() {
           document.querySelector("[data-checkout-form]")?.requestSubmit?.();
@@ -410,7 +424,7 @@
     if (!cta) return;
     window.addEventListener("resize", () => {
       const active = document.querySelector("[data-checkout-stage].is-active");
-      syncStickyCheckoutBar(active?.getAttribute("data-checkout-stage") || "details");
+      syncStickyCheckoutBar(active?.getAttribute("data-checkout-stage") || "patient");
     });
   }
 
@@ -458,6 +472,7 @@
       },
       address: {
         city: details.city,
+        pin: details.pin || "",
         line1: details.address,
       },
       schedule: {
@@ -548,7 +563,7 @@
   async function startPaymentSession(methodMeta) {
     const details = readCheckoutDetails();
     if (!details) {
-      activateDeckCard("details");
+      activateDeckCard("patient");
       throw new Error("Complete customer details before paying.");
     }
     if (!cartItemsWithTests().length) {
@@ -765,7 +780,7 @@
       const details = readCheckoutDetails();
       if (!details) {
         setPayStatus("Checkout details expired. Please enter details again.", true);
-        activateDeckCard("details");
+        activateDeckCard("patient");
         return true;
       }
       if (status.status === "paid" || status.status === "captured" || status.status === "success") {
@@ -889,7 +904,7 @@
   function completeLocalPayment(methodLabel) {
     const details = readCheckoutDetails();
     if (!details) {
-      activateDeckCard("details");
+      activateDeckCard("patient");
       return;
     }
     const amount = cartItemsWithTests().reduce((sum, item) => sum + itemPrice(item), 0);
@@ -1309,7 +1324,9 @@
 
   function syncCheckoutProgress(stageName) {
     const steps = {
-      details: "details",
+      patient: "details",
+      address: "details",
+      schedule: "details",
       "pay-choose": "payment",
       "pay-card": "payment",
       "pay-qr": "payment",
@@ -1331,10 +1348,25 @@
       if (active) step.setAttribute("aria-current", "step");
       else step.removeAttribute("aria-current");
     });
+
+    const substeps = document.querySelector("[data-checkout-substeps]");
+    const infoStages = ["patient", "address", "schedule"];
+    if (substeps) {
+      const showSubs = infoStages.includes(stageName);
+      substeps.hidden = !showSubs;
+      substeps.querySelectorAll("[data-substep]").forEach((item) => {
+        const key = item.getAttribute("data-substep");
+        const idx = infoStages.indexOf(key);
+        const currentIdx = infoStages.indexOf(stageName);
+        item.classList.toggle("is-active", key === stageName);
+        item.classList.toggle("is-complete", currentIdx > idx && currentIdx >= 0);
+      });
+    }
   }
 
   function activateDeckCard(name) {
     const paymentStages = ["pay-choose", "pay-card", "pay-qr", "pay-bank", "pay-processing"];
+    const infoStages = ["patient", "address", "schedule"];
     if (name !== "pay-qr" && name !== "pay-processing" && name !== "confirmation") {
       stopPaymentPoll();
     }
@@ -1348,7 +1380,7 @@
     const customerSummary = document.querySelector("[data-summary-customer]");
     const paymentSummary = document.querySelector("[data-summary-payment]");
     if (customerSummary) {
-      customerSummary.hidden = name === "details";
+      customerSummary.hidden = infoStages.includes(name);
     }
     if (paymentSummary) {
       paymentSummary.hidden = name !== "confirmation";
@@ -1388,6 +1420,7 @@
         ["Age", details.age],
         ["Phone", details.phone],
         ["When", `${details.sampleDayLabel || formatSampleDayLabel(details.sampleDay)} · ${details.sampleWindow}`],
+        ["PIN", details.pin],
         ["City", details.city],
         ["Address", details.address],
       ];
@@ -1656,6 +1689,7 @@
       gender: form.querySelector("input[name='gender']:checked")?.value || "",
       age: form.querySelector("#book-age")?.value || "",
       phone: form.querySelector("#book-phone")?.value || "",
+      pin: form.querySelector("#book-pin")?.value || "",
       city: form.querySelector("#book-city")?.value || "",
       address: form.querySelector("#book-address")?.value || "",
       sampleDay: dayInput?.value || "Today",
@@ -1685,11 +1719,13 @@
     const name = form.querySelector("#book-name");
     const age = form.querySelector("#book-age");
     const phone = form.querySelector("#book-phone");
+    const pin = form.querySelector("#book-pin");
     const city = form.querySelector("#book-city");
     const address = form.querySelector("#book-address");
     if (name && draft.name) name.value = draft.name;
     if (age && draft.age !== undefined && draft.age !== null) age.value = draft.age;
     if (phone && draft.phone) phone.value = String(draft.phone).replace(/\D/g, "").slice(0, 10);
+    if (pin && (draft.pin || serviceArea?.pin)) pin.value = String(draft.pin || serviceArea.pin).replace(/\D/g, "").slice(0, 6);
     if (city && (draft.city || serviceArea?.city)) city.value = draft.city || serviceArea.city;
     if (address && draft.address) address.value = draft.address;
 
@@ -1766,7 +1802,7 @@
         }
       })();
       if (!paid?.reference) {
-        window.location.replace("cart.html");
+        window.location.replace("/cart");
         return;
       }
     }
@@ -1782,7 +1818,7 @@
     resumePaymentReturn();
     syncStickyCheckoutBar(
       document.querySelector("[data-checkout-stage].is-active")?.getAttribute("data-checkout-stage") ||
-        "details"
+        "patient"
     );
 
     form.querySelectorAll("input[name='sampleWindow']").forEach((input) => {
@@ -1801,9 +1837,34 @@
     const phoneInput = form.querySelector("#book-phone");
     const otpInput = form.querySelector("#book-otp");
     const statusEl = form.querySelector("[data-checkout-status]");
+    const addressStatusEl = form.querySelector("[data-address-status]");
+    const scheduleStatusEl = form.querySelector("[data-schedule-status]");
     const successEl = form.querySelector("[data-auth-success]");
     const sendBtn = form.querySelector("[data-otp-send]");
     const verifyBtn = form.querySelector("[data-otp-verify]");
+    const pinInput = form.querySelector("#book-pin");
+
+    // Prefill from demo account / progressive auth profile when available
+    try {
+      const account =
+        JSON.parse(localStorage.getItem("drswift.demoAccount.v1") || "null") ||
+        JSON.parse(sessionStorage.getItem("drswift.demoAccount.v1") || "null");
+      if (account) {
+        const name = form.querySelector("#book-name");
+        const age = form.querySelector("#book-age");
+        if (name && !name.value && account.name) name.value = account.name;
+        if (age && !age.value && account.age) age.value = account.age;
+        if (phoneInput && !phoneInput.value && account.phone) {
+          phoneInput.value = String(account.phone).replace(/\D/g, "").slice(0, 10);
+        }
+        if (account.gender) {
+          const gender = form.querySelector(`input[name='gender'][value="${account.gender}"]`);
+          if (gender) gender.checked = true;
+        }
+      }
+    } catch {
+      /* ignore */
+    }
 
     const existing = readVerified();
     if (existing && phoneInput) {
@@ -1825,6 +1886,10 @@
       form.addEventListener(evt, () => saveDraft(form));
     });
 
+    pinInput?.addEventListener("input", () => {
+      pinInput.value = digitsOnly(pinInput.value).slice(0, 6);
+    });
+
     phoneInput?.addEventListener("input", () => {
       phoneInput.value = phoneInput.value.replace(/\D/g, "").slice(0, 10);
       const verified = readVerified();
@@ -1838,10 +1903,76 @@
       }
       syncOtpSendEnabled(form);
       saveDraft(form);
+      syncStickyCheckoutBar("patient");
     });
 
     syncOtpSendEnabled(form);
     saveDraft(form);
+    syncCheckoutProgress("patient");
+
+    function validatePatientStep() {
+      setStatus(statusEl, "", false);
+      const name = form.querySelector("#book-name");
+      const age = form.querySelector("#book-age");
+      if (!name?.value.trim()) {
+        setStatus(statusEl, "Enter the patient’s full name.", true);
+        name?.focus();
+        return false;
+      }
+      const ageNum = Number(age?.value);
+      if (!age?.value || Number.isNaN(ageNum) || ageNum < 1 || ageNum > 120) {
+        setStatus(statusEl, "Enter a valid age between 1 and 120.", true);
+        age?.focus();
+        return false;
+      }
+      const verified = readVerified();
+      if (!verified) {
+        setStatus(statusEl, "Verify your mobile number with OTP to continue.", true);
+        phoneInput?.focus();
+        return false;
+      }
+      return true;
+    }
+
+    function validateAddressStep() {
+      setStatus(addressStatusEl, "", false);
+      const pin = form.querySelector("#book-pin");
+      const city = form.querySelector("#book-city");
+      const address = form.querySelector("#book-address");
+      const pinDigits = digitsOnly(pin?.value);
+      if (pinDigits.length !== 6 || !/^[1-9][0-9]{5}$/.test(pinDigits)) {
+        setStatus(addressStatusEl, "Enter a valid 6-digit PIN code.", true);
+        pin?.focus();
+        return false;
+      }
+      if (city && !isValidCityVillage(city.value)) {
+        setStatus(
+          addressStatusEl,
+          "City/Town must start with a letter, include at least 3 letters, and be under 100 characters.",
+          true
+        );
+        city.focus();
+        return false;
+      }
+      if (!address?.value.trim()) {
+        setStatus(addressStatusEl, "Enter the full collection address.", true);
+        address?.focus();
+        return false;
+      }
+      return true;
+    }
+
+    form.querySelector("[data-patient-continue]")?.addEventListener("click", () => {
+      if (!validatePatientStep()) return;
+      saveDraft(form);
+      activateDeckCard("address");
+    });
+
+    form.querySelector('[data-checkout-next="schedule"]')?.addEventListener("click", () => {
+      if (!validateAddressStep()) return;
+      saveDraft(form);
+      activateDeckCard("schedule");
+    });
 
     sendBtn?.addEventListener("click", () => {
       setStatus(statusEl, "", false);
@@ -1881,28 +2012,34 @@
       setPhoneVerifiedUi(form, true);
       setStatus(statusEl, "", false);
       saveDraft(form);
+      syncStickyCheckoutBar("patient");
     });
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
-      setStatus(statusEl, "", false);
+      setStatus(scheduleStatusEl, "", false);
       if (successEl) successEl.hidden = true;
 
-      const verified = readVerified();
-      if (!verified) {
-        setStatus(statusEl, "Verify your phone number to continue to payment.", true);
-        phoneInput?.focus();
+      if (!validatePatientStep()) {
+        activateDeckCard("patient");
+        return;
+      }
+      if (!validateAddressStep()) {
+        activateDeckCard("address");
         return;
       }
 
-      if (!form.checkValidity()) {
-        form.reportValidity();
+      const day = form.querySelector("input[name='sampleDay']:checked")?.value || "";
+      const windowVal = form.querySelector("input[name='sampleWindow']:checked")?.value || "";
+      if (!day || !windowVal) {
+        setStatus(scheduleStatusEl, "Choose a collection date and time window.", true);
         return;
       }
 
       const submitBtn = form.querySelector("[type='submit']");
       if (submitBtn) submitBtn.disabled = true;
 
+      const verified = readVerified();
       const name = form.querySelector("#book-name")?.value || "";
       const names = splitName(name);
       const recipientProfile = selectedCartRecipientProfile();
@@ -1918,11 +2055,10 @@
         phone: verified.phone,
         phoneVerified: true,
         firebaseUid: window.DRSWIFT_USER?.uid || null,
-        sampleDay: form.querySelector("input[name='sampleDay']:checked")?.value || "",
-        sampleDayLabel: formatSampleDayLabel(
-          form.querySelector("input[name='sampleDay']:checked")?.value || ""
-        ),
-        sampleWindow: form.querySelector("input[name='sampleWindow']:checked")?.value || "",
+        sampleDay: day,
+        sampleDayLabel: formatSampleDayLabel(day),
+        sampleWindow: windowVal,
+        pin: digitsOnly(form.querySelector("#book-pin")?.value || ""),
         city: form.querySelector("#book-city")?.value || "",
         address: form.querySelector("#book-address")?.value || "",
         cart: cartLineItems(),
@@ -1930,31 +2066,19 @@
         createdAt: new Date().toISOString(),
       };
 
-      const cityInput = form.querySelector("#book-city");
-      if (cityInput && !isValidCityVillage(cityInput.value)) {
-        setStatus(
-          statusEl,
-          "City/Town/Village must start with a letter, include at least 3 letters, and be under 100 characters.",
-          true
-        );
-        cityInput.focus();
-        if (submitBtn) submitBtn.disabled = false;
-        return;
-      }
-
       try {
         sessionStorage.setItem(CHECKOUT_STORAGE_KEY, JSON.stringify(payload));
         renderInlinePayment(payload);
         if (submitBtn) submitBtn.disabled = false;
       } catch (err) {
-        setStatus(statusEl, err.message || "Could not continue. Please try again.", true);
+        setStatus(scheduleStatusEl, err.message || "Could not continue. Please try again.", true);
         if (submitBtn) submitBtn.disabled = false;
       }
     });
 
     document.querySelectorAll("[data-checkout-back]").forEach((button) => {
       button.addEventListener("click", () => {
-        activateDeckCard(button.getAttribute("data-checkout-back") || "details");
+        activateDeckCard(button.getAttribute("data-checkout-back") || "patient");
       });
     });
   }

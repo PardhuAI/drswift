@@ -5,41 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Sign in | Dr.Swift Diagnostics</title>
     <meta name="description" content="Customer and doctor login for Dr.Swift Diagnostics — reports, family health, and patient access.">
-    <link rel="stylesheet" href="assets/css/styles.css?v=visual-trust-1">
+    <link rel="stylesheet" href="assets/css/styles.css?v=fixed-nav-1">
+    <link rel="stylesheet" href="assets/css/mobile-ux.css?v=fixed-nav-1">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
-  <body class="auth-page login-page" data-hide-nav-google="1">
-    <header class="site-header" id="site-header">
-      <nav class="navbar container" aria-label="Primary navigation">
-        <a class="brand" href="index.html" aria-label="Dr.Swift Diagnostics home">
-          <img class="brand-mark" src="assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="40" height="40">
-          <span>Dr.Swift Diagnostics</span>
-        </a>
-        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu">
-          <span class="sr-only">Menu</span><span></span><span></span><span></span>
-        </button>
-        <div class="nav-menu" id="primary-menu">
-          <div class="nav-links">
-            <a href="tests.html">Tests</a>
-            <a href="reports.html">Reports</a>
-            <a href="about.html">About</a>
-          </div>
-          <div class="nav-actions" aria-label="Account links">
-            <a class="cart-link" href="cart.html" aria-label="View cart">
-              <svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-cart"></use></svg>
-              <span>Cart</span>
-              <span class="cart-count" data-cart-count hidden>0</span>
-            </a>
-            <a class="button primary nav-cta" href="tests.html">Book a test</a>
-          </div>
+  <body class="auth-page login-page auth-page--split" data-hide-nav-google="1">
+    <main class="auth-split">
+      <aside class="auth-split__visual" aria-hidden="true">
+        <img
+          class="auth-split__photo"
+          src="assets/images/wellness-family.webp"
+          alt=""
+          width="1200"
+          height="1600"
+          decoding="async"
+          fetchpriority="high"
+        >
+        <div class="auth-split__veil"></div>
+        <div class="auth-split__brand-mark">
+          <img src="assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="28" height="28">
+          <span>Dr.Swift</span>
         </div>
-      </nav>
-    </header>
+        <div class="auth-split__visual-copy">
+          <h2 class="auth-split__visual-title">See more than numbers.</h2>
+          <p class="auth-split__visual-text">
+            Your family’s tests, trends, and reports — in one calm place.
+          </p>
+        </div>
+      </aside>
 
-    <main class="auth-shell">
-      <div class="container container--centered auth-shell__card">
-        <div class="auth-card auth-card--tabs" data-login-card>
-          <div class="login-audience" role="tablist" aria-label="Who is signing in">
+      <section class="auth-split__panel" aria-label="Sign in">
+        <a class="auth-split__close" href="index.html" aria-label="Close and return to Dr.Swift home">
+          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" fill="none">
+            <path d="M4.5 4.5 13.5 13.5M13.5 4.5 4.5 13.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </a>
+        <div class="auth-split__panel-inner" data-login-card>
+          <a class="auth-split__back" href="index.html">
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none">
+              <path d="M10 3 5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Back to Dr.Swift</span>
+          </a>
+
+          <div class="login-audience auth-split__audience" role="tablist" aria-label="Who is signing in" data-login-chrome>
             <button
               type="button"
               class="login-audience__tab is-active"
@@ -49,7 +58,7 @@
               aria-controls="panel-customer"
               data-audience="customer"
             >
-              Login to My Account
+              My Account
             </button>
             <button
               type="button"
@@ -60,22 +69,22 @@
               aria-controls="panel-doctor"
               data-audience="doctor"
             >
-              Doctor Login
+              Doctor
             </button>
           </div>
 
-          <div class="login-panel is-active" id="panel-customer" role="tabpanel" aria-labelledby="tab-customer" data-panel="customer">
-            <div class="auth-card__header auth-card__header--login">
-              <p class="login-lead">Access your account to view test history, track health, family health and more.</p>
-              <h1 class="login-hero-title">See More Than Numbers.</h1>
-            </div>
+          <div class="login-panel is-active" id="panel-customer" role="tabpanel" aria-labelledby="tab-customer" data-panel="customer" data-login-chrome>
+            <header class="auth-split__intro">
+              <h1 class="auth-split__title">Welcome back</h1>
+              <p class="auth-split__subtitle">Sign in with phone or Google. We’ll only ask for your details if you’re new.</p>
+            </header>
 
             <div class="login-method" role="tablist" aria-label="Sign-in method">
               <button type="button" class="login-method__tab is-active" role="tab" aria-selected="true" data-method="phone">
-                Login with Phone
+                Phone
               </button>
               <button type="button" class="login-method__tab" role="tab" aria-selected="false" data-method="mail">
-                Login with Mail
+                Email
               </button>
             </div>
 
@@ -182,11 +191,11 @@
             <p class="auth-alt">New to Dr.Swift? <a href="signup.html">Create an account</a></p>
           </div>
 
-          <div class="login-panel" id="panel-doctor" role="tabpanel" aria-labelledby="tab-doctor" data-panel="doctor" hidden>
-            <div class="auth-card__header auth-card__header--login">
-              <p class="login-lead">Access your patient reports 24/7.</p>
-              <h1 class="login-hero-title">See Health.</h1>
-            </div>
+          <div class="login-panel" id="panel-doctor" role="tabpanel" aria-labelledby="tab-doctor" data-panel="doctor" hidden data-login-chrome>
+            <header class="auth-split__intro">
+              <h1 class="auth-split__title">Doctor portal</h1>
+              <p class="auth-split__subtitle">Access patient reports anytime, from clinic or home.</p>
+            </header>
 
             <form class="auth-form login-form" data-auth-form data-doctor-login novalidate>
               <div class="form-field">
@@ -222,27 +231,83 @@
                 <span></span>
                 <a href="forgot-password.html">Forgot password?</a>
               </div>
-              <button class="button primary full" type="submit">Login</button>
+              <button class="button primary full" type="submit">Sign in</button>
               <p class="auth-success" data-auth-success aria-live="polite" hidden>Your sign-in request was received. We will confirm portal access with your clinic.</p>
             </form>
             <p class="auth-alt"><a href="doctors.html">About the doctors portal</a></p>
           </div>
-        </div>
-      </div>
 
-      <section class="community-band section-pad" aria-labelledby="login-community-heading">
-        <div class="container community-band__layout">
-          <figure class="community-band__media">
-            <img src="assets/images/wellness-family.jpg" alt="" loading="lazy" decoding="async">
-          </figure>
-          <div class="community-band__copy">
-            <h2 id="login-community-heading">Join families who test smarter</h2>
-            <p>Book your first panel or download the app to explore health insights built for everyday life.</p>
-            <div class="cta-band__actions">
-              <a class="button secondary" href="tests.html">Shop tests</a>
-              <a class="button primary" href="app.html">Get the app</a>
-            </div>
+          <div class="login-panel auth-complete-profile" id="panel-complete-profile" data-complete-profile hidden>
+            <header class="auth-split__intro">
+              <p class="auth-split__kicker">Almost there</p>
+              <h1 class="auth-split__title">Tell us about you</h1>
+              <p class="auth-split__subtitle" data-complete-profile-subtitle>
+                You’re verified. Add a few details so we can personalize bookings and reports.
+              </p>
+            </header>
+
+            <form class="auth-form auth-complete-profile__form" data-complete-profile-form novalidate>
+              <div class="form-field">
+                <label for="profile-name">Full name</label>
+                <input
+                  id="profile-name"
+                  type="text"
+                  name="name"
+                  autocomplete="name"
+                  maxlength="80"
+                  placeholder="As on your ID"
+                  required
+                >
+              </div>
+              <div class="auth-complete-profile__row">
+                <div class="form-field">
+                  <label for="profile-age">Age</label>
+                  <input
+                    id="profile-age"
+                    type="number"
+                    name="age"
+                    inputmode="numeric"
+                    min="1"
+                    max="120"
+                    placeholder="Years"
+                    required
+                  >
+                </div>
+                <div class="form-field">
+                  <label for="profile-gender">Gender</label>
+                  <select id="profile-gender" name="gender" required>
+                    <option value="">Select</option>
+                    <option value="Female">Female</option>
+                    <option value="Male">Male</option>
+                    <option value="Other">Other</option>
+                    <option value="Prefer not to say">Prefer not to say</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-field">
+                <label for="profile-email">Email <span class="field-optional">(optional)</span></label>
+                <input
+                  id="profile-email"
+                  type="email"
+                  name="email"
+                  autocomplete="email"
+                  maxlength="120"
+                  placeholder="you@email.com"
+                >
+              </div>
+              <label class="form-check">
+                <input type="checkbox" name="terms" required>
+                <span>I agree to the <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a></span>
+              </label>
+              <button class="button primary full" type="submit">Continue to My Account</button>
+              <p class="auth-success" data-auth-success aria-live="polite" hidden>Profile saved. Opening your account…</p>
+            </form>
+            <p class="auth-alt">
+              <button type="button" class="auth-text-btn" data-complete-profile-back>Use a different number</button>
+            </p>
           </div>
+
+          <p class="auth-split__fineprint">&copy; 2026 Dr.Swift Diagnostics</p>
         </div>
       </section>
     </main>
@@ -251,9 +316,10 @@
     <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
     <script src="assets/js/firebase-config.js?v=3"></script>
-    <script src="assets/js/google-auth.js?v=6"></script>
-    <script src="assets/js/main.js?v=recipient-sync-1"></script>
-    <script src="assets/js/auth.js?v=family-profiles-1"></script>
-    <script src="assets/js/login-tabs.js?v=production-ready-1"></script>
+    <script src="assets/js/auth-session.js?v=1"></script>
+    <script src="assets/js/google-auth.js?v=7"></script>
+    <script src="assets/js/main.js?v=fixed-nav-1"></script>
+    <script src="assets/js/auth.js?v=auth-progressive-1"></script>
+    <script src="assets/js/login-tabs.js?v=auth-progressive-1"></script>
   </body>
 </html>

@@ -231,6 +231,36 @@ export default {
       return Response.redirect(new URL("/tests", url).toString(), 302);
     }
 
+    // Redirect legacy ".html" page URLs to their catalog-injected clean routes.
+    // Without this, direct hits like /book.html?cart=checkout are served as raw
+    // static assets (no SSR catalog), so the offline demo catalog loads, the cart
+    // looks empty, and checkout bounces the user back to an empty cart.
+    const cleanAlias: Record<string, string> = {
+      "/about.html": "/about",
+      "/reports.html": "/reports",
+      "/cart.html": "/cart",
+      "/whatsapp.html": "/whatsapp",
+      "/promotions.html": "/promotions",
+      "/privacy.html": "/privacy",
+      "/terms.html": "/terms",
+      "/policies.html": "/policies",
+      "/help.html": "/help",
+      "/login.html": "/login",
+      "/book.html": "/book",
+      "/doctors.html": "/doctors",
+      "/signup.html": "/signup",
+      "/forgot-password.html": "/forgot-password",
+      "/sample-report.html": "/sample-report",
+      "/privacy-choices.html": "/privacy-choices",
+      "/account.html": "/account",
+    };
+    if (cleanAlias[pathname]) {
+      const target = new URL(cleanAlias[pathname]!, url);
+      target.search = url.search;
+      target.hash = url.hash;
+      return Response.redirect(target.toString(), 301);
+    }
+
     // Home SSR
     if (pathname === "/" || pathname === "") {
       return withCatalog(env, async (catalog) => {

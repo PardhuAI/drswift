@@ -15,11 +15,34 @@ function ensureSkipLink() {
 
 ensureSkipLink();
 
+function syncHeaderOffset() {
+  const header = document.getElementById("site-header");
+  if (!header || document.body.classList.contains("auth-page--split")) {
+    document.documentElement.style.setProperty("--header-offset", "0px");
+    return;
+  }
+  const style = getComputedStyle(header);
+  if (style.display === "none") {
+    document.documentElement.style.setProperty("--header-offset", "0px");
+    return;
+  }
+  const height = Math.ceil(header.getBoundingClientRect().height) || 72;
+  document.documentElement.style.setProperty("--header-offset", `${height}px`);
+}
+
+syncHeaderOffset();
+window.addEventListener("resize", syncHeaderOffset, { passive: true });
+window.addEventListener("orientationchange", syncHeaderOffset);
+if (document.fonts?.ready) {
+  document.fonts.ready.then(syncHeaderOffset).catch(() => {});
+}
+
 if (navToggle && navMenu) {
   const setNavOpen = (isOpen) => {
     navMenu.classList.toggle("is-open", isOpen);
     navToggle.setAttribute("aria-expanded", String(isOpen));
     document.body.classList.toggle("nav-open", isOpen);
+    syncHeaderOffset();
   };
 
   navToggle.addEventListener("click", () => {
@@ -28,6 +51,18 @@ if (navToggle && navMenu) {
 
   navMenu.addEventListener("click", (event) => {
     if (event.target.closest("a") && navMenu.classList.contains("is-open")) {
+      setNavOpen(false);
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!navMenu.classList.contains("is-open")) return;
+    if (event.target.closest(".nav-menu, .nav-toggle")) return;
+    setNavOpen(false);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && navMenu.classList.contains("is-open")) {
       setNavOpen(false);
     }
   });
@@ -2233,8 +2268,8 @@ function renderTestDetailPage() {
           </ul>
           ${customizeCta}
           <button class="button primary full" type="button" data-add-to-cart="${escapeHtml(test.slug)}">Add to cart</button>
-          <a class="button secondary full" href="book.html?test=${encodeURIComponent(test.name)}">Book now</a>
-          <a class="cart-inline-link" href="cart.html">View cart</a>
+          <a class="button secondary full" href="/book?test=${encodeURIComponent(test.name)}">Book now</a>
+          <a class="cart-inline-link" href="/cart">View cart</a>
         </aside>
         <div class="product-media photo-thumb photo-thumb--${escapeHtml(test.imageTone || "blood")}">
           <img src="${escapeHtml(test.image)}" alt="" decoding="async">
@@ -2447,7 +2482,7 @@ function cartFamilyBannerHtml(cartTotal = 0) {
             ? `<a class="button primary" href="account.html">Manage Family Members</a>`
             : `<a class="button primary" href="signup.html">Create Account &amp; Save 15%</a>`
         }
-        <a class="cart-family-skip" href="book.html?cart=checkout">${isSignedIn ? "Continue to checkout" : "Continue without an account"}</a>
+        <a class="cart-family-skip" href="/book?cart=checkout">${isSignedIn ? "Continue to checkout" : "Continue without an account"}</a>
       </div>
     </section>
   `;
@@ -2612,7 +2647,7 @@ function renderCartPage() {
           <span>Easy reschedule</span>
         </li>
       </ul>
-      <a class="button primary full" href="book.html?cart=checkout">Continue to booking</a>
+      <a class="button primary full" href="/book?cart=checkout">Continue to booking</a>
       <button class="cart-clear-link" type="button" data-cart-action="clear">Clear cart</button>
     </aside>
   `;

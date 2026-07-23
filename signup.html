@@ -5,154 +5,141 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Create account | Dr.Swift Diagnostics</title>
     <meta name="description" content="Create a Dr.Swift family account for at-home lab tests and health insights.">
-    <link rel="stylesheet" href="assets/css/styles.css?v=visual-trust-1">
+    <link rel="stylesheet" href="assets/css/styles.css?v=fixed-nav-1">
+    <link rel="stylesheet" href="assets/css/mobile-ux.css?v=fixed-nav-1">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
-  <body class="auth-page signup-page" data-hide-nav-google="1">
-    <header class="site-header" id="site-header">
-      <nav class="navbar container" aria-label="Primary navigation">
-        <a class="brand" href="index.html" aria-label="Dr.Swift Diagnostics home">
-          <img class="brand-mark" src="assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="40" height="40">
-          <span>Dr.Swift Diagnostics</span>
+  <body class="auth-page signup-page auth-page--split" data-hide-nav-google="1">
+    <main class="auth-split">
+      <aside class="auth-split__visual" aria-hidden="true">
+        <img
+          class="auth-split__photo"
+          src="assets/images/hero-couple.png"
+          alt=""
+          width="1200"
+          height="1600"
+          decoding="async"
+          fetchpriority="high"
+        >
+        <div class="auth-split__veil"></div>
+        <div class="auth-split__brand-mark">
+          <img src="assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="28" height="28">
+          <span>Dr.Swift</span>
+        </div>
+        <div class="auth-split__visual-copy">
+          <h2 class="auth-split__visual-title" data-signup-aside-title>One account for your whole household.</h2>
+          <p class="auth-split__visual-text" data-signup-aside-copy>
+            Start with yourself — add parents, partners, and children anytime.
+          </p>
+        </div>
+      </aside>
+
+      <section class="auth-split__panel" aria-label="Create account">
+        <a class="auth-split__close" href="index.html" aria-label="Close and return to Dr.Swift home">
+          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" fill="none">
+            <path d="M4.5 4.5 13.5 13.5M13.5 4.5 4.5 13.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
         </a>
-        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu">
-          <span class="sr-only">Menu</span><span></span><span></span><span></span>
-        </button>
-        <div class="nav-menu" id="primary-menu">
-          <div class="nav-links">
-            <a href="tests.html">Tests</a>
-            <a href="reports.html">Reports</a>
-            <a href="about.html">About</a>
-          </div>
-          <div class="nav-actions" aria-label="Account links">
-            <a class="cart-link" href="cart.html" aria-label="View cart">
-              <svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-cart"></use></svg>
-              <span>Cart</span>
-              <span class="cart-count" data-cart-count hidden>0</span>
-            </a>
-            <a class="button primary nav-cta" href="tests.html">Book a test</a>
-          </div>
-        </div>
-      </nav>
-    </header>
+        <div class="auth-split__panel-inner signup-auth-card">
+          <a class="auth-split__back" href="index.html">
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none">
+              <path d="M10 3 5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span data-signup-back-label>Back to Dr.Swift</span>
+          </a>
 
-    <main class="auth-shell">
-      <div class="container container--centered auth-shell__card">
-        <div class="auth-card auth-card--tabs signup-auth-card">
-          <div class="login-audience" role="tablist" aria-label="Account access">
-            <button type="button" class="login-audience__tab is-active" role="tab" aria-selected="true" data-signup-tab-label>
-              Create account
-            </button>
-            <a class="login-audience__tab signup-auth-card__tab-link" role="tab" aria-selected="false" href="login.html" data-signup-secondary-link>
-              Sign in
-            </a>
-          </div>
           <div class="login-panel is-active">
-            <div class="auth-card__header auth-card__header--login">
-              <p class="login-lead" data-signup-aside-kicker>Family account</p>
-              <h1 class="login-hero-title" data-signup-title>Create your account</h1>
-              <p data-signup-subtitle>Start with one profile — add family members anytime.</p>
-            </div>
+            <header class="auth-split__intro">
+              <p class="auth-split__kicker" data-signup-aside-kicker>Family account</p>
+              <h1 class="auth-split__title" data-signup-title>Create your account</h1>
+              <p class="auth-split__subtitle" data-signup-subtitle>A few details to get started. You can add family members later.</p>
+            </header>
 
-              <button class="button secondary full login-social-btn nav-google-login" type="button" data-google-auth="signin" data-google-auth-primary data-signup-social>
-                <svg class="login-social-btn__icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
-                <span>Continue with Google</span>
-              </button>
-              <p class="login-social__label auth-divider-label" data-signup-divider>Or sign up with email</p>
+            <button class="button secondary full login-social-btn nav-google-login" type="button" data-google-auth="signin" data-google-auth-primary data-signup-social>
+              <svg class="login-social-btn__icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+              <span>Continue with Google</span>
+            </button>
+            <p class="login-social__label auth-divider-label" data-signup-divider>Or sign up with email</p>
 
-              <form class="auth-form signup-form" data-auth-form novalidate>
-                <p class="secure-note" data-signup-note>Used only for account access, booking updates, and report notifications.</p>
-                <div class="form-field">
-                  <label for="signup-name">Full name</label>
-                  <input id="signup-name" type="text" name="name" autocomplete="name" placeholder="As on your ID" required>
+            <form class="auth-form signup-form" data-auth-form novalidate>
+              <p class="secure-note" data-signup-note>Used only for account access, booking updates, and report notifications.</p>
+              <div class="form-field">
+                <label for="signup-name">Full name</label>
+                <input id="signup-name" type="text" name="name" autocomplete="name" placeholder="As on your ID" required>
+              </div>
+              <div class="form-field" data-family-relation-field hidden>
+                <label for="signup-relation">Relationship to account owner</label>
+                <select id="signup-relation" name="relation">
+                  <option value="">Select relation</option>
+                  <option value="Father">Father</option>
+                  <option value="Mother">Mother</option>
+                  <option value="Grandfather">Grandfather</option>
+                  <option value="Grandmother">Grandmother</option>
+                  <option value="Husband">Husband</option>
+                  <option value="Wife">Wife</option>
+                  <option value="Partner">Partner</option>
+                  <option value="Son">Son</option>
+                  <option value="Daughter">Daughter</option>
+                  <option value="Child">Child</option>
+                  <option value="Brother">Brother</option>
+                  <option value="Sister">Sister</option>
+                  <option value="Friend">Friend</option>
+                  <option value="Other family">Other family</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label for="signup-email">Email</label>
+                <input id="signup-email" type="email" name="email" autocomplete="email" placeholder="you@email.com" required>
+              </div>
+              <div class="form-field">
+                <label for="signup-phone">Mobile number</label>
+                <div class="input-with-prefix">
+                  <span class="input-prefix" aria-hidden="true">+91</span>
+                  <input
+                    id="signup-phone"
+                    type="tel"
+                    name="phone"
+                    autocomplete="tel-national"
+                    inputmode="numeric"
+                    maxlength="10"
+                    pattern="[6-9][0-9]{9}"
+                    placeholder="10-digit mobile"
+                    required
+                  >
                 </div>
-                <div class="form-field" data-family-relation-field hidden>
-                  <label for="signup-relation">Relationship to account owner</label>
-                  <select id="signup-relation" name="relation">
-                    <option value="">Select relation</option>
-                    <option value="Father">Father</option>
-                    <option value="Mother">Mother</option>
-                    <option value="Grandfather">Grandfather</option>
-                    <option value="Grandmother">Grandmother</option>
-                    <option value="Husband">Husband</option>
-                    <option value="Wife">Wife</option>
-                    <option value="Partner">Partner</option>
-                    <option value="Son">Son</option>
-                    <option value="Daughter">Daughter</option>
-                    <option value="Child">Child</option>
-                    <option value="Brother">Brother</option>
-                    <option value="Sister">Sister</option>
-                    <option value="Friend">Friend</option>
-                    <option value="Other family">Other family</option>
-                  </select>
+              </div>
+              <div class="form-field" data-password-field>
+                <label for="signup-password">Password</label>
+                <div class="input-with-action">
+                  <input
+                    id="signup-password"
+                    type="password"
+                    name="password"
+                    autocomplete="new-password"
+                    minlength="8"
+                    maxlength="72"
+                    required
+                  >
+                  <button type="button" class="input-action" data-toggle-password="signup-password" aria-label="Show password">Show</button>
                 </div>
-                <div class="form-field">
-                  <label for="signup-email">Email</label>
-                  <input id="signup-email" type="email" name="email" autocomplete="email" placeholder="you@email.com" required>
-                </div>
-                <div class="form-field">
-                  <label for="signup-phone">Mobile number</label>
-                  <div class="input-with-prefix">
-                    <span class="input-prefix" aria-hidden="true">+91</span>
-                    <input
-                      id="signup-phone"
-                      type="tel"
-                      name="phone"
-                      autocomplete="tel-national"
-                      inputmode="numeric"
-                      maxlength="10"
-                      pattern="[6-9][0-9]{9}"
-                      placeholder="10-digit mobile"
-                      required
-                    >
-                  </div>
-                </div>
-                <div class="form-field" data-password-field>
-                  <label for="signup-password">Password</label>
-                  <div class="input-with-action">
-                    <input
-                      id="signup-password"
-                      type="password"
-                      name="password"
-                      autocomplete="new-password"
-                      minlength="8"
-                      maxlength="72"
-                      required
-                    >
-                    <button type="button" class="input-action" data-toggle-password="signup-password" aria-label="Show password">Show</button>
-                  </div>
-                  <p class="field-hint">At least 8 characters.</p>
-                </div>
-                <label class="form-check" data-terms-field>
-                  <input type="checkbox" name="terms" required>
-                  <span>I agree to the <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a></span>
-                </label>
-                <button class="button primary full" type="submit" data-signup-submit>Create account</button>
-                <p class="auth-success" data-auth-success aria-live="polite" hidden>Account created. You can now manage your profile, bookings, and family members.</p>
-              </form>
-              <p class="auth-alt" data-signup-alt>Already have an account? <a href="login.html">Sign in</a></p>
+                <p class="field-hint">At least 8 characters.</p>
+              </div>
+              <label class="form-check" data-terms-field>
+                <input type="checkbox" name="terms" required>
+                <span>I agree to the <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a></span>
+              </label>
+              <button class="button primary full" type="submit" data-signup-submit>Create account</button>
+              <p class="auth-success" data-auth-success aria-live="polite" hidden>Account created. You can now manage your profile, bookings, and family members.</p>
+            </form>
+            <p class="auth-alt" data-signup-alt>Already have an account? <a href="login.html">Sign in</a></p>
           </div>
-        </div>
-      </div>
 
-      <section class="community-band section-pad" aria-labelledby="signup-community-heading">
-        <div class="container community-band__layout">
-          <figure class="community-band__media">
-            <img src="assets/images/wellness-family.jpg" alt="" loading="lazy" decoding="async">
-          </figure>
-          <div class="community-band__copy">
-            <h2 id="signup-community-heading" data-signup-aside-title>One account for your whole household</h2>
-            <p data-signup-aside-copy>Track parents, partners, and children — each with their own reports and trends.</p>
-            <div class="cta-band__actions">
-              <a class="button secondary" href="tests.html">Shop tests</a>
-              <a class="button primary" href="app.html">Get the app</a>
-            </div>
-          </div>
+          <p class="auth-split__fineprint">&copy; 2026 Dr.Swift Diagnostics</p>
         </div>
       </section>
     </main>
@@ -160,8 +147,9 @@
     <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
     <script src="assets/js/firebase-config.js?v=3"></script>
-    <script src="assets/js/google-auth.js?v=6"></script>
-    <script src="assets/js/main.js?v=recipient-sync-1"></script>
-    <script src="assets/js/auth.js?v=family-profiles-1"></script>
+    <script src="assets/js/auth-session.js?v=1"></script>
+    <script src="assets/js/google-auth.js?v=7"></script>
+    <script src="assets/js/main.js?v=fixed-nav-1"></script>
+    <script src="assets/js/auth.js?v=auth-progressive-1"></script>
   </body>
 </html>

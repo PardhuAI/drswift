@@ -6,7 +6,9 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <title>Book a test | Dr.Swift Diagnostics</title>
-    <link rel="stylesheet" href="assets/css/styles.css?v=confirm-pixel-5">
+    <link rel="stylesheet" href="assets/css/styles.css?v=fixed-nav-1">
+    <link rel="stylesheet" href="assets/css/checkout.css?v=checkout-mobile-4">
+    <link rel="stylesheet" href="assets/css/mobile-ux.css?v=fixed-nav-1">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
   <body class="auth-page">
@@ -24,6 +26,7 @@
       <div class="checkout-frame">
         <div class="checkout-wire-shell">
           <div class="auth-card__header checkout-hero-copy">
+            <p class="checkout-kicker">Secure booking</p>
             <h1>Checkout</h1>
           </div>
 
@@ -46,18 +49,135 @@
             </li>
           </ol>
 
+          <nav class="checkout-substeps" data-checkout-substeps aria-label="Details steps">
+            <button type="button" class="checkout-substeps__item is-active" data-substep="patient" disabled>
+              <span>1</span> Patient
+            </button>
+            <button type="button" class="checkout-substeps__item" data-substep="address" disabled>
+              <span>2</span> Address
+            </button>
+            <button type="button" class="checkout-substeps__item" data-substep="schedule" disabled>
+              <span>3</span> Slot
+            </button>
+          </nav>
+
           <div class="checkout-wire-layout" data-checkout-flow>
             <div class="checkout-wire-main">
-              <section class="checkout-wire-panel is-active" data-checkout-stage="details">
+              <form class="checkout-wire-form" data-checkout-form id="book-form" novalidate>
+              <section class="checkout-wire-panel is-active" data-checkout-stage="patient">
                 <div class="checkout-wire-head">
-                  <span class="checkout-step-badge">2</span>
                   <div>
-                    <h2>Who is this booking for?</h2>
+                    <h2>Patient details</h2>
+                    <p class="checkout-wire-lead">Who should we collect the sample for?</p>
                   </div>
                 </div>
-                <form class="checkout-wire-form" data-checkout-form id="book-form" novalidate>
+                <p class="checkout-guest-note">Guest checkout — verify your mobile to continue.</p>
+                  <div class="checkout-wire-field checkout-wire-field--wide">
+                    <label for="book-name">Full name</label>
+                    <input id="book-name" type="text" name="name" autocomplete="name" placeholder="As on ID / prescription" required>
+                  </div>
+                  <div class="checkout-gender-age-row">
+                    <span class="checkout-gender-age-row__label" id="book-gender-label">Gender</span>
+                    <div class="checkout-segments" role="radiogroup" aria-labelledby="book-gender-label">
+                      <input id="book-gender-male" type="radio" name="gender" value="Male" checked required>
+                      <label for="book-gender-male">Male</label>
+                      <input id="book-gender-female" type="radio" name="gender" value="Female">
+                      <label for="book-gender-female">Female</label>
+                      <input id="book-gender-other" type="radio" name="gender" value="Other">
+                      <label for="book-gender-other">Other</label>
+                    </div>
+                    <label for="book-age">Age</label>
+                    <input id="book-age" type="number" name="age" inputmode="numeric" min="1" max="120" placeholder="Years" required>
+                  </div>
+                  <div class="checkout-wire-field checkout-wire-field--phone">
+                    <label for="book-phone">Mobile number</label>
+                    <div class="phone-verify-row">
+                      <div class="input-with-prefix checkout-phone-prefix">
+                        <span class="input-prefix" aria-hidden="true">+91</span>
+                        <input id="book-phone" type="tel" name="phone" autocomplete="tel-national" inputmode="numeric" placeholder="10-digit mobile" maxlength="10" pattern="[6-9][0-9]{9}" required>
+                      </div>
+                      <button class="button secondary" type="button" data-otp-send disabled>Send OTP</button>
+                      <p class="phone-verified-badge" data-phone-verified-badge hidden>✓ Verified</p>
+                    </div>
+                  </div>
+                  <div class="checkout-wire-field checkout-otp" data-otp-block hidden>
+                    <label for="book-otp">Enter OTP</label>
+                    <div class="phone-verify-row">
+                      <input id="book-otp" type="text" name="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code">
+                      <button class="button secondary" type="button" data-otp-verify>Verify</button>
+                    </div>
+                    <p class="field-hint">Demo OTP: 123456</p>
+                  </div>
+                  <p class="checkout-status" data-checkout-status hidden aria-live="polite"></p>
+                  <div class="checkout-wire-actions">
+                    <a class="checkout-back-link" href="cart.html" aria-label="View cart">
+                      <span aria-hidden="true">←</span> Cart
+                    </a>
+                    <button class="checkout-next-link" type="button" data-checkout-next="address" data-patient-continue disabled>Continue to address</button>
+                  </div>
+              </section>
+
+              <section class="checkout-wire-panel" data-checkout-stage="address" hidden>
+                <div class="checkout-wire-head">
+                  <div>
+                    <h2>Collection address</h2>
+                    <p class="checkout-wire-lead">Where should the phlebotomist visit?</p>
+                  </div>
+                </div>
+                  <div class="checkout-address-row">
+                    <div class="checkout-wire-field">
+                      <label for="book-pin">PIN code</label>
+                      <input
+                        id="book-pin"
+                        type="text"
+                        name="pin"
+                        inputmode="numeric"
+                        autocomplete="postal-code"
+                        maxlength="6"
+                        pattern="[1-9][0-9]{5}"
+                        placeholder="6-digit PIN"
+                        title="Enter a valid 6-digit Indian PIN code"
+                        required
+                      >
+                    </div>
+                    <div class="checkout-wire-field">
+                      <label for="book-city">City / Town</label>
+                      <input
+                        id="book-city"
+                        type="text"
+                        name="city"
+                        autocomplete="address-level2"
+                        maxlength="99"
+                        minlength="3"
+                        pattern="[A-Za-z].{2,98}"
+                        title="Must start with a letter, include at least 3 letters, and be under 100 characters"
+                        required
+                      >
+                    </div>
+                  </div>
+                  <div class="checkout-wire-field checkout-wire-field--address">
+                    <label for="book-address">Full address</label>
+                    <textarea id="book-address" name="address" autocomplete="street-address" rows="3" placeholder="House / flat, street, landmark" required></textarea>
+                  </div>
+                  <div data-site-content="checkout-coverage"></div>
+                  <p class="checkout-status" data-address-status hidden aria-live="polite"></p>
+                  <div class="checkout-wire-actions">
+                    <button class="checkout-back-link" type="button" data-checkout-back="patient">
+                      <span aria-hidden="true">←</span> Patient
+                    </button>
+                    <button class="checkout-next-link" type="button" data-checkout-next="schedule">Continue to slot</button>
+                  </div>
+              </section>
+
+              <section class="checkout-wire-panel" data-checkout-stage="schedule" hidden>
+                <div class="checkout-wire-head">
+                  <div>
+                    <h2>Collection slot</h2>
+                    <p class="checkout-wire-lead">Pick a day and time window for home collection.</p>
+                  </div>
+                </div>
                   <div class="checkout-time-row">
-                    <strong>Sample Collection Date/Time</strong>
+                    <strong>Date</strong>
                     <div class="checkout-segments" role="group" aria-label="Sample collection day">
                       <input id="book-day-today" type="radio" name="sampleDay" value="Today" checked>
                       <label for="book-day-today">Today</label>
@@ -108,85 +228,38 @@
                         </div>
                       </div>
                     </div>
+                    <strong>Time window</strong>
                     <div class="checkout-segments checkout-segments--time" role="group" aria-label="Sample collection window">
                       <input id="book-time-morning" type="radio" name="sampleWindow" value="Morning" checked>
-                      <label for="book-time-morning">Morning</label>
+                      <label for="book-time-morning">Morning<br><small>6–10 AM</small></label>
                       <input id="book-time-afternoon" type="radio" name="sampleWindow" value="Afternoon">
-                      <label for="book-time-afternoon">Afternoon</label>
+                      <label for="book-time-afternoon">Afternoon<br><small>12–4 PM</small></label>
                       <input id="book-time-evening" type="radio" name="sampleWindow" value="Evening">
-                      <label for="book-time-evening">Evening</label>
+                      <label for="book-time-evening">Evening<br><small>5–8 PM</small></label>
                     </div>
                     <p class="checkout-when-confirm" data-when-confirm aria-live="polite">
                       <span class="checkout-when-confirm__tick" aria-hidden="true">✓</span>
                       <strong data-when-confirm-value>Today · Morning</strong>
                     </p>
                   </div>
-
-                  <div class="checkout-wire-field checkout-wire-field--wide">
-                    <label for="book-name">Name</label>
-                    <input id="book-name" type="text" name="name" autocomplete="name" required>
-                  </div>
-                  <div class="checkout-gender-age-row">
-                    <span class="checkout-gender-age-row__label" id="book-gender-label">Gender</span>
-                    <div class="checkout-segments" role="radiogroup" aria-labelledby="book-gender-label">
-                      <input id="book-gender-male" type="radio" name="gender" value="Male" checked required>
-                      <label for="book-gender-male">Male</label>
-                      <input id="book-gender-female" type="radio" name="gender" value="Female">
-                      <label for="book-gender-female">Female</label>
-                    </div>
-                    <label for="book-age">Age</label>
-                    <input id="book-age" type="number" name="age" inputmode="numeric" min="0" max="120">
-                  </div>
-                  <div class="checkout-wire-field checkout-wire-field--phone">
-                    <label for="book-phone">Phone</label>
-                    <div class="phone-verify-row">
-                      <input id="book-phone" type="tel" name="phone" autocomplete="tel" inputmode="numeric" placeholder="10-digit mobile" maxlength="10" pattern="[0-9]{10}" required>
-                      <button class="button secondary" type="button" data-otp-send disabled>Send OTP</button>
-                      <p class="phone-verified-badge" data-phone-verified-badge hidden>✓ Verified</p>
-                    </div>
-                  </div>
-                  <div class="checkout-wire-field checkout-otp" data-otp-block hidden>
-                    <label for="book-otp">Verify OTP</label>
-                    <div class="phone-verify-row">
-                      <input id="book-otp" type="text" name="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code">
-                      <button class="button secondary" type="button" data-otp-verify>Verify</button>
-                    </div>
-                  </div>
-                  <p class="checkout-status" data-checkout-status hidden aria-live="polite"></p>
-                  <div class="checkout-wire-field">
-                    <label for="book-city">City/Town/Village</label>
-                    <input
-                      id="book-city"
-                      type="text"
-                      name="city"
-                      autocomplete="address-level2"
-                      maxlength="99"
-                      minlength="3"
-                      pattern="[A-Za-z].{2,98}"
-                      title="Must start with a letter, include at least 3 letters, and be under 100 characters"
-                      required
-                    >
-                  </div>
-                  <div class="checkout-wire-field checkout-wire-field--address">
-                    <label for="book-address">Address</label>
-                    <textarea id="book-address" name="address" autocomplete="street-address" required></textarea>
-                  </div>
+                  <p class="checkout-status" data-schedule-status hidden aria-live="polite"></p>
                   <div class="checkout-wire-actions">
-                    <a class="checkout-back-link" href="cart.html" aria-label="View cart">
-                      <span aria-hidden="true">←</span> View Cart
-                    </a>
-                    <button class="checkout-next-link" type="submit" disabled>Continue to payment</button>
+                    <button class="checkout-back-link" type="button" data-checkout-back="address">
+                      <span aria-hidden="true">←</span> Address
+                    </button>
+                    <button class="checkout-next-link" type="submit">Review &amp; pay</button>
                   </div>
-                </form>
               </section>
+              </form>
 
               <section class="checkout-wire-panel" data-checkout-stage="pay-choose" hidden>
                 <div class="checkout-wire-head">
-                  <span class="checkout-step-badge">3</span>
                   <div>
                     <h2>Payment</h2>
+                    <p class="checkout-wire-lead">Choose how you’d like to pay. Amount is locked from your cart.</p>
                   </div>
                 </div>
+                <p class="checkout-pay-trust">Secure checkout · Pay only after confirming patient, address, and slot.</p>
                 <div class="pay-method-list">
                   <button class="pay-method" type="button" data-pay-go="pay-card">
                     <span class="pay-method__left">
@@ -232,8 +305,8 @@
                   </button>
                 </div>
                 <div class="checkout-wire-actions">
-                  <button class="checkout-back-link" type="button" data-checkout-back="details">
-                    <span aria-hidden="true">←</span> Customer details
+                  <button class="checkout-back-link" type="button" data-checkout-back="schedule">
+                    <span aria-hidden="true">←</span> Change slot
                   </button>
                 </div>
                 <p class="pay-status" data-pay-status hidden></p>
@@ -241,7 +314,6 @@
 
               <section class="checkout-wire-panel" data-checkout-stage="pay-card" hidden>
                 <div class="checkout-wire-head">
-                  <span class="checkout-step-badge">3</span>
                   <div>
                     <h2>Debit / Credit Card</h2>
                   </div>
@@ -407,7 +479,6 @@
 
               <section class="checkout-wire-panel" data-checkout-stage="pay-qr" hidden>
                 <div class="checkout-wire-head">
-                  <span class="checkout-step-badge">3</span>
                   <div>
                     <h2 data-qr-title>Scan &amp; Pay</h2>
                   </div>
@@ -442,7 +513,6 @@
 
               <section class="checkout-wire-panel" data-checkout-stage="pay-bank" hidden>
                 <div class="checkout-wire-head">
-                  <span class="checkout-step-badge">3</span>
                   <div>
                     <h2>Internet Banking</h2>
                   </div>
@@ -469,7 +539,6 @@
 
               <section class="checkout-wire-panel" data-checkout-stage="pay-processing" hidden>
                 <div class="checkout-wire-head">
-                  <span class="checkout-step-badge">3</span>
                   <div>
                     <h2>Confirming payment</h2>
                   </div>
@@ -703,25 +772,23 @@
             <aside class="checkout-wire-aside" aria-label="Checkout summary">
               <section class="checkout-summary-panel">
                 <div class="checkout-summary-title">
-                  <span class="checkout-step-badge">1</span>
                   <h2>Order summary</h2>
                 </div>
                 <div class="booking-cart-summary" data-booking-cart hidden></div>
                 <div class="checkout-summary-empty" data-booking-cart-empty>
-                  <p>No tests found in this checkout.</p>
-                  <a href="tests.html">Browse tests</a>
+                  <p>Your cart is empty for this checkout.</p>
+                  <a class="button secondary checkout-summary-empty__cta" href="tests.html">Browse tests</a>
                 </div>
               </section>
               <section class="checkout-summary-panel" data-summary-customer hidden>
                 <div class="checkout-summary-title">
-                  <span class="checkout-step-badge">2</span>
-                  <h2>Customer details</h2>
+                  <h2>Booking details</h2>
                 </div>
                 <dl class="checkout-kv" data-inline-payment-patient></dl>
+                <button class="checkout-summary-edit" type="button" data-checkout-back="patient">Edit details</button>
               </section>
               <section class="checkout-summary-panel" data-summary-payment hidden>
                 <div class="checkout-summary-title">
-                  <span class="checkout-step-badge">3</span>
                   <h2>Payment</h2>
                 </div>
                 <p class="payment-success-mark">✓ Payment successful</p>
@@ -754,9 +821,9 @@
     <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
     <script src="assets/js/firebase-config.js?v=3"></script>
     <script src="assets/js/google-auth.js?v=6"></script>
-    <script src="assets/js/main.js?v=recipient-sync-1"></script>
+    <script src="assets/js/main.js?v=fixed-nav-1"></script>
     <script src="assets/js/checkout-api.js?v=production-ready-1"></script>
-    <script src="assets/js/checkout.js?v=confirm-pixel-5"></script>
+    <script src="assets/js/checkout.js?v=checkout-mobile-3"></script>
     <script>
       async function initBookingPage() {
         if (typeof window.DRSWIFT_BOOTSTRAP_CATALOG === "function") {
@@ -776,21 +843,56 @@
               }))
               .filter((item) => item.test);
             if (items.length) {
-              const total = items.reduce((sum, item) => {
+              const fmt = (n) => `₹${Number(n || 0).toLocaleString("en-IN")}`;
+              const priced = items.map((item) => {
                 let unit = Number(item.test.price || 0);
+                let panelCount = 0;
                 if (item.test.customizable && Array.isArray(item.customPanels) && window.DRSWIFT_PANELS) {
+                  panelCount = item.customPanels.length;
                   unit = item.customPanels.reduce(
                     (panelSum, panelId) => panelSum + Number(window.DRSWIFT_PANELS[panelId]?.price || 0),
                     0
                   );
                 }
-                return sum + unit * item.quantity;
-              }, 0);
+                return { name: item.test.name, unit, qty: item.quantity, panelCount };
+              });
+              const subtotal = priced.reduce((sum, it) => sum + it.unit * it.qty, 0);
               cartSummary.hidden = false;
               document.querySelector("[data-booking-cart-empty]")?.setAttribute("hidden", "");
-              cartSummary.innerHTML = `<strong>Order summary</strong><ul>${items
-                .map((item) => `<li>${item.test.name}</li>`)
-                .join("")}</ul><p class="booking-cart-summary__total">Estimated total: ₹${total.toLocaleString("en-IN")}</p>`;
+              const lines = priced
+                .map(
+                  (it) => `
+                    <div class="summary-line">
+                      <span class="summary-line__name">${it.name}${
+                        it.panelCount
+                          ? `<span class="summary-line__sub">${it.panelCount} parameter${it.panelCount > 1 ? "s" : ""} selected</span>`
+                          : `<span class="summary-line__sub">Home sample collection</span>`
+                      }</span>
+                      <span class="summary-line__price">${fmt(it.unit * it.qty)}</span>
+                    </div>`
+                )
+                .join("");
+              cartSummary.innerHTML = `
+                ${lines}
+                <div class="summary-totals">
+                  <div class="summary-totals__row">
+                    <span>Subtotal (${priced.length} item${priced.length > 1 ? "s" : ""})</span>
+                    <span>${fmt(subtotal)}</span>
+                  </div>
+                  <div class="summary-totals__row">
+                    <span>Home collection</span>
+                    <span class="summary-free">FREE</span>
+                  </div>
+                  <div class="summary-totals__row summary-totals__row--grand">
+                    <span>Total payable</span>
+                    <span>${fmt(subtotal)}</span>
+                  </div>
+                </div>
+                <ul class="summary-trust">
+                  <li>Free home sample collection</li>
+                  <li>NABL-accredited lab processing</li>
+                  <li>Reports online — view &amp; download</li>
+                </ul>`;
             }
           } catch {
             cartSummary.hidden = true;

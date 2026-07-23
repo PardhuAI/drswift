@@ -67,12 +67,27 @@
       ...owner,
       method: "signup",
       createdAt: updatedAt,
+      profileComplete: true,
     });
     writeBoth(DEMO_SESSION_KEY, {
       ownerId: household.owner.id,
       method: "signup",
       signedInAt: updatedAt,
     });
+
+    // Keep progressive login registry in sync (may still need age/gender later)
+    if (window.DrSwiftAuth?.upsertUser) {
+      window.DrSwiftAuth.upsertUser(
+        { method: "signup", phone: owner.phone, email: owner.email },
+        {
+          name: owner.name,
+          email: owner.email,
+          phone: owner.phone,
+          age: form.querySelector("[name='age']")?.value || "",
+          gender: form.querySelector("[name='gender']")?.value || "",
+        }
+      );
+    }
   }
 
   function saveFamilyMember(form) {
@@ -166,13 +181,17 @@
     if (submit) submit.textContent = "Save family member";
     if (alt) alt.innerHTML = `Back to <a href="account.html">My Account</a>`;
     if (asideKicker) asideKicker.textContent = "Family profile";
-    if (asideTitle) asideTitle.textContent = "Tests for yourself and loved ones";
+    if (asideTitle) asideTitle.textContent = "Tests for yourself and loved ones.";
     if (asideCopy) asideCopy.textContent = "Add each person once, then choose who a test is for at booking.";
     if (tabLabel) tabLabel.textContent = "Add profile";
     if (secondaryLink) {
       secondaryLink.textContent = "My Account";
       secondaryLink.href = "account.html";
     }
+    const backLink = document.querySelector(".auth-split__back");
+    const backLabel = document.querySelector("[data-signup-back-label]");
+    if (backLink) backLink.href = "account.html";
+    if (backLabel) backLabel.textContent = "Back to My Account";
     if (social) social.hidden = true;
     if (divider) divider.hidden = true;
 
@@ -360,6 +379,32 @@
         window.setTimeout(() => {
           window.location.href = "account.html";
         }, 650);
+      } else if (location.pathname.endsWith("login.html") && form.matches('[data-login-method="mail"]')) {
+        try {
+          const email = form.querySelector("[name='email']")?.value?.trim() || "";
+          const identity = { method: "email", email };
+          const session = window.DrSwiftAuth;
+          if (session?.continueAfterIdentity) {
+            session.continueAfterIdentity(identity, {
+              onExisting() {
+                if (success) {
+                  success.hidden = false;
+                  success.textContent = "Welcome back. Opening your account…";
+                }
+                window.setTimeout(() => {
+                  window.location.href = "account.html";
+                }, 500);
+              },
+              onNew(pendingIdentity, partial) {
+                if (success) success.hidden = true;
+                window.DrSwiftLoginUi?.showCompleteProfile?.(pendingIdentity, partial);
+              },
+            });
+            return;
+          }
+        } catch {
+          /* ignore */
+        }
       }
     });
   });
