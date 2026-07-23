@@ -3,8 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
     <title>Book a test | Dr.Swift Diagnostics</title>
-    <link rel="stylesheet" href="assets/css/styles.css?v=profile-vibe-1">
+    <link rel="stylesheet" href="assets/css/styles.css?v=confirm-pixel-5">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
   <body class="auth-page">
@@ -22,14 +24,7 @@
       <div class="checkout-frame">
         <div class="checkout-wire-shell">
           <div class="auth-card__header checkout-hero-copy">
-            <p class="eyebrow">Checkout</p>
-            <h1>Complete your booking</h1>
-            <p>Review the order, choose who needs the test, verify the phone number, and confirm a home collection slot.</p>
-            <div class="checkout-trust-strip" aria-label="Booking assurances">
-              <span>At-home collection</span>
-              <span>Phone verified updates</span>
-              <span>Secure online payment</span>
-            </div>
+            <h1>Checkout</h1>
           </div>
 
           <ol class="checkout-progress" aria-label="Checkout progress">
@@ -57,18 +52,11 @@
                 <div class="checkout-wire-head">
                   <span class="checkout-step-badge">2</span>
                   <div>
-                    <p class="checkout-step-kicker">Step 2</p>
-                    <h2>Collection and patient details</h2>
-                    <p class="checkout-wire-subtitle">Keep the patient, phone, and address accurate so the phlebotomist can reach the right person.</p>
+                    <h2>Who is this booking for?</h2>
                   </div>
                 </div>
                 <form class="checkout-wire-form" data-checkout-form id="book-form" novalidate>
-                  <section class="checkout-form-section checkout-form-section--schedule" aria-labelledby="checkout-slot-title">
-                    <div class="checkout-form-section__head">
-                      <p>Collection slot</p>
-                      <h3 id="checkout-slot-title">Pick a convenient home visit time</h3>
-                    </div>
-                    <div class="checkout-time-row">
+                  <div class="checkout-time-row">
                     <strong>Sample Collection Date/Time</strong>
                     <div class="checkout-segments" role="group" aria-label="Sample collection day">
                       <input id="book-day-today" type="radio" name="sampleDay" value="Today" checked>
@@ -132,42 +120,30 @@
                       <span class="checkout-when-confirm__tick" aria-hidden="true">✓</span>
                       <strong data-when-confirm-value>Today · Morning</strong>
                     </p>
-                    </div>
-                  </section>
+                  </div>
 
-                  <section class="checkout-form-section checkout-form-section--patient" aria-labelledby="checkout-patient-title">
-                    <div class="checkout-form-section__head">
-                      <p>Patient profile</p>
-                      <h3 id="checkout-patient-title">Who should we collect the sample from?</h3>
-                    </div>
-                    <div class="checkout-wire-field checkout-wire-field--wide">
+                  <div class="checkout-wire-field checkout-wire-field--wide">
                     <label for="book-name">Name</label>
                     <input id="book-name" type="text" name="name" autocomplete="name" required>
-                    </div>
-                    <div class="checkout-gender-age-row">
+                  </div>
+                  <div class="checkout-gender-age-row">
                     <span class="checkout-gender-age-row__label" id="book-gender-label">Gender</span>
                     <div class="checkout-segments" role="radiogroup" aria-labelledby="book-gender-label">
-                      <input id="book-gender-male" type="radio" name="gender" value="Male" required>
+                      <input id="book-gender-male" type="radio" name="gender" value="Male" checked required>
                       <label for="book-gender-male">Male</label>
                       <input id="book-gender-female" type="radio" name="gender" value="Female">
                       <label for="book-gender-female">Female</label>
-                      <input id="book-gender-other" type="radio" name="gender" value="Other">
-                      <label for="book-gender-other">Other</label>
-                      <input id="book-gender-unspecified" type="radio" name="gender" value="Prefer not to say">
-                      <label for="book-gender-unspecified">Prefer not to say</label>
                     </div>
                     <label for="book-age">Age</label>
                     <input id="book-age" type="number" name="age" inputmode="numeric" min="0" max="120">
-                    </div>
-                    <div class="checkout-wire-field checkout-wire-field--phone">
+                  </div>
+                  <div class="checkout-wire-field checkout-wire-field--phone">
                     <label for="book-phone">Phone</label>
                     <div class="phone-verify-row">
                       <input id="book-phone" type="tel" name="phone" autocomplete="tel" inputmode="numeric" placeholder="10-digit mobile" maxlength="10" pattern="[0-9]{10}" required>
-                      <button class="button secondary" type="button" data-otp-send disabled>Verify OTP</button>
+                      <button class="button secondary" type="button" data-otp-send disabled>Send OTP</button>
                       <p class="phone-verified-badge" data-phone-verified-badge hidden>✓ Verified</p>
                     </div>
-                    <p class="checkout-phone-hint">OTP is optional — verify now for faster updates, or continue with a valid mobile number.</p>
-                    <div data-site-content="otp-hint"></div>
                   </div>
                   <div class="checkout-wire-field checkout-otp" data-otp-block hidden>
                     <label for="book-otp">Verify OTP</label>
@@ -175,16 +151,9 @@
                       <input id="book-otp" type="text" name="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code">
                       <button class="button secondary" type="button" data-otp-verify>Verify</button>
                     </div>
-                    </div>
+                  </div>
                   <p class="checkout-status" data-checkout-status hidden aria-live="polite"></p>
-                  </section>
-
-                  <section class="checkout-form-section checkout-form-section--address" aria-labelledby="checkout-address-title">
-                    <div class="checkout-form-section__head">
-                      <p>Collection address</p>
-                      <h3 id="checkout-address-title">Where should the sample be collected?</h3>
-                    </div>
-                    <div class="checkout-wire-field">
+                  <div class="checkout-wire-field">
                     <label for="book-city">City/Town/Village</label>
                     <input
                       id="book-city"
@@ -197,17 +166,10 @@
                       title="Must start with a letter, include at least 3 letters, and be under 100 characters"
                       required
                     >
-                    </div>
-                    <div class="checkout-wire-field checkout-wire-field--address">
+                  </div>
+                  <div class="checkout-wire-field checkout-wire-field--address">
                     <label for="book-address">Address</label>
                     <textarea id="book-address" name="address" autocomplete="street-address" required></textarea>
-                    </div>
-                    <p class="checkout-address-note">Add house number, landmark, and area so the collector does not need repeated calls. Service availability is confirmed before payment.</p>
-                    <div data-site-content="checkout-coverage"></div>
-                  </section>
-                  <div class="checkout-consent">
-                    <input id="book-consent" type="checkbox" name="clinicalConsent" required>
-                    <label for="book-consent" data-site-content="consent-label">I agree to share booking details with care staff and partner labs.</label>
                   </div>
                   <div class="checkout-wire-actions">
                     <a class="checkout-back-link" href="cart.html" aria-label="View cart">
@@ -222,16 +184,8 @@
                 <div class="checkout-wire-head">
                   <span class="checkout-step-badge">3</span>
                   <div>
-                    <p class="checkout-step-kicker">Step 3</p>
-                    <h2>Choose payment option</h2>
-                    <p class="checkout-wire-subtitle">Payment is collected after patient details are locked. You can still go back and edit before paying.</p>
+                    <h2>Payment</h2>
                   </div>
-                </div>
-                <div class="checkout-policy-links">
-                  <a href="policies.html#payment">Payment policy</a>
-                  <a href="policies.html#refunds">Refunds</a>
-                  <a href="policies.html#cancellation">Cancellation</a>
-                  <a href="policies.html#reschedule">Reschedule</a>
                 </div>
                 <div class="pay-method-list">
                   <button class="pay-method" type="button" data-pay-go="pay-card">
@@ -289,30 +243,165 @@
                 <div class="checkout-wire-head">
                   <span class="checkout-step-badge">3</span>
                   <div>
-                    <p class="checkout-step-kicker">Payment</p>
                     <h2>Debit / Credit Card</h2>
                   </div>
                 </div>
-                <div class="pay-gateway">
-                  <p class="pay-gateway__amount" data-pay-total>₹0</p>
-                  <p class="pay-gateway__lead">
-                    You’ll continue on a secure payment page. Card numbers and CVV are never entered on Dr.Swift.
-                  </p>
-                  <ul class="pay-gateway__list">
-                    <li>Amount is locked from your cart</li>
-                    <li>Return here automatically after payment</li>
-                    <li>Booking confirms only when payment succeeds</li>
-                  </ul>
-                  <p class="pay-status" data-pay-status hidden></p>
+                <div class="pay-tabs" role="tablist">
+                  <button type="button" class="is-on" data-card-tab>Debit Card</button>
+                  <button type="button" data-card-tab>Credit Card</button>
                 </div>
+                <form class="pay-card-form" id="checkout-card-form" data-card-pay-form novalidate>
+                  <div class="field">
+                    <label for="cc-number">Card Number</label>
+                    <input
+                      id="cc-number"
+                      name="cardNumber"
+                      inputmode="numeric"
+                      autocomplete="cc-number"
+                      placeholder="XXXX XXXX XXXX XXXX"
+                      maxlength="19"
+                      pattern="[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}"
+                      title="Enter a 16-digit card number"
+                      required
+                      data-card-number
+                    >
+                  </div>
+                  <div class="pay-card-row">
+                    <div class="field">
+                      <label>Expiry date</label>
+                      <div class="pay-exp-row">
+                        <select name="expMonth" required aria-label="Month" data-card-exp-month>
+                          <option value="">Month</option>
+                          <option value="01">01</option><option value="02">02</option><option value="03">03</option><option value="04">04</option>
+                          <option value="05">05</option><option value="06">06</option><option value="07">07</option><option value="08">08</option>
+                          <option value="09">09</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                        </select>
+                        <select name="expYear" required aria-label="Year" data-card-exp-year>
+                          <option value="">Year</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="field">
+                      <label for="cc-cvv">CVV</label>
+                      <input
+                        id="cc-cvv"
+                        name="cvv"
+                        inputmode="numeric"
+                        autocomplete="cc-csc"
+                        maxlength="4"
+                        minlength="3"
+                        pattern="[0-9]{3,4}"
+                        placeholder="XXX"
+                        title="Enter 3 or 4 digit CVV"
+                        required
+                        data-card-cvv
+                      >
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="cc-name">Name</label>
+                    <input
+                      id="cc-name"
+                      name="cardName"
+                      autocomplete="cc-name"
+                      placeholder="Name on card"
+                      maxlength="60"
+                      minlength="2"
+                      pattern="[A-Za-z][A-Za-z .'-]{1,59}"
+                      title="Enter the name printed on the card"
+                      required
+                      data-card-name
+                    >
+                  </div>
+                  <fieldset class="pay-billing">
+                    <legend>Billing address</legend>
+                    <div class="pay-address-list" role="radiogroup" aria-label="Billing address">
+                      <label class="pay-address-card is-selected">
+                        <input
+                          type="radio"
+                          name="billingAddress"
+                          value="customer"
+                          checked
+                          data-billing-choice="customer"
+                        >
+                        <span class="pay-address-card__body">
+                          <span class="pay-address-card__top">
+                            <span class="pay-address-card__title">Collection address</span>
+                            <span class="pay-address-card__badge">Default</span>
+                          </span>
+                          <span class="pay-address-card__line" data-billing-customer-address>—</span>
+                          <span class="pay-address-card__meta" data-billing-customer-city>—</span>
+                        </span>
+                      </label>
+
+                      <label class="pay-address-card">
+                        <input
+                          type="radio"
+                          name="billingAddress"
+                          value="new"
+                          data-billing-choice="new"
+                        >
+                        <span class="pay-address-card__body">
+                          <span class="pay-address-card__top">
+                            <span class="pay-address-card__title">Use a different address</span>
+                          </span>
+                          <span class="pay-address-card__hint">Enter a billing address that differs from collection</span>
+                        </span>
+                      </label>
+                    </div>
+
+                    <div class="pay-address-form" data-billing-new hidden>
+                      <div class="pay-address-form__row">
+                        <label for="billing-street">Street address</label>
+                        <input
+                          id="billing-street"
+                          type="text"
+                          name="billingStreet"
+                          autocomplete="street-address"
+                          placeholder="House no., street, landmark"
+                          data-billing-street
+                        >
+                      </div>
+                      <div class="pay-address-form__grid">
+                        <div class="pay-address-form__row">
+                          <label for="billing-city">City / Town / Village</label>
+                          <input
+                            id="billing-city"
+                            type="text"
+                            name="billingCity"
+                            autocomplete="address-level2"
+                            maxlength="99"
+                            minlength="3"
+                            pattern="[A-Za-z].{2,98}"
+                            placeholder="Hyderabad"
+                            data-billing-city
+                          >
+                        </div>
+                        <div class="pay-address-form__row">
+                          <label for="billing-pin">PIN code</label>
+                          <input
+                            id="billing-pin"
+                            type="text"
+                            name="billingPin"
+                            inputmode="numeric"
+                            maxlength="6"
+                            pattern="[0-9]{6}"
+                            placeholder="500001"
+                            data-billing-pin
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </fieldset>
+                </form>
                 <div class="checkout-wire-actions">
                   <button class="checkout-back-link checkout-change-pay" type="button" data-checkout-back="pay-choose">
                     <svg class="checkout-change-pay__icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
                       <path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M19 12H5M11 6l-6 6 6 6"/>
                     </svg>
-                    Change method
+                    Select Different Payment Method
                   </button>
-                  <button class="checkout-next-link" type="button" data-pay-start="card">Continue to secure pay</button>
+                  <button class="checkout-next-link" type="submit" form="checkout-card-form">Pay Now</button>
                 </div>
               </section>
 
@@ -320,13 +409,11 @@
                 <div class="checkout-wire-head">
                   <span class="checkout-step-badge">3</span>
                   <div>
-                    <p class="checkout-step-kicker">Payment</p>
                     <h2 data-qr-title>Scan &amp; Pay</h2>
                   </div>
                 </div>
                 <div class="pay-gateway" data-upi-pending>
                   <p class="pay-gateway__amount" data-pay-total>₹0</p>
-                  <p class="pay-gateway__lead">Starting UPI payment…</p>
                   <p class="pay-status" data-pay-status hidden></p>
                 </div>
                 <div class="pay-qr" data-upi-ready hidden>
@@ -335,12 +422,11 @@
                   <div class="pay-qr__card" aria-label="Payment QR code">
                     <img class="pay-qr__img" data-upi-qr alt="UPI QR code" hidden>
                     <div class="pay-qr__placeholder" data-upi-qr-placeholder>
-                      <p>QR appears when the payment API returns <code>qrDataUrl</code>. Use Open UPI app if a deep link is available.</p>
+                      <p>QR loading…</p>
                     </div>
                   </div>
                   <p class="pay-qr__upi" data-upi-id hidden></p>
                   <a class="button secondary" data-upi-intent hidden>Open UPI app</a>
-                  <p class="pay-qr__help" data-qr-help>Complete payment in your UPI app. We’ll confirm automatically.</p>
                   <p class="pay-status" data-pay-status hidden></p>
                 </div>
                 <div class="checkout-wire-actions">
@@ -358,12 +444,10 @@
                 <div class="checkout-wire-head">
                   <span class="checkout-step-badge">3</span>
                   <div>
-                    <p class="checkout-step-kicker">Payment</p>
                     <h2>Internet Banking</h2>
                   </div>
                 </div>
                 <p class="pay-gateway__amount" data-pay-total>₹0</p>
-                <p class="pay-gateway__lead">Select your bank. You’ll continue on the bank’s secure page — booking confirms only after payment succeeds.</p>
                 <div class="bank-list">
                   <button type="button" data-bank>HDFC Bank</button>
                   <button type="button" data-bank>ICICI Bank</button>
@@ -387,7 +471,6 @@
                 <div class="checkout-wire-head">
                   <span class="checkout-step-badge">3</span>
                   <div>
-                    <p class="checkout-step-kicker">Payment</p>
                     <h2>Confirming payment</h2>
                   </div>
                 </div>
@@ -405,107 +488,214 @@
               </section>
 
               <section class="checkout-wire-panel checkout-wire-panel--confirmation" data-checkout-stage="confirmation" hidden>
-                <div class="checkout-wire-head">
-                  <span class="checkout-step-badge">4</span>
-                  <div>
-                    <p class="checkout-step-kicker">Step 4</p>
-                    <h2>Booking confirmed</h2>
-                  </div>
-                </div>
-
-                <div class="confirm-page">
-                  <div class="confirm-hero">
-                    <div class="confirm-hero__copy">
-                      <div class="checkout-confirmation-icon" aria-hidden="true">
-                        <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-shield-check"></use></svg>
+                <div class="confirm-v2" data-confirm-page data-confirm-build="pixel-5">
+                  <header class="confirm-v2-hero">
+                    <div class="confirm-v2-hero__copy">
+                      <div class="confirm-v2-check" aria-hidden="true">
+                        <span class="confirm-v2-check__dot confirm-v2-check__dot--a"></span>
+                        <span class="confirm-v2-check__dot confirm-v2-check__dot--b"></span>
+                        <span class="confirm-v2-check__dot confirm-v2-check__dot--c"></span>
+                        <span class="confirm-v2-check__dot confirm-v2-check__dot--d"></span>
+                        <span class="confirm-v2-check__dot confirm-v2-check__dot--e"></span>
+                        <svg viewBox="0 0 24 24" width="36" height="36" focusable="false">
+                          <path fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                        </svg>
                       </div>
-                      <p class="confirm-hero__status">You’re all set</p>
-                      <p class="confirm-hero__lead" data-confirm-lead>
-                        Payment received. We’ll collect your sample at home and send reports when ready.
+                      <h2 class="confirm-v2-hero__title">Booking confirmed!</h2>
+                      <p class="confirm-v2-hero__kicker">You’ve taken a great step towards your health.</p>
+                      <p class="confirm-v2-hero__lead" data-confirm-lead>
+                        We’ll collect your sample at home and let you know when your reports are ready.
                       </p>
-                      <dl class="confirm-meta">
-                        <div>
-                          <dt>Booking ID</dt>
-                          <dd data-confirm-ref>—</dd>
-                        </div>
-                        <div>
-                          <dt>Collection</dt>
-                          <dd data-confirm-slot>—</dd>
-                        </div>
-                      </dl>
                     </div>
-                    <div class="confirm-hero__art" aria-hidden="true">
+                    <div class="confirm-v2-hero__art" aria-hidden="true">
                       <img
-                        class="confirm-hero__illustration"
                         src="assets/images/peace-of-mind.svg"
                         alt=""
-                        width="320"
-                        height="190"
+                        width="420"
+                        height="250"
                         decoding="async"
                       >
                     </div>
+                  </header>
+
+                  <p class="confirm-v2-slot" data-confirm-slot-banner>
+                    <span class="confirm-v2-slot__icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5.5" width="16" height="15" rx="2"/><path d="M8 3.5v4M16 3.5v4M4 10h16"/><path d="m9 14.5 2 2 4-4"/></svg>
+                    </span>
+                    <span class="confirm-v2-slot__copy">
+                      <span class="confirm-v2-slot__label">Collection scheduled</span>
+                      <strong data-confirm-slot>——</strong>
+                    </span>
+                  </p>
+
+                  <ol class="confirm-v2-steps" aria-label="What happens next">
+                    <li class="is-done">
+                      <span class="confirm-v2-steps__rail" aria-hidden="true">
+                        <span class="confirm-v2-steps__ico">
+                          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+                        </span>
+                        <span class="confirm-v2-steps__conn confirm-v2-steps__conn--partial">
+                          <i></i><i></i><b></b>
+                        </span>
+                      </span>
+                      <div class="confirm-v2-steps__copy">
+                        <strong>1. Booking confirmed</strong>
+                        <span>Thank you!</span>
+                      </div>
+                    </li>
+                    <li class="is-pending">
+                      <span class="confirm-v2-steps__rail" aria-hidden="true">
+                        <span class="confirm-v2-steps__ico">
+                          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.8 12 4l8 6.8V19a1.5 1.5 0 0 1-1.5 1.5H14v-5.5h-4V20.5H5.5A1.5 1.5 0 0 1 4 19v-8.2Z"/></svg>
+                        </span>
+                        <span class="confirm-v2-steps__conn">
+                          <i></i><b></b>
+                        </span>
+                      </span>
+                      <div class="confirm-v2-steps__copy">
+                        <strong>2. Sample collection</strong>
+                        <span>We’ll visit your home</span>
+                        <em class="confirm-v2-badge">Pending</em>
+                      </div>
+                    </li>
+                    <li class="is-pending">
+                      <span class="confirm-v2-steps__rail" aria-hidden="true">
+                        <span class="confirm-v2-steps__ico">
+                          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h7l4 4V20H7.7A1.7 1.7 0 0 1 6 18.3V5.2A1.7 1.7 0 0 1 7.7 3.5H7Z"/><path d="M14 3.5V8h4"/><path d="M9 13h6M9 16.5h4"/><path d="m9.5 10.5 2-2 2 1.5 2.5-3"/></svg>
+                        </span>
+                      </span>
+                      <div class="confirm-v2-steps__copy">
+                        <strong>3. Reports &amp; Insights</strong>
+                        <span>Coming soon!</span>
+                        <em class="confirm-v2-badge">Pending</em>
+                      </div>
+                    </li>
+                  </ol>
+
+                  <div class="confirm-v2-facts" aria-label="Booking details">
+                    <div class="confirm-v2-fact">
+                      <span class="confirm-v2-fact__ico confirm-v2-fact__ico--violet" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3.5" width="12" height="17" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>
+                      </span>
+                      <div class="confirm-v2-fact__body">
+                        <span class="confirm-v2-fact__label">Booking ID</span>
+                        <span class="confirm-v2-fact__value">
+                          <strong data-confirm-ref>—</strong>
+                          <button type="button" class="confirm-v2-copy" data-confirm-copy aria-label="Copy booking ID">
+                            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V6a2 2 0 0 1 2-2h10" stroke-linecap="round"/></svg>
+                          </button>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="confirm-v2-fact">
+                      <span class="confirm-v2-fact__ico confirm-v2-fact__ico--green" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5.5" width="16" height="15" rx="2"/><path d="M8 3.5v4M16 3.5v4M4 10h16"/><path d="m9 14.5 2 2 4-4"/></svg>
+                      </span>
+                      <div class="confirm-v2-fact__body">
+                        <span class="confirm-v2-fact__label">Collection</span>
+                        <strong class="confirm-v2-fact__value confirm-v2-fact__value--stack" data-confirm-slot-fact>—</strong>
+                      </div>
+                    </div>
+                    <div class="confirm-v2-fact">
+                      <span class="confirm-v2-fact__ico confirm-v2-fact__ico--violet" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.8 12 4l8 6.8V19a1.5 1.5 0 0 1-1.5 1.5H14v-5.5h-4V20.5H5.5A1.5 1.5 0 0 1 4 19v-8.2Z"/></svg>
+                      </span>
+                      <div class="confirm-v2-fact__body">
+                        <span class="confirm-v2-fact__label">Type</span>
+                        <strong class="confirm-v2-fact__value">Home collection</strong>
+                      </div>
+                    </div>
+                    <div class="confirm-v2-fact">
+                      <span class="confirm-v2-fact__ico confirm-v2-fact__ico--violet" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.4 18.1 3.8 21l3.6-1.1A8.2 8.2 0 0 0 12 21c5 0 8.8-3.4 8.8-7.8S17 5.4 12 5.4 3.2 8.8 3.2 13.2c0 1.9 1 3.8 2.2 4.9Z"/><path d="M8.4 11.5h7.2M8.4 15h4.8"/></svg>
+                      </span>
+                      <div class="confirm-v2-fact__body">
+                        <span class="confirm-v2-fact__label">Updates</span>
+                        <strong class="confirm-v2-fact__value">WhatsApp &amp; SMS</strong>
+                      </div>
+                    </div>
+                    <div class="confirm-v2-fact">
+                      <span class="confirm-v2-fact__ico confirm-v2-fact__ico--violet" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h7l4 4V20H7.7A1.7 1.7 0 0 1 6 18.3V5.2A1.7 1.7 0 0 1 7.7 3.5H7Z"/><path d="M14 3.5V8h4M9 13h6M9 16.5h4"/></svg>
+                      </span>
+                      <div class="confirm-v2-fact__body">
+                        <span class="confirm-v2-fact__label">Reports</span>
+                        <strong class="confirm-v2-fact__value">Online view &amp; download</strong>
+                      </div>
+                    </div>
                   </div>
 
-                  <section class="confirm-block" aria-labelledby="confirm-next-title">
-                    <h3 id="confirm-next-title">What happens next</h3>
-                    <ol class="confirm-timeline">
-                      <li>
-                        <span class="confirm-timeline__step" aria-hidden="true">1</span>
-                        <div>
-                          <strong>Phlebotomist will call you</strong>
-                          <p>Expect a call before arrival to confirm your address and any prep (for example fasting).</p>
-                        </div>
-                      </li>
-                      <li>
-                        <span class="confirm-timeline__step" aria-hidden="true">2</span>
-                        <div>
-                          <strong>Home collection in your booked slot</strong>
-                          <p>A certified phlebo arrives at your address during the selected date and time window.</p>
-                        </div>
-                      </li>
-                      <li>
-                        <span class="confirm-timeline__step" aria-hidden="true">3</span>
-                        <div>
-                          <strong>Reports on WhatsApp &amp; online</strong>
-                          <p>When results are ready, we’ll share a secure link on WhatsApp. You can also view reports anytime on the website or app.</p>
-                        </div>
-                      </li>
-                    </ol>
-                  </section>
+                  <p class="confirm-v2-privacy">
+                    <span aria-hidden="true">
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6 19 6.7v5.4c0 4.4-2.7 7.3-7 8.5-4.3-1.2-7-4.1-7-8.5V6.7l7-3.1Z"/><path d="m8.8 12.2 2.1 2.1 4.5-4.8"/></svg>
+                    </span>
+                    <span class="confirm-v2-privacy__copy">
+                      <strong>Your health data is safe and private with us.</strong>
+                      <span>We use industry-standard security to protect your information.</span>
+                    </span>
+                  </p>
 
-                  <section class="confirm-block confirm-block--app" aria-labelledby="confirm-app-title">
-                    <h3 id="confirm-app-title">Track live &amp; see insights</h3>
-                    <p>
-                      Download the Dr.Swift app to follow your booking status live, get result alerts, and explore trends and insights for your whole family.
-                    </p>
-                    <div class="confirm-app-actions">
-                      <a class="button primary" href="app.html">Get the app</a>
-                      <a class="button secondary" href="signup.html">Create account</a>
+                  <section class="confirm-v2-app" aria-labelledby="confirm-app-title">
+                    <div class="confirm-v2-app__phone" aria-hidden="true">
+                      <div class="confirm-v2-app__screen">
+                        <img src="assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="48" height="48">
+                        <span>Dr.Swift</span>
+                      </div>
                     </div>
-                    <p class="confirm-block__hint">Already have an account? Open <a href="account.html">My Account</a> or <a href="login.html">sign in</a> to manage bookings and reports.</p>
+                    <div class="confirm-v2-app__copy">
+                      <h3 id="confirm-app-title">Track your health. Anytime, anywhere.</h3>
+                      <p>Get live updates, result alerts, and insights for you and your family.</p>
+                      <a class="button primary" href="app.html">Download Dr.Swift App</a>
+                    </div>
+                    <div class="confirm-v2-app__qr">
+                      <p>Scan to download</p>
+                      <a class="confirm-v2-app__qr-img" href="app.html" aria-label="Open app download page">
+                        <svg viewBox="0 0 100 100" width="100" height="100" aria-hidden="true">
+                          <rect width="100" height="100" fill="#fff"/>
+                          <path fill="#1f2a44" d="M8 8h28v28H8zm6 6h16v16H14zm50-6h28v28H64zm6 6h16v16H70zM8 64h28v28H8zm6 6h16v16H14zm42-6h8v8h-8zm12 0h8v8h-8zm12 0h8v8h-8zm-24 12h8v8h-8zm12 0h8v8h-8zm12 0h8v8h-8zm-24 12h8v8h-8zm12 0h8v8h-8zm12 0h16v16H70zm-36-48h8v8h-8zm12 0h8v8h-8zm0 12h8v8h-8zm12-12h8v8h-8z"/>
+                        </svg>
+                      </a>
+                      <div class="confirm-v2-app__stores">
+                        <a class="confirm-store-badge" href="app.html" aria-label="Get it on Google Play">
+                          <img src="assets/images/badge-google-play.svg" alt="" width="162" height="48" decoding="async">
+                        </a>
+                        <a class="confirm-store-badge" href="app.html" aria-label="Download on the App Store">
+                          <img src="assets/images/badge-app-store.svg" alt="" width="162" height="48" decoding="async">
+                        </a>
+                      </div>
+                    </div>
                   </section>
 
-                  <section class="confirm-block confirm-block--support" aria-labelledby="confirm-support-title">
-                    <h3 id="confirm-support-title">Need help?</h3>
-                    <p>Our care team can help with rescheduling, prep questions, or report access.</p>
-                    <div class="confirm-support-grid">
-                      <a class="confirm-support-card" href="https://wa.me/919000424591" target="_blank" rel="noopener">
+                  <div class="confirm-v2-support">
+                    <p class="confirm-v2-support__intro">
+                      <span aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 10a7.5 7.5 0 0 1 15 0v2.2a2.3 2.3 0 0 1-2.3 2.3h-.7"/><path d="M7 18.5h4.2a2.3 2.3 0 0 0 2.3-2.3V12"/><circle cx="17.5" cy="14.5" r="2"/><path d="M9.5 21h5"/></svg></span>
+                      Need help? We’re here for you.
+                    </p>
+                    <a class="confirm-v2-support__link" href="https://wa.me/919000424591" target="_blank" rel="noopener">
+                      <span class="confirm-v2-support__ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12.04 2C6.58 2 2.15 6.3 2.15 11.6c0 1.9.55 3.67 1.5 5.2L2 22l5.4-1.58a10.1 10.1 0 0 0 4.64 1.14h.01c5.46 0 9.89-4.3 9.89-9.6C21.94 6.3 17.5 2 12.04 2Zm5.76 13.6c-.24.67-1.4 1.23-1.93 1.31-.5.07-1.13.1-1.82-.11-.42-.13-.96-.31-1.66-.61-2.92-1.26-4.82-4.2-4.97-4.4-.14-.2-1.2-1.6-1.2-3.05 0-1.45.76-2.16 1.03-2.46.27-.3.59-.37.79-.37h.57c.18 0 .42-.07.66.5.24.58.82 2 .89 2.15.07.15.12.32.02.52-.1.2-.15.32-.3.5-.14.17-.3.38-.43.51-.14.14-.29.29-.12.56.16.28.72 1.19 1.55 1.93 1.06.95 1.96 1.25 2.24 1.39.28.14.44.12.6-.07.16-.2.7-.81.89-1.09.18-.28.37-.23.62-.14.25.1 1.58.75 1.85.88.27.14.45.2.52.31.07.11.07.64-.17 1.31Z"/></svg>
+                      </span>
+                      <span>
                         <strong>WhatsApp support</strong>
                         <span>+91 90004 24591</span>
-                      </a>
-                      <a class="confirm-support-card" href="tel:+919000424591">
+                      </span>
+                    </a>
+                    <a class="confirm-v2-support__link" href="tel:+919000424591">
+                      <span class="confirm-v2-support__ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.2 4.5h2.4l1.2 3-1.6 1a10.5 10.5 0 0 0 4.8 4.8l1-1.6 3 1.2v2.4A2.1 2.1 0 0 1 16 17.4 12.9 12.9 0 0 1 4.5 5.9 2.1 2.1 0 0 1 6.6 3.8Z"/></svg>
+                      </span>
+                      <span>
                         <strong>Call support</strong>
                         <span>+91 90004 24591</span>
-                      </a>
-                    </div>
-                    <p class="confirm-block__hint">Prefer email or more FAQs? Visit <a href="help.html">Help</a>, <a href="policies.html">Policies</a>, or <a href="about.html#contact">Contact</a>.</p>
-                    <div data-site-content="urgent-care"></div>
-                  </section>
-                </div>
+                      </span>
+                    </a>
+                    <a class="button secondary confirm-v2-support__cta" href="account.html">View My Bookings <span aria-hidden="true">›</span></a>
+                  </div>
 
-                <div class="checkout-wire-actions">
-                  <a class="checkout-back-link" href="account.html">My Account</a>
-                  <a class="checkout-next-link" href="tests.html">Shop All Tests</a>
+                  <p class="confirm-v2-thanks">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-9.2A4.2 4.2 0 0 1 12 7.2a4.2 4.2 0 0 1 7 3.6C19 15.6 12 20 12 20Z"/></svg>
+                    Thank you for choosing Dr.Swift Diagnostics. We’re committed to your health.
+                  </p>
                 </div>
               </section>
             </div>
@@ -520,11 +710,6 @@
                 <div class="checkout-summary-empty" data-booking-cart-empty>
                   <p>No tests found in this checkout.</p>
                   <a href="tests.html">Browse tests</a>
-                </div>
-                <div class="checkout-care-card">
-                  <strong>Need help choosing or booking?</strong>
-                  <p>Our care team can confirm prep, timing, and the right profile before payment.</p>
-                  <a href="whatsapp.html">Chat on WhatsApp</a>
                 </div>
               </section>
               <section class="checkout-summary-panel" data-summary-customer hidden>
@@ -571,7 +756,7 @@
     <script src="assets/js/google-auth.js?v=6"></script>
     <script src="assets/js/main.js?v=recipient-sync-1"></script>
     <script src="assets/js/checkout-api.js?v=production-ready-1"></script>
-    <script src="assets/js/checkout.js?v=family-recipient-sync-1"></script>
+    <script src="assets/js/checkout.js?v=confirm-pixel-5"></script>
     <script>
       async function initBookingPage() {
         if (typeof window.DRSWIFT_BOOTSTRAP_CATALOG === "function") {
