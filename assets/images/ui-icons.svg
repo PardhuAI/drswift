@@ -84,4 +84,82 @@
       <path d="M10.4 12.6h3.2"/>
     </g>
   </symbol>
+  <symbol id="icon-heart" viewBox="0 0 24 24">
+    <path d="M12 20s-7.4-4.7-7.4-10.2A4.1 4.1 0 0 1 12 7.4a4.1 4.1 0 0 1 7.4 2.4C19.4 15.3 12 20 12 20Z"/>
+  </symbol>
+  <symbol id="icon-droplet" viewBox="0 0 24 24">
+    <path d="M12 3.6s6 6.6 6 11a6 6 0 0 1-12 0c0-4.4 6-11 6-11Z"/>
+    <path d="M9.2 15.2a3.1 3.1 0 0 0 3.1 2.4"/>
+  </symbol>
+  <symbol id="icon-thyroid" viewBox="0 0 24 24">
+    <path d="M10.3 8.4c-3.4-2.8-6.1-.9-6.1 2.9 0 3.3 2 6.2 5 6.2 1.6 0 2.8-1.1 2.8-3.1 0 2 1.2 3.1 2.8 3.1 3 0 5-2.9 5-6.2 0-3.8-2.7-5.7-6.1-2.9"/>
+    <path d="M12 6.5v7.9"/>
+  </symbol>
+  <symbol id="icon-kidney" viewBox="0 0 24 24">
+    <path d="M9.4 4.2c-3 .9-5 4-5 7.6 0 4.3 2.6 7.9 5.6 7.9 1.6 0 2.7-1.3 2.2-3-.5-1.8-2.6-2.2-2.6-4.7 0-2.3 1.9-2.8 2.3-4.6.4-1.6-.8-3.8-2.5-3.2Z"/>
+    <path d="M14.6 4.2c3 .9 5 4 5 7.6 0 4.3-2.6 7.9-5.6 7.9-1.6 0-2.7-1.3-2.2-3 .5-1.8 2.6-2.2 2.6-4.7 0-2.3-1.9-2.8-2.3-4.6-.4-1.6.8-3.8 2.5-3.2Z"/>
+  </symbol>
+  <symbol id="icon-sun" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="3.8"/>
+    <path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.6 1.6M16.4 16.4 18 18M18 6l-1.6 1.6M7.6 16.4 6 18"/>
+  </symbol>
+  <symbol id="icon-liver" viewBox="0 0 24 24">
+    <path d="M4.2 12.9c.4-4.5 3.8-7 9.7-7 3.5 0 5.4 1.1 5.9 3.2.8 3.4-2.5 7.8-7.8 7.8H8.4c-2.6 0-4.5-1.3-4.2-4Z"/>
+    <path d="M13.6 6.1c.7 2.4.3 4.5-1.3 6.4"/>
+  </symbol>
+  <symbol id="icon-thermometer" viewBox="0 0 24 24">
+    <path d="M10 14.2V5.9a2.4 2.4 0 0 1 4.8 0v8.3a4.4 4.4 0 1 1-4.8 0Z"/>
+    <path d="M12.4 8.2v8.4"/>
+  </symbol>
+  <symbol id="icon-pregnancy" viewBox="0 0 24 24">
+    <circle cx="11.2" cy="5.6" r="2.1"/>
+    <path d="M10.4 8.4c-1.5 1.1-2.4 3.1-2.4 5.1 0 4 2.3 6.9 5.6 6.9 2.5 0 4.3-1.8 4.3-4.2 0-2.2-1.3-4-3.4-4.7"/>
+    <path d="M11.2 10.2c2.8.6 4.3 2.7 4.3 5.2"/>
+  </symbol>
+  <symbol id="icon-body" viewBox="0 0 24 24">
+    <circle cx="12" cy="4.8" r="2.1"/>
+    <path d="M7.3 9.2h9.4M12 7v13.2M9 20.2l3-6 3 6M7.8 12.6 6 17M16.2 12.6 18 17"/>
+  </symbol>
+  <symbol id="icon-molecule" viewBox="0 0 24 24">
+    <circle cx="7" cy="8" r="2.2"/>
+    <circle cx="16.8" cy="6.7" r="2"/>
+    <circle cx="17.4" cy="17" r="2.3"/>
+    <circle cx="8.6" cy="16.2" r="1.9"/>
+    <path d="m9.2 7.7 5.6-.7M8.2 9.8l.4 4.4M10.4 16.4l4.8.4M15.8 8.5l1 6.2"/>
+  </symbol>
+  <symbol id="icon-basket-plus" viewBox="0 0 24 24">
+    <path d="M6.4 9.2h11.2l-1.2 9.2a2 2 0 0 1-2 1.7H9.6a2 2 0 0 1-2-1.7L6.4 9.2Z"/>
+    <path d="m8.8 9.2 3.2-5 3.2 5M12 12.5v4.4M9.8 14.7h4.4"/>
+  </symbol>
+  <symbol id="icon-house-heart" viewBox="0 0 24 24">
+    <path d="M4 10.8 12 4l8 6.8v8.1a1.6 1.6 0 0 1-1.6 1.6H5.6A1.6 1.6 0 0 1 4 18.9v-8.1Z"/>
+    <path d="M12 17s-3.4-2.1-3.4-4.6a1.9 1.9 0 0 1 3.4-1.1 1.9 1.9 0 0 1 3.4 1.1c0 2.5-3.4 4.6-3.4 4.6Z"/>
+  </symbol>
+  <symbol id="icon-lock-check" viewBox="0 0 24 24">
+    <rect x="5" y="10" width="14" height="10" rx="2"/>
+    <path d="M8.5 10V7.8a3.5 3.5 0 0 1 7 0V10"/>
+    <path d="m9.2 15.1 1.9 1.9 3.8-4"/>
+  </symbol>
+  <symbol id="icon-calendar-refresh" viewBox="0 0 24 24">
+    <rect x="4" y="5.5" width="16" height="15" rx="2"/>
+    <path d="M8 3.5v4M16 3.5v4M4 10h16"/>
+    <path d="M15.8 14.1a3.4 3.4 0 1 0 .7 3.7"/>
+    <path d="M16.6 12.4v2.5h-2.5"/>
+  </symbol>
+  <symbol id="icon-chat-wave" viewBox="0 0 24 24">
+    <path d="M5.4 18.1 3.8 21l3.6-1.1c1.2.6 2.6.9 4.2.9 5 0 8.8-3.4 8.8-7.8s-3.8-7.8-8.8-7.8S2.8 8.6 2.8 13c0 1.9 1 3.8 2.6 5.1Z"/>
+    <path d="M8.2 12.8c.8.8 1.6.8 2.4 0M13.4 12.8c.8.8 1.6.8 2.4 0"/>
+  </symbol>
+  <symbol id="icon-clipboard-list" viewBox="0 0 24 24">
+    <path d="M8.2 5.2H6.8A1.8 1.8 0 0 0 5 7v11.2A1.8 1.8 0 0 0 6.8 20h10.4a1.8 1.8 0 0 0 1.8-1.8V7a1.8 1.8 0 0 0-1.8-1.8h-1.4"/>
+    <path d="M9 4h6v3.2H9zM8.8 11.2h6.4M8.8 14.8h6.4"/>
+  </symbol>
+  <symbol id="icon-map-house" viewBox="0 0 24 24">
+    <path d="M12 21s6.2-5.4 6.2-10.4A6.2 6.2 0 0 0 5.8 10.6C5.8 15.6 12 21 12 21Z"/>
+    <path d="M9.2 11.3 12 9l2.8 2.3v3.1H9.2v-3.1Z"/>
+  </symbol>
+  <symbol id="icon-document-check" viewBox="0 0 24 24">
+    <path d="M7 3.5h7l4 4v13H7a1.7 1.7 0 0 1-1.7-1.7V5.2A1.7 1.7 0 0 1 7 3.5Z"/>
+    <path d="M14 3.5v4.6h4M8.6 15.1l2 2 4.8-5.1"/>
+  </symbol>
 </svg>

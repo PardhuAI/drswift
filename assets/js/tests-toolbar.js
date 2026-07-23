@@ -309,6 +309,7 @@
       quickFiltersBackdrop.hidden = true;
       quickFiltersBackdrop.setAttribute("aria-hidden", "true");
     }
+    document.body.classList.remove("is-quick-filters-open");
     quickFiltersToggle.setAttribute("aria-expanded", "false");
   }
 
@@ -323,6 +324,7 @@
       quickFiltersBackdrop.hidden = !useMobileSheet;
       quickFiltersBackdrop.setAttribute("aria-hidden", String(!useMobileSheet));
     }
+    document.body.classList.toggle("is-quick-filters-open", useMobileSheet);
     quickFiltersToggle.setAttribute("aria-expanded", "true");
   }
 

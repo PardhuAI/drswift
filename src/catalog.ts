@@ -34,6 +34,98 @@ export interface CatalogBundle {
 
 const CATALOG_CACHE_KEY = "https://catalog-cache.drswift.internal/v1/catalog";
 
+const LOCAL_DEMO_CATALOG: CatalogPayload = {
+  tests: [
+    {
+      slug: "cbc",
+      name: "Complete Blood Count",
+      category: "General",
+      filters: ["all", "cbc"],
+      image: "assets/images/test-cbc.jpg",
+      badge: "Popular",
+      price: 29,
+      oldPrice: 45,
+      summary: "Checks blood cells, anemia indicators, and infection clues.",
+      frequentlyOrderedTest: true,
+      testAudience: ["General Public"],
+    },
+    {
+      slug: "lipid-profile",
+      name: "Lipid Profile",
+      category: "Heart",
+      filters: ["all", "heart"],
+      image: "assets/images/test-heart.jpg",
+      price: 39,
+      oldPrice: 58,
+      summary: "Measures cholesterol, triglycerides, HDL, and LDL.",
+      frequentlyOrderedTest: true,
+      testAudience: ["General Public"],
+    },
+    {
+      slug: "thyroid-profile",
+      name: "Thyroid Profile",
+      category: "Thyroid",
+      filters: ["all", "thyroid"],
+      image: "assets/images/test-thyroid.jpg",
+      price: 35,
+      oldPrice: 52,
+      summary: "Includes T3, T4, and TSH for thyroid screening.",
+      frequentlyOrderedTest: true,
+      testAudience: ["General Public"],
+    },
+    {
+      slug: "vitamin-d",
+      name: "Vitamin D Test",
+      category: "Wellness",
+      filters: ["all", "vitamins"],
+      image: "assets/images/test-vitamin-d.jpg",
+      price: 31,
+      oldPrice: 49,
+      summary: "Useful for fatigue, bone health, and wellness checks.",
+      frequentlyOrderedTest: true,
+      testAudience: ["General Public"],
+    },
+    {
+      slug: "full-body-checkup",
+      name: "Full Body Checkup",
+      category: "Full Body Checkup",
+      filters: ["all", "full-body"],
+      image: "assets/images/test-full-body.jpg",
+      badge: "Best value",
+      price: 99,
+      oldPrice: 149,
+      summary: "A broad wellness panel for annual preventive testing.",
+      frequentlyOrderedTest: true,
+      testAudience: ["General Public"],
+    },
+    {
+      slug: "womens-hormone-panel",
+      name: "Women's Hormone Panel",
+      category: "Women",
+      filters: ["all", "her"],
+      image: "assets/images/test-womens-health.jpg",
+      price: 79,
+      oldPrice: 119,
+      summary: "Hormone and wellness markers for women.",
+      frequentlyOrderedTest: true,
+      testAudience: ["General Public"],
+    },
+    {
+      slug: "kidney-function",
+      name: "Kidney Function Test",
+      category: "Kidney",
+      filters: ["all", "kidney"],
+      image: "assets/images/test-kidney.jpg",
+      price: 42,
+      oldPrice: 64,
+      summary: "Checks creatinine, urea, electrolytes, and filtration markers.",
+      frequentlyOrderedTest: true,
+      testAudience: ["General Public"],
+    },
+  ],
+  promotions: [],
+};
+
 function asArray<T>(value: unknown): T[] {
   return Array.isArray(value) ? (value as T[]) : [];
 }
@@ -319,12 +411,21 @@ export async function loadCatalog(env: Env): Promise<CatalogBundle> {
     }
   }
 
-  const raw = await Promise.race([
-    fetchCatalogFromOrigin(env),
-    new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error("Catalog upstream timed out")), 10_000);
-    }),
-  ]);
+  let raw: CatalogPayload;
+  const originTimeoutMs = isLocalDev(env) ? 1_500 : 10_000;
+  try {
+    raw = await Promise.race([
+      fetchCatalogFromOrigin(env),
+      new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error("Catalog upstream timed out")), originTimeoutMs);
+      }),
+    ]);
+  } catch (err) {
+    if (!isLocalDev(env)) throw err;
+    const message = err instanceof Error ? err.message : "Catalog upstream unavailable";
+    console.warn(`Using local demo catalog: ${message}`);
+    raw = LOCAL_DEMO_CATALOG;
+  }
 
   if (cache) {
     try {

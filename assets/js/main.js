@@ -2535,6 +2535,9 @@ function renderCartPage() {
     setCartBodyVisible(true);
     container.innerHTML = `
       <div class="empty-cart">
+        <div class="empty-cart__illustration" aria-hidden="true">
+          <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-basket-plus"></use></svg>
+        </div>
         <p class="eyebrow">Empty cart</p>
         <h2>Your cart is ready for tests.</h2>
         <p>Add one or more panels, then continue to booking for patient and collection details.</p>
@@ -2595,13 +2598,22 @@ function renderCartPage() {
         <div><dt>Savings</dt><dd>-${formatPrice(savings)}</dd></div>
         <div class="cart-summary__total"><dt>Total</dt><dd>${formatPrice(totals.subtotal)}</dd></div>
       </dl>
+      <ul class="cart-assurance cart-assurance--strip">
+        <li>
+          <span class="cart-assurance__icon" aria-hidden="true"><svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-house-heart"></use></svg></span>
+          <span>Home collection</span>
+        </li>
+        <li>
+          <span class="cart-assurance__icon" aria-hidden="true"><svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-lock-check"></use></svg></span>
+          <span>Secure checkout</span>
+        </li>
+        <li>
+          <span class="cart-assurance__icon" aria-hidden="true"><svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-calendar-refresh"></use></svg></span>
+          <span>Easy reschedule</span>
+        </li>
+      </ul>
       <a class="button primary full" href="book.html?cart=checkout">Continue to booking</a>
       <button class="cart-clear-link" type="button" data-cart-action="clear">Clear cart</button>
-      <ul class="cart-assurance">
-        <li>Review address, timing, and preparation before choosing payment.</li>
-        <li>Care team confirms collection details before the visit.</li>
-        <li>You can switch to WhatsApp support anytime.</li>
-      </ul>
     </aside>
   `;
 
