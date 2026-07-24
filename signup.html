@@ -40,7 +40,7 @@
             <path d="M4.5 4.5 13.5 13.5M13.5 4.5 4.5 13.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
           </svg>
         </a>
-        <div class="auth-split__panel-inner signup-auth-card">
+        <div class="auth-split__panel-inner signup-auth-card" data-signup-card>
           <a class="auth-split__back" href="index.html">
             <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none">
               <path d="M10 3 5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -48,11 +48,13 @@
             <span data-signup-back-label>Back to Dr.Swift</span>
           </a>
 
-          <div class="login-panel is-active">
+          <div class="login-panel is-active" data-signup-owner data-signup-chrome>
             <header class="auth-split__intro">
-              <p class="auth-split__kicker" data-signup-aside-kicker>Family account</p>
+              <p class="auth-split__kicker" data-signup-aside-kicker>Personal or family — one account for the whole family</p>
               <h1 class="auth-split__title" data-signup-title>Create your account</h1>
-              <p class="auth-split__subtitle" data-signup-subtitle>A few details to get started. You can add family members later.</p>
+              <p class="auth-split__subtitle" data-signup-subtitle>
+                Sign up with Google or phone. We’ll only ask for a few details if you’re new.
+              </p>
             </header>
 
             <button class="button secondary full login-social-btn nav-google-login" type="button" data-google-auth="signin" data-google-auth-primary data-signup-social>
@@ -64,17 +66,157 @@
               </svg>
               <span>Continue with Google</span>
             </button>
-            <p class="login-social__label auth-divider-label" data-signup-divider>Or sign up with email</p>
+            <p class="login-social__label" data-signup-divider>Or continue with phone</p>
 
-            <form class="auth-form signup-form" data-auth-form novalidate>
-              <p class="secure-note" data-signup-note>Used only for account access, booking updates, and report notifications.</p>
+            <form class="auth-form login-form" data-signup-phone-form novalidate>
               <div class="form-field">
                 <label for="signup-name">Full name</label>
-                <input id="signup-name" type="text" name="name" autocomplete="name" placeholder="As on your ID" required>
+                <input
+                  id="signup-name"
+                  type="text"
+                  name="name"
+                  autocomplete="name"
+                  maxlength="80"
+                  placeholder="As on your ID"
+                  required
+                >
               </div>
-              <div class="form-field" data-family-relation-field hidden>
+              <div class="form-field">
+                <label for="signup-phone">Phone number</label>
+                <div class="login-inline-field">
+                  <div class="input-with-prefix">
+                    <span class="input-prefix" aria-hidden="true">+91</span>
+                    <input
+                      id="signup-phone"
+                      type="tel"
+                      name="phone"
+                      autocomplete="tel-national"
+                      inputmode="numeric"
+                      maxlength="10"
+                      pattern="[6-9][0-9]{9}"
+                      title="Enter a valid 10-digit Indian mobile number"
+                      placeholder="10-digit mobile"
+                      required
+                    >
+                  </div>
+                  <button type="button" class="button secondary login-otp-btn" data-otp-send>Send OTP</button>
+                </div>
+              </div>
+              <div class="form-field" data-otp-block hidden>
+                <label for="signup-otp">One-time password</label>
+                <div class="login-inline-field">
+                  <input
+                    id="signup-otp"
+                    type="text"
+                    name="otp"
+                    inputmode="numeric"
+                    maxlength="6"
+                    minlength="6"
+                    pattern="[0-9]{6}"
+                    title="Enter the 6-digit OTP"
+                    autocomplete="one-time-code"
+                    placeholder="6-digit code"
+                    required
+                  >
+                  <button type="button" class="button primary login-otp-btn" data-otp-verify>Verify</button>
+                </div>
+                <div data-site-content="otp-hint"></div>
+              </div>
+              <label class="form-check" data-terms-field>
+                <input type="checkbox" name="terms" required>
+                <span>I agree to the <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a></span>
+              </label>
+              <p class="login-status" data-login-status hidden aria-live="polite"></p>
+              <p class="auth-success" data-auth-success aria-live="polite" hidden>Phone verified. Opening your account…</p>
+            </form>
+
+            <p class="auth-alt" data-signup-alt>Already have an account? <a href="login.html">Sign in</a></p>
+          </div>
+
+          <div class="login-panel auth-complete-profile" data-complete-profile hidden>
+            <header class="auth-split__intro">
+              <p class="auth-split__kicker">Almost there</p>
+              <h1 class="auth-split__title">Tell us about you</h1>
+              <p class="auth-split__subtitle" data-complete-profile-subtitle>
+                You’re verified. Add a few details so we can personalize bookings and reports.
+              </p>
+            </header>
+
+            <form class="auth-form auth-complete-profile__form" data-complete-profile-form novalidate>
+              <div class="form-field">
+                <label for="profile-name">Full name</label>
+                <input
+                  id="profile-name"
+                  type="text"
+                  name="name"
+                  autocomplete="name"
+                  maxlength="80"
+                  placeholder="As on your ID"
+                  required
+                >
+              </div>
+              <div class="auth-complete-profile__row">
+                <div class="form-field">
+                  <label for="profile-age">Age</label>
+                  <input
+                    id="profile-age"
+                    type="number"
+                    name="age"
+                    inputmode="numeric"
+                    min="1"
+                    max="120"
+                    placeholder="Years"
+                    required
+                  >
+                </div>
+                <div class="form-field">
+                  <label for="profile-gender">Gender</label>
+                  <select id="profile-gender" name="gender" required>
+                    <option value="">Select</option>
+                    <option value="Female">Female</option>
+                    <option value="Male">Male</option>
+                    <option value="Other">Other</option>
+                    <option value="Prefer not to say">Prefer not to say</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-field">
+                <label for="profile-email">Email <span class="field-optional">(optional)</span></label>
+                <input
+                  id="profile-email"
+                  type="email"
+                  name="email"
+                  autocomplete="email"
+                  maxlength="120"
+                  placeholder="you@email.com"
+                >
+              </div>
+              <button class="button primary full" type="submit">Continue to My Account</button>
+              <p class="auth-success" data-auth-success aria-live="polite" hidden>Profile saved. Opening your account…</p>
+            </form>
+            <p class="auth-alt">
+              <button type="button" class="auth-text-btn" data-complete-profile-back>Use a different number</button>
+            </p>
+          </div>
+
+          <div class="login-panel" data-signup-family hidden>
+            <header class="auth-split__intro">
+              <p class="auth-split__kicker">Family profile</p>
+              <h1 class="auth-split__title" data-signup-family-title>Add family member</h1>
+              <p class="auth-split__subtitle">
+                Create a separate profile under your family account.
+              </p>
+            </header>
+
+            <form class="auth-form signup-form" data-auth-form data-signup-mode="family" novalidate>
+              <p class="secure-note">Family member details help keep bookings, preparation notes, reports, and trends separate.</p>
+              <div class="form-field">
+                <label for="family-name">Full name</label>
+                <input id="family-name" type="text" name="name" autocomplete="name" placeholder="As on their ID" required>
+              </div>
+              <div class="form-field" data-family-relation-field>
                 <label for="signup-relation">Relationship to account owner</label>
-                <select id="signup-relation" name="relation">
+                <select id="signup-relation" name="relation" required>
                   <option value="">Select relation</option>
                   <option value="Father">Father</option>
                   <option value="Mother">Mother</option>
@@ -93,50 +235,29 @@
                 </select>
               </div>
               <div class="form-field">
-                <label for="signup-email">Email</label>
-                <input id="signup-email" type="email" name="email" autocomplete="email" placeholder="you@email.com" required>
-              </div>
-              <div class="form-field">
-                <label for="signup-phone">Mobile number</label>
+                <label for="family-phone">Phone <span class="field-optional">(optional)</span></label>
                 <div class="input-with-prefix">
                   <span class="input-prefix" aria-hidden="true">+91</span>
                   <input
-                    id="signup-phone"
+                    id="family-phone"
                     type="tel"
                     name="phone"
                     autocomplete="tel-national"
                     inputmode="numeric"
                     maxlength="10"
                     pattern="[6-9][0-9]{9}"
-                    placeholder="10-digit mobile"
-                    required
+                    placeholder="Optional"
                   >
                 </div>
               </div>
-              <div class="form-field" data-password-field>
-                <label for="signup-password">Password</label>
-                <div class="input-with-action">
-                  <input
-                    id="signup-password"
-                    type="password"
-                    name="password"
-                    autocomplete="new-password"
-                    minlength="8"
-                    maxlength="72"
-                    required
-                  >
-                  <button type="button" class="input-action" data-toggle-password="signup-password" aria-label="Show password">Show</button>
-                </div>
-                <p class="field-hint">At least 8 characters.</p>
+              <div class="form-field">
+                <label for="family-email">Email <span class="field-optional">(optional)</span></label>
+                <input id="family-email" type="email" name="email" autocomplete="email" placeholder="Optional">
               </div>
-              <label class="form-check" data-terms-field>
-                <input type="checkbox" name="terms" required>
-                <span>I agree to the <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a></span>
-              </label>
-              <button class="button primary full" type="submit" data-signup-submit>Create account</button>
-              <p class="auth-success" data-auth-success aria-live="polite" hidden>Account created. You can now manage your profile, bookings, and family members.</p>
+              <button class="button primary full" type="submit" data-signup-submit>Save family member</button>
+              <p class="auth-success" data-auth-success aria-live="polite" hidden>Family member saved. Returning to My Account.</p>
             </form>
-            <p class="auth-alt" data-signup-alt>Already have an account? <a href="login.html">Sign in</a></p>
+            <p class="auth-alt">Back to <a href="account.html">My Account</a></p>
           </div>
 
           <p class="auth-split__fineprint">&copy; 2026 Dr.Swift Diagnostics</p>
@@ -144,12 +265,13 @@
       </section>
     </main>
 
+    <script src="assets/js/site-content.js?v=design-content-2"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
     <script src="assets/js/firebase-config.js?v=3"></script>
     <script src="assets/js/auth-session.js?v=1"></script>
     <script src="assets/js/google-auth.js?v=7"></script>
     <script src="assets/js/main.js?v=fixed-nav-1"></script>
-    <script src="assets/js/auth.js?v=auth-progressive-1"></script>
+    <script src="assets/js/auth.js?v=auth-phone-google-3"></script>
   </body>
 </html>

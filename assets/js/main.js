@@ -2432,20 +2432,6 @@ function renderCartPage() {
         <div><dt>Savings</dt><dd>-${formatPrice(savings)}</dd></div>
         <div class="cart-summary__total"><dt>Total</dt><dd>${formatPrice(totals.subtotal)}</dd></div>
       </dl>
-      <ul class="cart-assurance cart-assurance--strip">
-        <li>
-          <span class="cart-assurance__icon" aria-hidden="true"><svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-house-heart"></use></svg></span>
-          <span>Home collection</span>
-        </li>
-        <li>
-          <span class="cart-assurance__icon" aria-hidden="true"><svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-lock-check"></use></svg></span>
-          <span>Secure checkout</span>
-        </li>
-        <li>
-          <span class="cart-assurance__icon" aria-hidden="true"><svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-calendar-refresh"></use></svg></span>
-          <span>Easy reschedule</span>
-        </li>
-      </ul>
       <a class="button primary full" href="/book?cart=checkout">Continue to booking</a>
       <button class="cart-clear-link" type="button" data-cart-action="clear">Clear cart</button>
     </aside>

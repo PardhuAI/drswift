@@ -8240,6 +8240,16 @@ a.hero-image-note__chip:focus-visible {
   padding: 10px 4px 28px;
 }
 
+.ordered-tests .test-cards .test-card--catalog {
+  border: none;
+  box-shadow: 0 0 18px rgba(33, 49, 78, 0.14), 0 0 6px rgba(33, 49, 78, 0.08);
+}
+
+.ordered-tests .test-cards .test-card--catalog:hover {
+  border: none;
+  box-shadow: 0 0 28px rgba(33, 49, 78, 0.18), 0 0 10px rgba(33, 49, 78, 0.1);
+}
+
 .test-cards .test-card--catalog,
 .catalog-grid .test-card--catalog {
   width: 100%;
@@ -8718,10 +8728,10 @@ body.auth-page--split .button.primary.full {
 }
 
 body.auth-page--split .login-social {
-  gap: 10px;
+  gap: 12px;
   margin-top: 22px;
-  padding-top: 20px;
-  border-top: 1px solid rgba(220, 227, 238, 0.9);
+  padding-top: 0;
+  border-top: 0;
 }
 
 body.auth-page--split .login-social .button,
@@ -8737,9 +8747,9 @@ body.auth-page--split .login-panel .auth-alt {
   text-align: center;
 }
 
-body.auth-page--split .auth-divider-label {
-  margin: 16px 0 4px !important;
-  text-align: center;
+body.auth-page--split .auth-divider-label,
+body.auth-page--split .login-social__label {
+  margin: 18px 0 14px !important;
 }
 
 .auth-split__fineprint {
@@ -12473,20 +12483,31 @@ body.auth-page .auth-shell:has(.checkout-frame) {
 
 .login-social {
   display: grid;
-  gap: 8px;
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid var(--color-line);
+  gap: 12px;
+  margin-top: 22px;
+  padding-top: 0;
+  border-top: 0;
 }
 
 .login-social__label {
-  margin: 0 0 2px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
   text-align: center;
   font-size: 0.78rem;
   font-weight: 600;
-  color: var(--color-muted);
+  color: var(--color-caption);
   text-transform: uppercase;
   letter-spacing: 0.06em;
+}
+
+.login-social__label::before,
+.login-social__label::after {
+  content: "";
+  height: 1px;
+  background: var(--color-line);
 }
 
 .login-social .button:disabled {

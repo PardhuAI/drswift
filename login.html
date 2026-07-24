@@ -79,15 +79,6 @@
               <p class="auth-split__subtitle">Sign in with phone or Google. We’ll only ask for your details if you’re new.</p>
             </header>
 
-            <div class="login-method" role="tablist" aria-label="Sign-in method">
-              <button type="button" class="login-method__tab is-active" role="tab" aria-selected="true" data-method="phone">
-                Phone
-              </button>
-              <button type="button" class="login-method__tab" role="tab" aria-selected="false" data-method="mail">
-                Email
-              </button>
-            </div>
-
             <form class="auth-form login-form" data-auth-form data-login-method="phone" novalidate>
               <div class="form-field">
                 <label for="cust-phone">Phone number</label>
@@ -132,47 +123,6 @@
               </div>
               <p class="login-status" data-login-status hidden aria-live="polite"></p>
               <p class="auth-success" data-auth-success aria-live="polite" hidden>Phone verified. Opening your account…</p>
-            </form>
-
-            <form class="auth-form login-form" data-auth-form data-login-method="mail" hidden novalidate>
-              <div class="form-field">
-                <label for="cust-email">Email</label>
-                <input
-                  id="cust-email"
-                  type="email"
-                  name="email"
-                  autocomplete="username"
-                  maxlength="120"
-                  placeholder="you@email.com"
-                  title="Enter a valid email address"
-                  required
-                >
-              </div>
-              <div class="form-field">
-                <label for="cust-password">Password</label>
-                <div class="input-with-action">
-                  <input
-                    id="cust-password"
-                    type="password"
-                    name="password"
-                    autocomplete="current-password"
-                    minlength="8"
-                    maxlength="72"
-                    title="Password must be at least 8 characters"
-                    required
-                  >
-                  <button type="button" class="input-action" data-toggle-password="cust-password" aria-label="Show password">Show</button>
-                </div>
-              </div>
-              <div class="form-row-split">
-                <label class="form-check">
-                  <input type="checkbox" name="remember">
-                  <span>Keep me signed in</span>
-                </label>
-                <a href="forgot-password.html">Forgot password?</a>
-              </div>
-              <button class="button primary full" type="submit">Sign in</button>
-              <p class="auth-success" data-auth-success aria-live="polite" hidden>Signed in successfully. Your account is ready.</p>
             </form>
 
             <div class="login-social" data-customer-social>
@@ -234,7 +184,6 @@
               <button class="button primary full" type="submit">Sign in</button>
               <p class="auth-success" data-auth-success aria-live="polite" hidden>Your sign-in request was received. We will confirm portal access with your clinic.</p>
             </form>
-            <p class="auth-alt"><a href="doctors.html">About the doctors portal</a></p>
           </div>
 
           <div class="login-panel auth-complete-profile" id="panel-complete-profile" data-complete-profile hidden>
@@ -319,7 +268,7 @@
     <script src="assets/js/auth-session.js?v=1"></script>
     <script src="assets/js/google-auth.js?v=7"></script>
     <script src="assets/js/main.js?v=fixed-nav-1"></script>
-    <script src="assets/js/auth.js?v=auth-progressive-1"></script>
-    <script src="assets/js/login-tabs.js?v=auth-progressive-1"></script>
+    <script src="assets/js/auth.js?v=auth-phone-google-1"></script>
+    <script src="assets/js/login-tabs.js?v=auth-phone-google-1"></script>
   </body>
 </html>

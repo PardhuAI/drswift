@@ -1,5 +1,6 @@
 /**
- * Login card: Customer ↔ Doctor, Phone ↔ Mail.
+ * Login card: Customer ↔ Doctor.
+ * Customers: phone + OTP or Google only (no email/password).
  * After phone OTP / identity: existing users go to account;
  * new users see complete-profile (name, age, gender).
  */
@@ -17,17 +18,13 @@
     customer: card.querySelector('[data-panel="customer"]'),
     doctor: card.querySelector('[data-panel="doctor"]'),
   };
-  const methodTabs = card.querySelectorAll("[data-method]");
-  const methodForms = {
-    phone: card.querySelector('[data-login-method="phone"]'),
-    mail: card.querySelector('[data-login-method="mail"]'),
-  };
 
   const chromeEls = card.querySelectorAll("[data-login-chrome]");
   const profilePanel = card.querySelector("[data-complete-profile]");
   const profileForm = card.querySelector("[data-complete-profile-form]");
   const profileSubtitle = card.querySelector("[data-complete-profile-subtitle]");
 
+  const phoneForm = card.querySelector('[data-login-method="phone"]');
   const phoneInput = card.querySelector("#cust-phone");
   const otpInput = card.querySelector("#cust-otp");
   const sendBtn = card.querySelector("[data-otp-send]");
@@ -100,7 +97,7 @@
     }
     updateSendButton();
     setStatus("");
-    const success = methodForms.phone?.querySelector("[data-auth-success]");
+    const success = phoneForm?.querySelector("[data-auth-success]");
     if (success) success.hidden = true;
   }
 
@@ -171,28 +168,13 @@
       panel.hidden = !on;
       panel.classList.toggle("is-active", on);
     });
-    if (audience === "customer") setMethod("phone");
-  }
-
-  function setMethod(method) {
-    methodTabs.forEach((tab) => {
-      const on = tab.dataset.method === method;
-      tab.classList.toggle("is-active", on);
-      tab.setAttribute("aria-selected", on ? "true" : "false");
-    });
-    Object.entries(methodForms).forEach(([key, form]) => {
-      if (!form) return;
-      form.hidden = key !== method;
-    });
-    setStatus("");
-    if (method === "phone") updateSendButton();
+    if (audience === "customer") {
+      updateSendButton();
+    }
   }
 
   audienceTabs.forEach((tab) => {
     tab.addEventListener("click", () => setAudience(tab.dataset.audience));
-  });
-  methodTabs.forEach((tab) => {
-    tab.addEventListener("click", () => setMethod(tab.dataset.method));
   });
 
   phoneInput?.addEventListener("input", () => {
@@ -203,8 +185,8 @@
   });
 
   phoneInput?.addEventListener("blur", () => {
-    if (!methodForms.phone || methodForms.phone.hidden) return;
-    v?.validateField(methodForms.phone, phoneInput);
+    if (!phoneForm || phoneForm.hidden) return;
+    v?.validateField(phoneForm, phoneInput);
   });
 
   otpInput?.addEventListener("input", () => {
@@ -214,17 +196,16 @@
   });
 
   otpInput?.addEventListener("blur", () => {
-    if (!otpBlock || otpBlock.hidden || !methodForms.phone) return;
-    v?.validateField(methodForms.phone, otpInput);
+    if (!otpBlock || otpBlock.hidden || !phoneForm) return;
+    v?.validateField(phoneForm, otpInput);
   });
 
   sendBtn?.addEventListener("click", () => {
     if (cooldownLeft > 0) return;
-    const form = methodForms.phone;
-    if (!form || !phoneInput) return;
+    if (!phoneForm || !phoneInput) return;
 
     setStatus("");
-    if (!v?.validateField(form, phoneInput)) {
+    if (!v?.validateField(phoneForm, phoneInput)) {
       phoneInput.focus();
       return;
     }
@@ -238,15 +219,14 @@
   });
 
   card.querySelector("[data-otp-verify]")?.addEventListener("click", () => {
-    const form = methodForms.phone;
-    const success = form?.querySelector("[data-auth-success]");
-    if (!form || !otpInput || !auth) return;
+    const success = phoneForm?.querySelector("[data-auth-success]");
+    if (!phoneForm || !otpInput || !auth) return;
 
     if (!otpSentOnce) {
       setStatus("Send an OTP first.", true);
       return;
     }
-    if (!v?.validateField(form, phoneInput) || !v?.validateField(form, otpInput)) {
+    if (!v?.validateField(phoneForm, phoneInput) || !v?.validateField(phoneForm, otpInput)) {
       (otpInput.checkValidity() ? phoneInput : otpInput)?.focus();
       return;
     }
@@ -263,7 +243,7 @@
       phone: phoneInput.value,
     };
 
-    const result = auth.continueAfterIdentity(identity, {
+    auth.continueAfterIdentity(identity, {
       onExisting() {
         if (success) {
           success.hidden = false;
@@ -281,10 +261,6 @@
         showCompleteProfile(pendingIdentity, partial);
       },
     });
-
-    if (result.status === "needs_profile") {
-      /* handled in onNew */
-    }
   });
 
   profileForm?.addEventListener("submit", (event) => {
@@ -336,6 +312,5 @@
   } else {
     resetPhoneOtpUi();
     setAudience("customer");
-    setMethod("phone");
   }
 })();
