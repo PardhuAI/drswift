@@ -183,10 +183,11 @@ The hero is the emotional center of the site. **Keep:**
 
 ### Audience columns (`.audience-tests`)
 
-- Three columns: For Him (blue), For Her (green), Loved Ones (purple)
-- `2×2` tile grid per column + “See more tests” gradient button
+- Three photo-led cards: For Him (blue), For Her (green), Loved Ones (purple)
+- Frosted featured chips over imagery + iOS-style popular-test list + text “Explore more”
+- Soft Apple-like panel surface (`#f5f5f7` section, white `28px` cards)
+- Bottom strip CTA to browse full catalog
 - Section heading: optional gentle wobble animation when in view
-- Background: blue-soft gradient with top/bottom border
 
 ### Feature pairs (`.feature-pair`)
 
@@ -275,7 +276,7 @@ Flat buttons — no button shadows unless hover lift is used.
 | Hero / feature cards | `18px` (`--radius`) |
 | Test cards | `18px` |
 | Quick category cards | `8px` |
-| Audience tiles | `10px` |
+| Audience tiles | `28px` cards · `20px` media |
 | Nav dropdown | `14px` |
 | Inputs (future) | `8px` |
 
@@ -286,12 +287,11 @@ Flat buttons — no button shadows unless hover lift is used.
 | Section | Class / location | Background |
 |---------|------------------|------------|
 | Hero | `.hero-shell` | White gradient |
-| Categories | `.quick-select` | Soft gray |
-| Audience grid | `.audience-tests` | Blue wash |
+| Audience grid | `.audience-tests` | Soft gray `#f5f5f7` |
 | How it works | `.how-it-works` | White |
 | Features / insights | `.features` | White |
+| Featured tests | `.ordered-tests` | Soft gray / white |
 | Report CTA | `.report-cta` | White |
-| Featured tests | `.ordered-tests` | Soft gray |
 | Family wellness | `.wellness-program` | White |
 | Four reasons | `.reasons` | Soft gray |
 | Testimonial | `.testimonial-band` | Navy |

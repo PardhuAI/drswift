@@ -216,7 +216,7 @@
   .feature-grid,
   .reason-grid,
   .steps-grid,
-  .audience-grid,
+  .audience-tests-grid,
   .how-steps,
   .trust-row {
     grid-template-columns: 1fr !important;

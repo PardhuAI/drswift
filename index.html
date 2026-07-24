@@ -8,8 +8,8 @@
       name="description"
       content="Dr.Swift Diagnostics offers clean, simple health testing, report access, and care-friendly lab services."
     >
-    <link rel="preload" as="image" href="assets/images/hero-couple.avif" type="image/avif" fetchpriority="high">
-    <link rel="stylesheet" href="assets/css/styles.css?v=fixed-nav-1">
+    <link rel="preload" as="image" href="assets/images/hero-couple.png" type="image/png" fetchpriority="high">
+    <link rel="stylesheet" href="assets/css/styles.css?v=hero-card-back-1">
     <link rel="stylesheet" href="assets/css/mobile-ux.css?v=fixed-nav-1">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
@@ -46,7 +46,7 @@
               <span>Cart</span>
               <span class="cart-count" data-cart-count hidden>0</span>
             </a>
-            <a class="button primary nav-cta" href="tests.html">Book a test</a>
+            <a class="nav-account" data-nav-account href="login.html" aria-label="Sign in to My Account">Sign in</a>
           </div>
         </div>
       </nav>
@@ -108,18 +108,15 @@
             </article>
 
             <article class="hero-image hero-image--photo" aria-label="Couple reviewing their health results at home">
-              <picture>
-                <source srcset="assets/images/hero-couple.avif" type="image/avif">
-                <img
-                  class="hero-photo"
-                  src="assets/images/hero-couple.png"
-                  alt="A couple looking at their health results together on a desktop computer at home"
-                  width="1584"
-                  height="993"
-                  fetchpriority="high"
-                  decoding="async"
-                >
-              </picture>
+              <img
+                class="hero-photo"
+                src="assets/images/hero-couple.png"
+                alt="A couple looking at their health results together on a desktop computer at home"
+                width="1584"
+                height="993"
+                fetchpriority="high"
+                decoding="async"
+              >
               <div class="hero-image-note">
                 <span class="hero-image-note__chip">At-home collection</span>
                 <a class="hero-image-note__chip hero-image-note__chip--keep" href="#features">Reports with trends</a>
@@ -167,116 +164,233 @@
       <section class="audience-tests section-pad" aria-labelledby="audience-tests-heading">
         <div class="container">
           <div class="section-heading centered">
-            <p class="overline">For everyone you care about</p>
+            <p class="overline">For everyone <span class="overline-accent">you care</span> about</p>
             <h2 id="audience-tests-heading">Quick tests,<br>picked for who you care about</h2>
+            <p class="audience-tests__lede">Curated health tests for every stage, every goal, every you.</p>
           </div>
 
           <div class="audience-tests-grid">
-            <div class="audience-column audience-column--him">
-              <figure class="audience-column__media">
-                <img src="assets/images/generated/audience-him-jogging.jpg" alt="A man jogging outdoors for preventive health" loading="lazy" decoding="async">
+            <article class="audience-card audience-card--him">
+              <header class="audience-card__intro">
+                <h3 class="audience-card__title">For Him</h3>
+                <p class="audience-card__tagline">Stay strong. Stay ahead.</p>
+              </header>
+              <figure class="audience-card__media">
+                <img
+                  src="assets/images/generated/audience-him-jogging.jpg"
+                  alt="A man jogging outdoors for preventive health"
+                  width="800"
+                  height="600"
+                  loading="lazy"
+                  decoding="async"
+                >
+                <div class="audience-card__chips" aria-label="Featured tests for him">
+                  <a class="audience-chip" href="tests.html?group=him&amp;category=Heart">
+                    <svg class="audience-chip__icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-heart"></use></svg>
+                    Heart Health
+                  </a>
+                  <a class="audience-chip" href="tests.html?group=him&amp;category=Testosterone">
+                    <svg class="audience-chip__icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-body"></use></svg>
+                    Athletic Performance
+                  </a>
+                </div>
               </figure>
-              <h3 class="audience-column__title">For Him</h3>
-              <div class="audience-tiles">
-                <a class="audience-tile" href="tests.html?group=him">Men's Health</a>
-                <a class="audience-tile" href="tests.html?group=him&amp;category=Testosterone">Athletic Performance</a>
-                <a class="audience-tile" href="tests.html?group=him&amp;category=Heart">Heart Health</a>
-                <a class="audience-tile" href="tests.html?group=him&amp;category=Testosterone">Hormones</a>
+              <div class="audience-card__body">
+                <p class="audience-card__list-label">Popular tests</p>
+                <ul class="audience-card__list">
+                  <li>
+                    <a href="tests.html?group=him">
+                      <span class="audience-card__item-icon" aria-hidden="true">
+                        <svg><use href="assets/images/ui-icons.svg#icon-body"></use></svg>
+                      </span>
+                      <span class="audience-card__item-label">Men's Health</span>
+                      <span class="audience-card__chevron" aria-hidden="true"></span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="tests.html?group=him&amp;category=Testosterone">
+                      <span class="audience-card__item-icon" aria-hidden="true">
+                        <svg><use href="assets/images/ui-icons.svg#icon-molecule"></use></svg>
+                      </span>
+                      <span class="audience-card__item-label">Hormones</span>
+                      <span class="audience-card__chevron" aria-hidden="true"></span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="tests.html?group=him&amp;category=Liver">
+                      <span class="audience-card__item-icon" aria-hidden="true">
+                        <svg><use href="assets/images/ui-icons.svg#icon-liver"></use></svg>
+                      </span>
+                      <span class="audience-card__item-label">Liver Health</span>
+                      <span class="audience-card__chevron" aria-hidden="true"></span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="tests.html?group=him&amp;category=Thyroid">
+                      <span class="audience-card__item-icon" aria-hidden="true">
+                        <svg><use href="assets/images/ui-icons.svg#icon-thyroid"></use></svg>
+                      </span>
+                      <span class="audience-card__item-label">Thyroid Profile</span>
+                      <span class="audience-card__chevron" aria-hidden="true"></span>
+                    </a>
+                  </li>
+                </ul>
+                <a class="audience-card__more" href="tests.html?group=him">Explore more for him</a>
               </div>
-              <a class="button audience-more" href="tests.html?group=him">See more for Him</a>
-            </div>
+            </article>
 
-            <div class="audience-column audience-column--her">
-              <figure class="audience-column__media">
-                <img src="assets/images/generated/audience-her-yoga.jpg" alt="A woman doing yoga at home in morning light" loading="lazy" decoding="async">
+            <article class="audience-card audience-card--her">
+              <header class="audience-card__intro">
+                <h3 class="audience-card__title">For Her</h3>
+                <p class="audience-card__tagline">Nurture today. Stronger tomorrow.</p>
+              </header>
+              <figure class="audience-card__media">
+                <img
+                  src="assets/images/generated/audience-her-yoga.jpg"
+                  alt="A woman doing yoga at home in morning light"
+                  width="800"
+                  height="600"
+                  loading="lazy"
+                  decoding="async"
+                >
+                <div class="audience-card__chips" aria-label="Featured tests for her">
+                  <a class="audience-chip" href="tests.html?group=her">
+                    <svg class="audience-chip__icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-heart"></use></svg>
+                    Women's Health
+                  </a>
+                  <a class="audience-chip" href="tests.html?group=her&amp;category=Pregnancy">
+                    <svg class="audience-chip__icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-pregnancy"></use></svg>
+                    Maternal Tests
+                  </a>
+                </div>
               </figure>
-              <h3 class="audience-column__title">For Her</h3>
-              <div class="audience-tiles">
-                <a class="audience-tile" href="tests.html?group=her">Women's Health</a>
-                <a class="audience-tile" href="tests.html?group=her&amp;category=Pregnancy">Maternal Tests</a>
-                <a class="audience-tile" href="tests.html?group=her&amp;category=Women">Hormonal Balance</a>
-                <a class="audience-tile" href="tests.html?group=her&amp;category=Thyroid">Thyroid Profile</a>
+              <div class="audience-card__body">
+                <p class="audience-card__list-label">Popular tests</p>
+                <ul class="audience-card__list">
+                  <li>
+                    <a href="tests.html?group=her&amp;category=Women">
+                      <span class="audience-card__item-icon" aria-hidden="true">
+                        <svg><use href="assets/images/ui-icons.svg#icon-molecule"></use></svg>
+                      </span>
+                      <span class="audience-card__item-label">Hormonal Balance</span>
+                      <span class="audience-card__chevron" aria-hidden="true"></span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="tests.html?group=her&amp;category=Thyroid">
+                      <span class="audience-card__item-icon" aria-hidden="true">
+                        <svg><use href="assets/images/ui-icons.svg#icon-thyroid"></use></svg>
+                      </span>
+                      <span class="audience-card__item-label">Thyroid Profile</span>
+                      <span class="audience-card__chevron" aria-hidden="true"></span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="tests.html?group=her&amp;category=Pregnancy">
+                      <span class="audience-card__item-icon" aria-hidden="true">
+                        <svg><use href="assets/images/ui-icons.svg#icon-pregnancy"></use></svg>
+                      </span>
+                      <span class="audience-card__item-label">Fertility &amp; Planning</span>
+                      <span class="audience-card__chevron" aria-hidden="true"></span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="tests.html?group=her&amp;category=Women">
+                      <span class="audience-card__item-icon" aria-hidden="true">
+                        <svg><use href="assets/images/ui-icons.svg#icon-house-heart"></use></svg>
+                      </span>
+                      <span class="audience-card__item-label">Postpartum Health</span>
+                      <span class="audience-card__chevron" aria-hidden="true"></span>
+                    </a>
+                  </li>
+                </ul>
+                <a class="audience-card__more" href="tests.html?group=her">Explore more for her</a>
               </div>
-              <a class="button audience-more" href="tests.html?group=her">See more for Her</a>
-            </div>
+            </article>
 
-            <div class="audience-column audience-column--loved">
-              <figure class="audience-column__media">
-                <img src="assets/images/wellness-family.jpg" alt="A multi-generational family reviewing health together at home" loading="lazy" decoding="async">
+            <article class="audience-card audience-card--loved">
+              <header class="audience-card__intro">
+                <h3 class="audience-card__title">For Loved Ones</h3>
+                <p class="audience-card__tagline">Care that grows with every age.</p>
+              </header>
+              <figure class="audience-card__media">
+                <picture>
+                  <source srcset="assets/images/wellness-family.webp" type="image/webp">
+                  <img
+                    src="assets/images/wellness-family.jpg"
+                    alt="A multi-generational family reviewing health together at home"
+                    width="800"
+                    height="600"
+                    loading="lazy"
+                    decoding="async"
+                  >
+                </picture>
+                <div class="audience-card__chips" aria-label="Featured tests for loved ones">
+                  <a class="audience-chip" href="tests.html?group=loved&amp;category=Full%20Body%20Checkup">
+                    <svg class="audience-chip__icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-shield-check"></use></svg>
+                    General Health
+                  </a>
+                  <a class="audience-chip" href="tests.html?group=loved&amp;category=Diabetes">
+                    <svg class="audience-chip__icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-droplet"></use></svg>
+                    Diabetic Risk
+                  </a>
+                </div>
               </figure>
-              <h3 class="audience-column__title">For Loved Ones</h3>
-              <div class="audience-tiles">
-                <a class="audience-tile" href="tests.html?group=loved&amp;category=Full%20Body%20Checkup">General Health</a>
-                <a class="audience-tile" href="tests.html?group=loved&amp;category=Diabetes">Diabetic Risk</a>
-                <a class="audience-tile" href="tests.html?group=loved">Senior Wellness</a>
-                <a class="audience-tile" href="tests.html?group=loved&amp;category=Heart">Heart Health</a>
+              <div class="audience-card__body">
+                <p class="audience-card__list-label">Popular tests</p>
+                <ul class="audience-card__list">
+                  <li>
+                    <a href="tests.html?group=loved">
+                      <span class="audience-card__item-icon" aria-hidden="true">
+                        <svg><use href="assets/images/ui-icons.svg#icon-family"></use></svg>
+                      </span>
+                      <span class="audience-card__item-label">Senior Wellness</span>
+                      <span class="audience-card__chevron" aria-hidden="true"></span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="tests.html?group=loved&amp;category=Heart">
+                      <span class="audience-card__item-icon" aria-hidden="true">
+                        <svg><use href="assets/images/ui-icons.svg#icon-heart"></use></svg>
+                      </span>
+                      <span class="audience-card__item-label">Heart Health</span>
+                      <span class="audience-card__chevron" aria-hidden="true"></span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="tests.html?group=loved&amp;category=Vitamin%20D">
+                      <span class="audience-card__item-icon" aria-hidden="true">
+                        <svg><use href="assets/images/ui-icons.svg#icon-sun"></use></svg>
+                      </span>
+                      <span class="audience-card__item-label">Vitamin &amp; Nutrition</span>
+                      <span class="audience-card__chevron" aria-hidden="true"></span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="tests.html?group=loved&amp;category=Full%20Body%20Checkup">
+                      <span class="audience-card__item-icon" aria-hidden="true">
+                        <svg><use href="assets/images/ui-icons.svg#icon-body"></use></svg>
+                      </span>
+                      <span class="audience-card__item-label">Kids' Health</span>
+                      <span class="audience-card__chevron" aria-hidden="true"></span>
+                    </a>
+                  </li>
+                </ul>
+                <a class="audience-card__more" href="tests.html?group=loved">Explore more for loved ones</a>
               </div>
-              <a class="button audience-more" href="tests.html?group=loved">See more for Loved Ones</a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="quick-select section-pad section-bg-soft" aria-labelledby="quick-select-heading">
-        <div class="container quick-select__layout">
-          <div class="section-heading centered">
-            <p class="overline">Browse by need</p>
-            <h2 id="quick-select-heading">Tests by Category</h2>
-          </div>
-          <div class="quick-select__cards scroll-wrap">
-            <div class="quick-cards horizontal-scroll" id="quick-cards" data-scroll-container>
-              <a class="quick-card" href="tests.html?category=Heart"><svg class="quick-card__icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-heart"></use></svg><span>Heart Health Tests</span></a>
-              <a class="quick-card" href="tests.html?category=Diabetes"><svg class="quick-card__icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-droplet"></use></svg><span>Diabetes Risk Tests</span></a>
-              <a class="quick-card" href="tests.html?group=her&amp;category=Pregnancy"><svg class="quick-card__icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-pregnancy"></use></svg><span>Women Health Postpartum</span></a>
-              <a class="quick-card" href="tests.html?category=Women"><svg class="quick-card__icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-molecule"></use></svg><span>Hormonal Tests</span></a>
-              <a class="quick-card" href="tests.html?category=Liver"><svg class="quick-card__icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-liver"></use></svg><span>Liver Enzymes and Fatty Liver</span></a>
-              <a class="quick-card" href="tests.html?category=Thyroid"><svg class="quick-card__icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-thyroid"></use></svg><span>Thyroid Profile</span></a>
-              <a class="quick-card" href="tests.html?category=Kidney"><svg class="quick-card__icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-kidney"></use></svg><span>Kidney Function</span></a>
-              <a class="quick-card" href="tests.html?category=Vitamin%20D"><svg class="quick-card__icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-sun"></use></svg><span>Vitamin D</span></a>
-              <a class="quick-card" href="tests.html?category=Fever"><svg class="quick-card__icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-thermometer"></use></svg><span>Fever &amp; Infection</span></a>
-              <a class="quick-card" href="tests.html?category=Full%20Body%20Checkup"><svg class="quick-card__icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-body"></use></svg><span>Full Body Checkup</span></a>
-            </div>
-          </div>
-          <div class="quick-select__hint swipe-hint" aria-hidden="true">
-            <span class="sr-only">Swipe sideways to see more tests</span>
-            <img
-              class="swipe-hint__svg"
-              src="assets/images/scroll_left_right_hint_animated.svg"
-              alt=""
-              height="32"
-              decoding="async"
-            >
-          </div>
-          <div class="section-cta">
-            <a class="button primary" href="tests.html">Browse all tests</a>
-          </div>
-        </div>
-      </section>
-
-      <section class="ordered-tests section-pad section-bg-white" id="popular-tests">
-        <div class="container">
-          <div class="section-heading split">
-            <div>
-              <p class="overline">Popular panels</p>
-              <h2>Frequently ordered tests</h2>
-              <p class="catalog-meta">At-home collection · clear reports · cart checkout</p>
-            </div>
-            <div class="carousel-actions">
-              <button class="scroll-btn inline" type="button" data-scroll-target="test-cards" data-scroll-dir="-1" aria-label="Scroll test cards left">
-                <span aria-hidden="true">&lsaquo;</span>
-              </button>
-              <button class="scroll-btn inline" type="button" data-scroll-target="test-cards" data-scroll-dir="1" aria-label="Scroll test cards right">
-                <span aria-hidden="true">&rsaquo;</span>
-              </button>
-            </div>
+            </article>
           </div>
 
-          <div
-            class="test-cards horizontal-scroll"
-            id="test-cards"
-            data-scroll-container
-            data-home-featured
-          ></div>
+          <aside class="audience-tests__cta" aria-label="Browse the full test catalog">
+            <div class="audience-tests__cta-copy">
+              <p class="audience-tests__cta-title">Not sure what to choose?</p>
+              <p class="audience-tests__cta-sub">Explore all tests across 100+ health categories.</p>
+            </div>
+            <a class="button audience-tests__cta-btn" href="tests.html">
+              <span>Explore all tests</span>
+              <span class="audience-tests__cta-chevron" aria-hidden="true">›</span>
+            </a>
+          </aside>
         </div>
       </section>
 
@@ -546,6 +660,33 @@
         </div>
       </section>
 
+      <section class="ordered-tests section-pad section-bg-white" id="popular-tests">
+        <div class="container">
+          <div class="section-heading split">
+            <div>
+              <p class="overline">Popular panels</p>
+              <h2>Frequently ordered tests</h2>
+              <p class="catalog-meta">At-home collection · clear reports · cart checkout</p>
+            </div>
+            <div class="carousel-actions">
+              <button class="scroll-btn inline" type="button" data-scroll-target="test-cards" data-scroll-dir="-1" aria-label="Scroll test cards left">
+                <span aria-hidden="true">&lsaquo;</span>
+              </button>
+              <button class="scroll-btn inline" type="button" data-scroll-target="test-cards" data-scroll-dir="1" aria-label="Scroll test cards right">
+                <span aria-hidden="true">&rsaquo;</span>
+              </button>
+            </div>
+          </div>
+
+          <div
+            class="test-cards horizontal-scroll"
+            id="test-cards"
+            data-scroll-container
+            data-home-featured
+          ></div>
+        </div>
+      </section>
+
       <section class="testimonial-band section-pad section-bg-navy" aria-labelledby="testimonial-heading">
         <div class="container">
           <p class="overline">Patient stories</p>
@@ -711,6 +852,6 @@
     <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
     <script src="assets/js/firebase-config.js?v=3"></script>
     <script src="assets/js/google-auth.js?v=6"></script>
-    <script src="assets/js/main.js?v=fixed-nav-1"></script>
+    <script src="assets/js/main.js?v=nav-signin-1"></script>
   </body>
 </html>

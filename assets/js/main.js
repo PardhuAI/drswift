@@ -109,8 +109,6 @@ const prefersReducedMotion = window.matchMedia(
 
 const heroStatement = document.querySelector(".hero-statement--spring");
 const heroPoints = document.querySelector(".hero-points--reveal");
-const heroItem4 = document.querySelector(".hero-points--reveal .item-4");
-const quickCards = document.getElementById("quick-cards");
 
 function startHeroAnimations() {
   if (heroStatement) {
@@ -121,39 +119,12 @@ function startHeroAnimations() {
   }
 }
 
-function restartQuickCardAnimations() {
-  if (!quickCards) {
-    return;
-  }
-
-  quickCards.querySelectorAll(".quick-card").forEach((card) => {
-    card.style.animation = "none";
-    void card.getBoundingClientRect();
-    card.style.removeProperty("animation");
-  });
-}
-
 if (heroStatement || heroPoints) {
   if (prefersReducedMotion) {
     startHeroAnimations();
   } else {
     requestAnimationFrame(startHeroAnimations);
   }
-}
-
-if (heroItem4 && quickCards && !prefersReducedMotion) {
-  heroItem4.addEventListener(
-    "animationend",
-    (event) => {
-      if (
-        event.animationName === "hero-point-reveal" &&
-        window.matchMedia("(min-width: 880px)").matches
-      ) {
-        restartQuickCardAnimations();
-      }
-    },
-    { once: true }
-  );
 }
 
 // Duration of the carousel arrow scroll in milliseconds. Higher = slower.
@@ -241,114 +212,6 @@ document.querySelectorAll("[data-scroll-target]").forEach((button) => {
   });
 });
 
-const panSection = document.querySelector(".quick-select");
-const panTarget = document.getElementById("quick-cards");
-
-// Shared so category auto-scroll pauses while the user is manually dragging the cards.
-let isDraggingCards = false;
-
-if (panSection && panTarget && !prefersReducedMotion) {
-  const AUTO_SCROLL_SPEED = 0.55;
-  const AUTO_RESUME_DELAY_MS = 1400;
-  let isAutoPaused = false;
-  let isSectionVisible = true;
-  let resumeTimer = null;
-
-  function pauseCategoryAutoScroll() {
-    isAutoPaused = true;
-    window.clearTimeout(resumeTimer);
-  }
-
-  function resumeCategoryAutoScroll(delay = AUTO_RESUME_DELAY_MS) {
-    window.clearTimeout(resumeTimer);
-    resumeTimer = window.setTimeout(() => {
-      isAutoPaused = false;
-    }, delay);
-  }
-
-  function autoScrollTick() {
-    const maxScroll = panTarget.scrollWidth - panTarget.clientWidth;
-    if (
-      isSectionVisible &&
-      !isAutoPaused &&
-      !isDraggingCards &&
-      document.visibilityState === "visible" &&
-      maxScroll > 8
-    ) {
-      if (panTarget.scrollLeft >= maxScroll - 1) {
-        panTarget.scrollLeft = 0;
-      } else {
-        panTarget.scrollLeft += AUTO_SCROLL_SPEED;
-      }
-    }
-
-    requestAnimationFrame(autoScrollTick);
-  }
-
-  panTarget.style.scrollSnapType = "none";
-  panTarget.style.scrollBehavior = "auto";
-
-  panTarget.addEventListener("mouseenter", pauseCategoryAutoScroll);
-  panTarget.addEventListener("mouseleave", () => resumeCategoryAutoScroll());
-  panTarget.addEventListener("focusin", pauseCategoryAutoScroll);
-  panTarget.addEventListener("focusout", () => resumeCategoryAutoScroll());
-  panTarget.addEventListener("touchstart", pauseCategoryAutoScroll, { passive: true });
-  panTarget.addEventListener("touchend", () => resumeCategoryAutoScroll(2200), { passive: true });
-  panTarget.addEventListener("wheel", () => {
-    pauseCategoryAutoScroll();
-    resumeCategoryAutoScroll(2200);
-  }, { passive: true });
-
-  const autoScrollObserver = new IntersectionObserver(
-    (entries) => {
-      const entry = entries.find((item) => item.target === panSection);
-      isSectionVisible = entry ? entry.isIntersecting : true;
-    },
-    { threshold: 0.15 }
-  );
-
-  autoScrollObserver.observe(panSection);
-  requestAnimationFrame(autoScrollTick);
-}
-
-// Mobile swipe hint: show for 5s when quick-select enters view, once per page load.
-const swipeHint = document.querySelector(".quick-select__hint.swipe-hint");
-const mobileCarousel = window.matchMedia("(max-width: 879px)");
-const SWIPE_HINT_DURATION_MS = 5000;
-
-function showSwipeHintOnce() {
-  if (
-    !swipeHint ||
-    swipeHint.dataset.shown === "true" ||
-    !mobileCarousel.matches
-  ) {
-    return;
-  }
-
-  swipeHint.dataset.shown = "true";
-  swipeHint.classList.add("is-active");
-  swipeHint.setAttribute("aria-hidden", "false");
-
-  window.setTimeout(() => {
-    swipeHint.classList.remove("is-active");
-    swipeHint.setAttribute("aria-hidden", "true");
-  }, SWIPE_HINT_DURATION_MS);
-}
-
-if (panSection && swipeHint) {
-  const swipeHintObserver = new IntersectionObserver(
-    (entries) => {
-      if (entries.some((entry) => entry.isIntersecting)) {
-        showSwipeHintOnce();
-        swipeHintObserver.disconnect();
-      }
-    },
-    { threshold: 0.35 }
-  );
-
-  swipeHintObserver.observe(panSection);
-}
-
 // Audience heading: gentle left-right wobble while the section is in view.
 const audienceSection = document.querySelector(".audience-tests");
 const audienceHeading = document.querySelector(".audience-tests .section-heading");
@@ -364,68 +227,6 @@ if (audienceSection && audienceHeading && !prefersReducedMotion) {
   );
 
   audienceHeadingObserver.observe(audienceSection);
-}
-
-// Click-hold-drag: press on the cards and drag left/right to scroll manually.
-if (panTarget) {
-  const DRAG_THRESHOLD = 6; // px before a press counts as a drag (vs. a click)
-  let startX = 0;
-  let startScrollLeft = 0;
-  let movedDuringDrag = false;
-  let savedSnapDrag = "";
-  let savedBehaviorDrag = "";
-
-  panTarget.style.cursor = "grab";
-
-  panTarget.addEventListener("mousedown", (event) => {
-    if (event.button !== 0) {
-      return;
-    }
-    isDraggingCards = true;
-    movedDuringDrag = false;
-    startX = event.clientX;
-    startScrollLeft = panTarget.scrollLeft;
-    savedSnapDrag = panTarget.style.scrollSnapType;
-    savedBehaviorDrag = panTarget.style.scrollBehavior;
-    panTarget.style.scrollSnapType = "none";
-    panTarget.style.scrollBehavior = "auto";
-    panTarget.style.cursor = "grabbing";
-    event.preventDefault(); // prevent image/text selection while dragging
-  });
-
-  window.addEventListener("mousemove", (event) => {
-    if (!isDraggingCards) {
-      return;
-    }
-    const delta = event.clientX - startX;
-    if (Math.abs(delta) > DRAG_THRESHOLD) {
-      movedDuringDrag = true;
-    }
-    panTarget.scrollLeft = startScrollLeft - delta;
-  });
-
-  window.addEventListener("mouseup", () => {
-    if (!isDraggingCards) {
-      return;
-    }
-    isDraggingCards = false;
-    panTarget.style.scrollSnapType = savedSnapDrag;
-    panTarget.style.scrollBehavior = savedBehaviorDrag;
-    panTarget.style.cursor = "grab";
-  });
-
-  // If the press turned into a drag, swallow the click so cards don't navigate.
-  panTarget.addEventListener(
-    "click",
-    (event) => {
-      if (movedDuringDrag) {
-        event.preventDefault();
-        event.stopPropagation();
-        movedDuringDrag = false;
-      }
-    },
-    true
-  );
 }
 
 // Replay feature animations every 10s (graph line + metric badge icons).
@@ -1168,14 +969,12 @@ function closeAccountMenus(exceptMenu = null) {
 
 function syncAccountNav() {
   const isSignedIn = hasLocalAccountSession();
-  document.querySelectorAll(".nav-cta").forEach((link) => {
-    // Primary CTA stays conversion-focused; account is a utility link.
-    link.href = "tests.html";
-    link.textContent = "Book a test";
-    link.setAttribute("aria-label", "Book a home collection test");
-
-    const actions = link.closest(".nav-actions");
-    if (!actions) return;
+  document.querySelectorAll(".nav-actions").forEach((actions) => {
+    // Drop leftover Book-a-test CTAs from the header; hero/body keep conversion CTAs.
+    actions.querySelectorAll(":scope > .nav-cta").forEach((cta) => {
+      const label = (cta.textContent || "").trim().toLowerCase();
+      if (label === "book a test") cta.remove();
+    });
 
     Array.from(actions.children).forEach((child) => {
       if (child.matches("[data-account-logout]")) child.remove();
@@ -1207,7 +1006,7 @@ function syncAccountNav() {
             <button type="button" role="menuitem" data-account-logout>Logout</button>
           </div>
         `;
-        link.insertAdjacentElement("afterend", accountMenu);
+        actions.appendChild(accountMenu);
       }
       const userName = accountDisplayName(currentAccountUser());
       const trigger = accountMenu.querySelector("[data-nav-account-toggle]");
@@ -1220,7 +1019,7 @@ function syncAccountNav() {
         accountLink = document.createElement("a");
         accountLink.className = "nav-account";
         accountLink.setAttribute("data-nav-account", "");
-        link.insertAdjacentElement("afterend", accountLink);
+        actions.appendChild(accountLink);
       }
       accountLink.href = "login.html";
       accountLink.textContent = "Sign in";
