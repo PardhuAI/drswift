@@ -6,9 +6,9 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <title>Checkout | Dr.Swift Diagnostics</title>
-    <link rel="stylesheet" href="assets/css/styles.css?v=checkout-coverage-clean-1">
-    <link rel="stylesheet" href="assets/css/checkout.css?v=checkout-coverage-clean-1">
-    <link rel="stylesheet" href="assets/css/mobile-ux.css?v=checkout-coverage-clean-1">
+    <link rel="stylesheet" href="assets/css/styles.css?v=confirm-beside-1">
+    <link rel="stylesheet" href="assets/css/checkout.css?v=confirm-beside-1">
+    <link rel="stylesheet" href="assets/css/mobile-ux.css?v=confirm-beside-1">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
   <body class="auth-page checkout-page">
@@ -633,6 +633,25 @@
                     </li>
                   </ol>
 
+                  <section class="confirm-v2-order" data-confirm-order hidden>
+                    <div class="confirm-v2-order__head">
+                      <h3>Order summary</h3>
+                      <p data-confirm-order-meta></p>
+                    </div>
+                    <div class="confirm-v2-order__lines" data-confirm-order-lines></div>
+                    <div class="confirm-v2-order__totals">
+                      <div class="confirm-v2-order__row">
+                        <span>Payment method</span>
+                        <strong data-confirm-method>—</strong>
+                      </div>
+                      <div class="confirm-v2-order__row confirm-v2-order__row--grand">
+                        <span>Amount paid</span>
+                        <strong data-confirm-paid>—</strong>
+                      </div>
+                    </div>
+                    <p class="confirm-v2-order__patient" data-confirm-patient></p>
+                  </section>
+
                   <div class="confirm-v2-facts" aria-label="Booking details">
                     <div class="confirm-v2-fact">
                       <span class="confirm-v2-fact__ico confirm-v2-fact__ico--violet" aria-hidden="true">
@@ -646,15 +665,6 @@
                             <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V6a2 2 0 0 1 2-2h10" stroke-linecap="round"/></svg>
                           </button>
                         </span>
-                      </div>
-                    </div>
-                    <div class="confirm-v2-fact">
-                      <span class="confirm-v2-fact__ico confirm-v2-fact__ico--green" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5.5" width="16" height="15" rx="2"/><path d="M8 3.5v4M16 3.5v4M4 10h16"/><path d="m9 14.5 2 2 4-4"/></svg>
-                      </span>
-                      <div class="confirm-v2-fact__body">
-                        <span class="confirm-v2-fact__label">Collection</span>
-                        <strong class="confirm-v2-fact__value confirm-v2-fact__value--stack" data-confirm-slot-fact>—</strong>
                       </div>
                     </div>
                     <div class="confirm-v2-fact">
@@ -829,7 +839,7 @@
     <script src="assets/js/google-auth.js?v=6"></script>
     <script src="assets/js/main.js?v=checkout-summary-image-1"></script>
     <script src="assets/js/checkout-api.js?v=production-ready-1"></script>
-    <script src="assets/js/checkout.js?v=checkout-cart-fix-1"></script>
+    <script src="assets/js/checkout.js?v=confirm-order-1"></script>
     <script>
       async function initBookingPage() {
         if (typeof window.DRSWIFT_BOOTSTRAP_CATALOG === "function") {

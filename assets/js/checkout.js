@@ -629,6 +629,23 @@
       stub: !!paymentResult.stub,
     };
     sessionStorage.setItem(PAYMENT_STORAGE_KEY, JSON.stringify(payment));
+
+    let confirmDetails = details && typeof details === "object" ? { ...details } : {};
+    if (!Array.isArray(confirmDetails.orderItems) || !confirmDetails.orderItems.length) {
+      confirmDetails.orderItems = cartItemsWithTests().map((item) => ({
+        slug: item.test?.slug || "",
+        name: item.test?.name || item.test?.slug || "Test",
+        price: itemPrice(item),
+        image: item.test?.image || "assets/images/peace-of-mind.svg",
+        customPanels: item.customPanels || null,
+      }));
+      try {
+        sessionStorage.setItem(CHECKOUT_STORAGE_KEY, JSON.stringify(confirmDetails));
+      } catch {
+        /* ignore */
+      }
+    }
+
     try {
       localStorage.removeItem("drswift.cart.v1");
       window.dispatchEvent(new CustomEvent("drswift:cart-updated"));
@@ -636,7 +653,7 @@
       /* ignore */
     }
     checkoutApi()?.clearCheckoutSessions?.();
-    renderInlineConfirmation(details, payment);
+    renderInlineConfirmation(confirmDetails, payment);
   }
 
   async function pollPaymentUntilPaid(paymentId, methodMeta, options = {}) {
@@ -1660,6 +1677,85 @@
     sync();
   }
 
+  function renderConfirmOrderSummary(details, payment) {
+    const orderRoot = document.querySelector("[data-confirm-order]");
+    const linesRoot = document.querySelector("[data-confirm-order-lines]");
+    if (!orderRoot || !linesRoot) return;
+
+    const snapshot = Array.isArray(details?.orderItems) ? details.orderItems : [];
+    const liveItems = cartItemsWithTests();
+    const lines = snapshot.length
+      ? snapshot.map((row) => ({
+          name: row.name || row.slug || "Test",
+          price: Number(row.price || 0),
+          image: row.image || "assets/images/peace-of-mind.svg",
+        }))
+      : liveItems.map((item) => ({
+          name: item.test?.name || "Test",
+          price: itemPrice(item),
+          image: item.test?.image || "assets/images/peace-of-mind.svg",
+        }));
+
+    if (!lines.length && !(Number(payment?.amount) > 0)) {
+      orderRoot.hidden = true;
+      return;
+    }
+
+    orderRoot.hidden = false;
+    linesRoot.innerHTML = lines
+      .map(
+        (item) => `
+          <div class="confirm-v2-order__line">
+            <span class="confirm-v2-order__thumb" aria-hidden="true">
+              <img src="${escapeHtml(item.image)}" alt="" width="48" height="48" loading="lazy" decoding="async">
+            </span>
+            <span class="confirm-v2-order__name">
+              ${escapeHtml(item.name)}
+              <span class="confirm-v2-order__sub">Home sample collection</span>
+            </span>
+            <span class="confirm-v2-order__price">${escapeHtml(formatPrice(item.price))}</span>
+          </div>`
+      )
+      .join("");
+
+    const meta = document.querySelector("[data-confirm-order-meta]");
+    if (meta) {
+      const count = lines.length;
+      meta.textContent = count
+        ? `${count} test${count === 1 ? "" : "s"} · payment successful`
+        : "Payment successful";
+    }
+
+    const paidAmount =
+      Number(payment?.amount) > 0
+        ? Number(payment.amount)
+        : lines.reduce((sum, item) => sum + Number(item.price || 0), 0);
+
+    document.querySelectorAll("[data-confirm-paid]").forEach((el) => {
+      el.textContent = formatPrice(paidAmount);
+    });
+    document.querySelectorAll("[data-confirm-method]").forEach((el) => {
+      el.textContent = payment?.method || "Online";
+    });
+
+    const patient = document.querySelector("[data-confirm-patient]");
+    if (patient) {
+      const bits = [details?.name, details?.phone ? `+91 ${details.phone}` : ""]
+        .map((part) => String(part || "").trim())
+        .filter(Boolean);
+      const place = [details?.address, details?.city, details?.pin]
+        .map((part) => String(part || "").trim())
+        .filter(Boolean)
+        .join(", ");
+      patient.textContent = place
+        ? `Collecting for ${bits.join(" · ")} at ${place}`
+        : bits.length
+          ? `Collecting for ${bits.join(" · ")}`
+          : "";
+      patient.hidden = !patient.textContent;
+    }
+  }
+
   function renderInlineConfirmation(details, payment) {
     const summary = document.querySelector("[data-inline-confirm-summary]");
     if (summary) {
@@ -1706,6 +1802,8 @@
       leadEl.textContent =
         "We’ll collect your sample at home and let you know when your reports are ready.";
     }
+
+    renderConfirmOrderSummary(details, payment);
 
     const copyBtn = document.querySelector("[data-confirm-copy]");
     if (copyBtn && !copyBtn.dataset.bound) {
@@ -1861,9 +1959,26 @@
         {
           name: "Preview Guest",
           phone: "9000424591",
+          pin: "500034",
+          city: "Hyderabad",
+          address: "12 Banjara Hills Road",
           sampleDay: "Tomorrow",
           sampleDayLabel: tomorrowLabel,
           sampleWindow: "Morning",
+          orderItems: [
+            {
+              slug: "full-body-checkup",
+              name: "Full Body Checkup",
+              price: 999,
+              image: "assets/images/peace-of-mind.svg",
+            },
+            {
+              slug: "vitamin-d",
+              name: "Vitamin D Test",
+              price: 500,
+              image: "assets/images/peace-of-mind.svg",
+            },
+          ],
         },
         { method: "UPI", amount: 1499, reference: "DS-MRWHJSWS" }
       );
@@ -2121,6 +2236,13 @@
       const name = form.querySelector("#book-name")?.value || "";
       const names = splitName(name);
       const recipientProfile = selectedCartRecipientProfile();
+      const orderItems = cartItemsWithTests().map((item) => ({
+        slug: item.test?.slug || "",
+        name: item.test?.name || item.test?.slug || "Test",
+        price: itemPrice(item),
+        image: item.test?.image || "assets/images/peace-of-mind.svg",
+        customPanels: item.customPanels || null,
+      }));
       const payload = {
         name,
         ...names,
@@ -2140,6 +2262,7 @@
         city: form.querySelector("#book-city")?.value || "",
         address: form.querySelector("#book-address")?.value || "",
         cart: cartLineItems(),
+        orderItems,
         lineItemsJson: cartLineItemsJson(),
         createdAt: new Date().toISOString(),
       };

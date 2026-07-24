@@ -1501,3 +1501,289 @@ body.checkout-page .checkout-coverage-note strong {
   color: var(--color-ink);
   font-weight: 700;
 }
+
+/* ---- Confirmation polish + order receipt ---- */
+body.checkout-page .checkout-wire-layout:has([data-checkout-stage="confirmation"].is-active) {
+  grid-template-columns: 1fr !important;
+}
+
+body.checkout-page .checkout-wire-layout:has([data-checkout-stage="confirmation"].is-active) .checkout-wire-aside {
+  display: none !important;
+}
+
+body.checkout-page .checkout-wire-panel--confirmation {
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+body.checkout-page .confirm-v2 {
+  gap: 14px;
+  max-width: 1080px;
+  overflow: visible;
+}
+
+body.checkout-page .confirm-v2-hero {
+  gap: 16px 24px;
+  padding: 4px 0 0;
+}
+
+body.checkout-page .confirm-v2-hero__title {
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
+}
+
+body.checkout-page .confirm-v2-order {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 18px 18px 16px;
+  border: 1px solid var(--color-line);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(22, 32, 51, 0.05);
+}
+
+body.checkout-page .confirm-v2-order[hidden] {
+  display: none !important;
+}
+
+body.checkout-page .confirm-v2-order__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+body.checkout-page .confirm-v2-order__head h3 {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--color-ink);
+}
+
+body.checkout-page .confirm-v2-order__head p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+body.checkout-page .confirm-v2-order__lines {
+  display: grid;
+  gap: 0;
+}
+
+body.checkout-page .confirm-v2-order__line {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+  padding: 12px 0;
+  border-top: 1px solid #eef2f7;
+}
+
+body.checkout-page .confirm-v2-order__line:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+body.checkout-page .confirm-v2-order__thumb {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #eef5f7;
+}
+
+body.checkout-page .confirm-v2-order__thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+body.checkout-page .confirm-v2-order__name {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+body.checkout-page .confirm-v2-order__sub {
+  color: var(--color-caption);
+  font-size: 0.76rem;
+  font-weight: 500;
+}
+
+body.checkout-page .confirm-v2-order__price {
+  font-weight: 750;
+  color: var(--color-ink);
+  white-space: nowrap;
+}
+
+body.checkout-page .confirm-v2-order__totals {
+  display: grid;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #eef2f7;
+}
+
+body.checkout-page .confirm-v2-order__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+body.checkout-page .confirm-v2-order__row strong {
+  color: var(--color-ink);
+  font-weight: 700;
+}
+
+body.checkout-page .confirm-v2-order__row--grand {
+  color: var(--color-ink);
+  font-size: 1.05rem;
+  font-weight: 750;
+}
+
+body.checkout-page .confirm-v2-order__row--grand strong {
+  font-weight: 800;
+}
+
+body.checkout-page .confirm-v2-order__patient {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+body.checkout-page .confirm-v2-order__patient[hidden] {
+  display: none !important;
+}
+
+body.checkout-page .confirm-v2-facts {
+  gap: 0;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+body.checkout-page .confirm-v2-fact {
+  align-items: center;
+  padding: 16px 14px;
+}
+
+body.checkout-page .confirm-v2-fact__body {
+  min-width: 0;
+}
+
+body.checkout-page .confirm-v2-fact__label {
+  white-space: nowrap;
+}
+
+body.checkout-page .confirm-v2-fact__value {
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
+  white-space: normal;
+  max-width: 100%;
+}
+
+body.checkout-page .confirm-v2-fact__value strong {
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+body.checkout-page .confirm-v2-slot {
+  background: #eef4ff;
+  border: 1px solid #d7e4ff;
+}
+
+body.checkout-page .confirm-v2-slot__icon {
+  color: var(--color-brand, #1e5bd7);
+  border-color: #c9d9fb;
+}
+
+body.checkout-page .confirm-v2-slot strong {
+  color: var(--color-brand, #1e5bd7);
+}
+
+body.checkout-page .confirm-v2-steps {
+  padding: 22px 20px 18px;
+}
+
+body.checkout-page .confirm-v2-app {
+  margin-top: 4px;
+}
+
+body.checkout-page .confirm-v2-thanks {
+  margin-bottom: 8px;
+}
+
+@media (max-width: 900px) {
+  body.checkout-page .confirm-v2-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body.checkout-page .confirm-v2-fact:nth-child(2n) {
+    border-right: 0;
+  }
+
+  body.checkout-page .confirm-v2-fact:nth-child(-n + 2) {
+    border-bottom: 1px solid #e8eef6;
+  }
+}
+
+@media (min-width: 901px) {
+  body.checkout-page .confirm-v2 {
+    grid-template-columns: minmax(0, 1.2fr) minmax(300px, 340px);
+    align-items: start;
+    column-gap: 22px;
+  }
+
+  body.checkout-page .confirm-v2-hero {
+    grid-column: 1;
+    grid-row: 1;
+    grid-template-columns: 1fr;
+  }
+
+  body.checkout-page .confirm-v2-hero__art {
+    display: none;
+  }
+
+  body.checkout-page .confirm-v2-slot {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  body.checkout-page .confirm-v2-steps {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  /* Beside collection + steps only — scrolls with the page (not sticky) */
+  body.checkout-page .confirm-v2-order {
+    grid-column: 2;
+    grid-row: 2 / 4;
+    align-self: start;
+    position: static;
+    top: auto;
+    z-index: auto;
+    max-height: none;
+    overflow: visible;
+  }
+
+  body.checkout-page .confirm-v2-facts,
+  body.checkout-page .confirm-v2-privacy,
+  body.checkout-page .confirm-v2-app,
+  body.checkout-page .confirm-v2-support,
+  body.checkout-page .confirm-v2-thanks {
+    grid-column: 1 / -1;
+  }
+}
