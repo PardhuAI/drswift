@@ -70,6 +70,9 @@
     if (otpBlock) otpBlock.hidden = verified || !otpVisible;
     if (continueBtn) continueBtn.disabled = !verified;
     if (phoneRow) phoneRow.classList.toggle("is-verified", !!verified);
+    document.querySelectorAll("[data-details-pay-cta]").forEach((btn) => {
+      btn.disabled = !verified;
+    });
     if (sendBtn) {
       sendBtn.hidden = !!verified;
       sendBtn.setAttribute("aria-hidden", verified ? "true" : "false");
@@ -284,10 +287,22 @@
   function cartItemsWithTests() {
     const tests = Array.isArray(window.DRSWIFT_TESTS) ? window.DRSWIFT_TESTS : [];
     return cartLineItems()
-      .map((item) => ({
-        test: tests.find((entry) => entry.slug === item.slug),
-        customPanels: item.customPanels
-      }))
+      .map((item) => {
+        const test =
+          tests.find((entry) => entry.slug === item.slug) ||
+          (item.slug
+            ? {
+                slug: item.slug,
+                name: item.name || item.slug,
+                price: Number(item.price || 0),
+                customizable: false,
+              }
+            : null);
+        return {
+          test,
+          customPanels: item.customPanels,
+        };
+      })
       .filter((item) => item.test);
   }
 
@@ -350,33 +365,28 @@
     const cta = document.querySelector("[data-checkout-sticky-cta]");
     if (!bar || !cta) return;
 
+    const infoStages = new Set(["patient", "address", "schedule", "details"]);
+    const effective = infoStages.has(stageName) ? "details" : stageName;
     const isNarrow = window.matchMedia("(max-width: 900px)").matches;
     const hideStages = new Set(["confirmation", "pay-processing"]);
-    const show = isNarrow && stageName && !hideStages.has(stageName);
+    const show = isNarrow && effective && !hideStages.has(effective);
     bar.hidden = !show;
     document.body.classList.toggle("has-checkout-sticky", show);
-    if (!show) return;
+    if (!show) {
+      const sheet = bar.querySelector("[data-sticky-summary-sheet]");
+      const toggle = bar.querySelector("[data-sticky-summary-toggle]");
+      if (sheet) sheet.hidden = true;
+      if (toggle) toggle.setAttribute("aria-expanded", "false");
+      return;
+    }
 
     syncPayTotals();
 
     const configs = {
-      patient: {
-        label: "Continue to address",
+      details: {
+        label: "Continue to Payment →",
         disabled: !readVerified(),
-        run() {
-          document.querySelector("[data-patient-continue]")?.click();
-        },
-      },
-      address: {
-        label: "Continue to slot",
-        disabled: false,
-        run() {
-          document.querySelector('[data-checkout-next="schedule"]')?.click();
-        },
-      },
-      schedule: {
-        label: "Review & pay",
-        disabled: false,
+        showToggle: true,
         run() {
           document.querySelector("[data-checkout-form]")?.requestSubmit?.();
         },
@@ -384,11 +394,13 @@
       "pay-choose": {
         label: "Select a method above",
         disabled: true,
+        showToggle: false,
         run: null,
       },
       "pay-card": {
         label: "Pay Now",
         disabled: false,
+        showToggle: false,
         run() {
           document.querySelector("[data-card-pay-form]")?.requestSubmit?.();
         },
@@ -396,6 +408,7 @@
       "pay-qr": {
         label: "Check payment status",
         disabled: false,
+        showToggle: false,
         run() {
           document.querySelector("[data-pay-check]")?.click();
         },
@@ -403,20 +416,26 @@
       "pay-bank": {
         label: "Continue to bank",
         disabled: !!document.querySelector("[data-bank-continue]")?.disabled,
+        showToggle: false,
         run() {
           document.querySelector("[data-bank-continue]")?.click();
         },
       },
     };
 
-    const config = configs[stageName] || configs["pay-choose"];
-    cta.textContent = config.label;
+    const config = configs[effective] || configs["pay-choose"];
+    cta.innerHTML = config.label.includes("→")
+      ? `${config.label.replace(" →", "")} <span aria-hidden="true">→</span>`
+      : config.label;
     cta.disabled = !!config.disabled;
     cta.onclick = (event) => {
       event.preventDefault();
       if (config.disabled || typeof config.run !== "function") return;
       config.run();
     };
+
+    const toggle = bar.querySelector("[data-sticky-summary-toggle]");
+    if (toggle) toggle.hidden = !config.showToggle;
   }
 
   function initStickyCheckoutBar() {
@@ -424,7 +443,17 @@
     if (!cta) return;
     window.addEventListener("resize", () => {
       const active = document.querySelector("[data-checkout-stage].is-active");
-      syncStickyCheckoutBar(active?.getAttribute("data-checkout-stage") || "patient");
+      const name = active?.getAttribute("data-checkout-stage") || "details";
+      syncStickyCheckoutBar(name);
+    });
+
+    const toggle = document.querySelector("[data-sticky-summary-toggle]");
+    const sheet = document.querySelector("[data-sticky-summary-sheet]");
+    toggle?.addEventListener("click", () => {
+      if (!sheet) return;
+      const open = sheet.hidden;
+      sheet.hidden = !open;
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
     });
   }
 
@@ -962,6 +991,39 @@
     return formatYmdDisplay(value) || value;
   }
 
+  function fillQuickDateTiles(form) {
+    if (!form) return;
+    const todayYmd = getIstNow().ymd;
+    const tomorrowYmd = addDaysToYmd(todayYmd, 1);
+    const thirdYmd = addDaysToYmd(todayYmd, 2);
+    const dayNum = (ymd) => {
+      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(ymd || "");
+      return m ? String(Number(m[3])) : "—";
+    };
+    const weekday = (ymd) => {
+      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(ymd || "");
+      if (!m) return "";
+      const date = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+      return date.toLocaleDateString("en-IN", { weekday: "short" });
+    };
+
+    form.querySelectorAll('[data-day-num="today"]').forEach((el) => {
+      el.textContent = dayNum(todayYmd);
+    });
+    form.querySelectorAll('[data-day-num="tomorrow"]').forEach((el) => {
+      el.textContent = dayNum(tomorrowYmd);
+    });
+    form.querySelectorAll('[data-day-num="third"]').forEach((el) => {
+      el.textContent = dayNum(thirdYmd);
+    });
+    form.querySelectorAll("[data-third-weekday]").forEach((el) => {
+      el.textContent = weekday(thirdYmd).toUpperCase();
+    });
+
+    const thirdRadio = form.querySelector("[data-third-day]");
+    if (thirdRadio) thirdRadio.value = thirdYmd;
+  }
+
   function updateWhenConfirm(form) {
     const valueEl = form.querySelector("[data-when-confirm-value]");
     if (!valueEl) return;
@@ -1327,6 +1389,7 @@
       patient: "details",
       address: "details",
       schedule: "details",
+      details: "details",
       "pay-choose": "payment",
       "pay-card": "payment",
       "pay-qr": "payment",
@@ -1348,43 +1411,39 @@
       if (active) step.setAttribute("aria-current", "step");
       else step.removeAttribute("aria-current");
     });
-
-    const substeps = document.querySelector("[data-checkout-substeps]");
-    const infoStages = ["patient", "address", "schedule"];
-    if (substeps) {
-      const showSubs = infoStages.includes(stageName);
-      substeps.hidden = !showSubs;
-      substeps.querySelectorAll("[data-substep]").forEach((item) => {
-        const key = item.getAttribute("data-substep");
-        const idx = infoStages.indexOf(key);
-        const currentIdx = infoStages.indexOf(stageName);
-        item.classList.toggle("is-active", key === stageName);
-        item.classList.toggle("is-complete", currentIdx > idx && currentIdx >= 0);
-      });
-    }
   }
 
   function activateDeckCard(name) {
     const paymentStages = ["pay-choose", "pay-card", "pay-qr", "pay-bank", "pay-processing"];
     const infoStages = ["patient", "address", "schedule"];
+    const showingDetails = infoStages.includes(name) || name === "details";
     if (name !== "pay-qr" && name !== "pay-processing" && name !== "confirmation") {
       stopPaymentPoll();
     }
     document.querySelectorAll("[data-checkout-stage]").forEach((stage) => {
       const stageName = stage.getAttribute("data-checkout-stage");
+      if (infoStages.includes(stageName)) {
+        stage.hidden = !showingDetails;
+        stage.classList.toggle("is-active", showingDetails);
+        return;
+      }
       const isCurrent = stageName === name;
       stage.hidden = !isCurrent;
       stage.classList.toggle("is-active", isCurrent);
     });
 
+    const detailsStack = document.querySelector("[data-checkout-details]");
+    if (detailsStack) detailsStack.hidden = !showingDetails;
+
+    const orderSummary = document.querySelector("[data-summary-order]");
     const customerSummary = document.querySelector("[data-summary-customer]");
     const paymentSummary = document.querySelector("[data-summary-payment]");
-    if (customerSummary) {
-      customerSummary.hidden = infoStages.includes(name);
-    }
-    if (paymentSummary) {
-      paymentSummary.hidden = name !== "confirmation";
-    }
+    if (orderSummary) orderSummary.hidden = !showingDetails;
+    if (customerSummary) customerSummary.hidden = showingDetails || name === "confirmation";
+    if (paymentSummary) paymentSummary.hidden = name !== "confirmation";
+
+    document.body.classList.toggle("checkout-on-details", showingDetails);
+    document.body.classList.toggle("checkout-on-payment", paymentStages.includes(name));
 
     if (name === "pay-card") {
       syncBillingAddress(readCheckoutDetails());
@@ -1407,8 +1466,9 @@
     if (paymentStages.includes(name)) {
       syncPayTotals();
     }
-    syncCheckoutProgress(name);
-    syncStickyCheckoutBar(name);
+    const progressName = showingDetails ? "details" : name;
+    syncCheckoutProgress(progressName);
+    syncStickyCheckoutBar(progressName);
   }
 
   function renderInlinePayment(details) {
@@ -1736,6 +1796,7 @@
 
     const todayRadio = form.querySelector("#book-day-today");
     const tomorrowRadio = form.querySelector("#book-day-tomorrow");
+    const thirdRadio = form.querySelector("[data-third-day]");
     const customRadio = form.querySelector("[data-custom-day]");
     const dayValue = draft.sampleDay || "Today";
     if (dayValue === "Today" && todayRadio) {
@@ -1750,11 +1811,18 @@
         customRadio.checked = false;
         customRadio.value = "";
       }
+    } else if (thirdRadio && dayValue === thirdRadio.value) {
+      thirdRadio.checked = true;
+      if (customRadio) {
+        customRadio.checked = false;
+        customRadio.value = "";
+      }
     } else if (customRadio && /^\d{4}-\d{2}-\d{2}$/.test(dayValue)) {
       customRadio.value = dayValue;
       customRadio.checked = true;
       if (todayRadio) todayRadio.checked = false;
       if (tomorrowRadio) tomorrowRadio.checked = false;
+      if (thirdRadio) thirdRadio.checked = false;
       const chip = form.querySelector("[data-date-chip]");
       const chipLabel = form.querySelector("[data-date-chip-label]");
       if (chipLabel) chipLabel.textContent = formatSampleDayLabel(dayValue);
@@ -1772,9 +1840,17 @@
     }
   }
 
-  function boot() {
+  async function boot() {
     const form = document.querySelector("[data-checkout-form]");
     if (!form) return;
+
+    if (typeof window.DRSWIFT_BOOTSTRAP_CATALOG === "function") {
+      try {
+        await window.DRSWIFT_BOOTSTRAP_CATALOG();
+      } catch {
+        /* keep any static catalog already on the page */
+      }
+    }
 
     const params = new URLSearchParams(location.search);
     const confirmPreview = params.get("confirm") === "preview";
@@ -1793,7 +1869,7 @@
       );
       return;
     }
-    if (fromCart && !cartItemsWithTests().length) {
+    if (fromCart && !cartLineItems().length) {
       const paid = (() => {
         try {
           return JSON.parse(sessionStorage.getItem(PAYMENT_STORAGE_KEY) || "null");
@@ -1808,6 +1884,7 @@
     }
 
     initCollectionCalendar(form);
+    fillQuickDateTiles(form);
     restoreDraft(form);
     applyCartRecipientToForm(form, { force: fromCart });
     initPaymentFlow();
@@ -1818,8 +1895,9 @@
     resumePaymentReturn();
     syncStickyCheckoutBar(
       document.querySelector("[data-checkout-stage].is-active")?.getAttribute("data-checkout-stage") ||
-        "patient"
+        "details"
     );
+    activateDeckCard("details");
 
     form.querySelectorAll("input[name='sampleWindow']").forEach((input) => {
       input.addEventListener("change", () => {
@@ -1908,7 +1986,7 @@
 
     syncOtpSendEnabled(form);
     saveDraft(form);
-    syncCheckoutProgress("patient");
+    syncCheckoutProgress("details");
 
     function validatePatientStep() {
       setStatus(statusEl, "", false);
@@ -2021,11 +2099,11 @@
       if (successEl) successEl.hidden = true;
 
       if (!validatePatientStep()) {
-        activateDeckCard("patient");
+        activateDeckCard("details");
         return;
       }
       if (!validateAddressStep()) {
-        activateDeckCard("address");
+        activateDeckCard("details");
         return;
       }
 

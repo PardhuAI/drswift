@@ -287,12 +287,26 @@
 
 /* ---- Mobile form defaults for checkout (defeat any leftover 118px grids) ---- */
 @media (max-width: 900px) {
+  /* Do not force checkout-page gender/age to a single column — checkout.css owns that. */
+  body:not(.checkout-page) .checkout-wire-form,
+  body:not(.checkout-page) .checkout-wire-panel:is([data-checkout-stage="patient"], [data-checkout-stage="address"], [data-checkout-stage="schedule"]) .checkout-wire-form,
+  body:not(.checkout-page) .checkout-time-row,
+  body:not(.checkout-page) .checkout-gender-age-row,
+  body:not(.checkout-page) .checkout-form-section {
+    grid-template-columns: 1fr !important;
+  }
+
   .checkout-wire-form,
   .checkout-wire-panel:is([data-checkout-stage="patient"], [data-checkout-stage="address"], [data-checkout-stage="schedule"]) .checkout-wire-form,
   .checkout-time-row,
-  .checkout-gender-age-row,
   .checkout-form-section {
     grid-template-columns: 1fr !important;
+  }
+
+  body.checkout-page .checkout-wire-form,
+  body.checkout-page .checkout-time-row,
+  body.checkout-page .checkout-form-section {
+    grid-template-columns: unset;
   }
 
   .checkout-wire-panel:is([data-checkout-stage="patient"], [data-checkout-stage="address"], [data-checkout-stage="schedule"]),

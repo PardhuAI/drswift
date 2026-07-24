@@ -11040,10 +11040,10 @@ body.auth-page--split .login-social__label {
   gap: 14px 0;
   margin: 0;
   padding: 28px 28px 24px;
-  border: 1px solid #e5ebf3;
-  border-radius: 18px;
+  border: 1px solid rgba(220, 227, 238, 0.5);
+  border-radius: 24px;
   background: #fff;
-  box-shadow: 0 10px 26px rgba(33, 49, 78, 0.05);
+  box-shadow: 0 12px 36px rgba(22, 32, 51, 0.03), 0 2px 8px rgba(22, 32, 51, 0.02);
 }
 
 .confirm-v2-steps li {
@@ -11177,10 +11177,10 @@ body.auth-page--split .login-social__label {
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0;
   padding: 4px 0;
-  border: 1px solid #e5ebf3;
-  border-radius: 18px;
+  border: 1px solid rgba(220, 227, 238, 0.5);
+  border-radius: 24px;
   background: #fff;
-  box-shadow: 0 10px 26px rgba(33, 49, 78, 0.05);
+  box-shadow: 0 12px 36px rgba(22, 32, 51, 0.03), 0 2px 8px rgba(22, 32, 51, 0.02);
   overflow: hidden;
 }
 
@@ -11326,7 +11326,7 @@ body.auth-page--split .login-social__label {
   gap: 18px 22px;
   align-items: center;
   padding: 24px;
-  border-radius: 18px;
+  border-radius: 24px;
   background:
     radial-gradient(circle at 8% 20%, rgba(120, 170, 230, 0.18), transparent 28%),
     radial-gradient(circle at 92% 80%, rgba(120, 170, 230, 0.16), transparent 30%),

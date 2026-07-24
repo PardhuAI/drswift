@@ -862,17 +862,30 @@ function readCart() {
     if (!Array.isArray(parsed)) {
       return [];
     }
-    // Lab tests are one line each — never keep duplicate quantities.
+    // Keep every valid cart line. Catalog mismatches are resolved at render time
+    // so a demo/SSR catalog swap cannot wipe the customer's cart.
+    const seen = new Set();
     return parsed
-      .filter((item) => item && item.slug && (!TESTS.length || getTestBySlug(item.slug)))
+      .filter((item) => item && item.slug)
       .map((item) => ({
         slug: item.slug,
         quantity: 1,
+        ...(typeof item.name === "string" && item.name.trim() ? { name: item.name.trim() } : {}),
+        ...(Number.isFinite(Number(item.price)) ? { price: Number(item.price) } : {}),
+        ...(typeof item.image === "string" && item.image.trim() ? { image: item.image.trim() } : {}),
+        ...(typeof item.imageTone === "string" && item.imageTone.trim()
+          ? { imageTone: item.imageTone.trim() }
+          : {}),
         ...(Array.isArray(item.customPanels) ? { customPanels: item.customPanels } : {}),
         ...(typeof item.recipient === "string" && item.recipient.trim()
           ? { recipient: item.recipient.trim() }
           : {})
-      }));
+      }))
+      .filter((item) => {
+        if (seen.has(item.slug)) return false;
+        seen.add(item.slug);
+        return true;
+      });
   } catch {
     return [];
   }
@@ -1072,6 +1085,10 @@ function addToCart(slug) {
   cart.push({
     slug,
     quantity: 1,
+    name: test.name || slug,
+    price: getTestLivePrice(test, customPanels),
+    image: test.image || "",
+    imageTone: test.imageTone || "blood",
     ...(customPanels ? { customPanels } : {})
   });
   writeCart(cart);
@@ -2177,7 +2194,23 @@ function renderTestDetailPage() {
 
 function cartLineItems() {
   return readCart()
-    .map((item) => ({ ...item, test: getTestBySlug(item.slug) }))
+    .map((item) => {
+      const test =
+        getTestBySlug(item.slug) ||
+        (item.slug
+          ? {
+              slug: item.slug,
+              name: item.name || item.slug,
+              price: Number(item.price || 0),
+              category: "Test",
+              summary: "Saved in your cart",
+              image: "assets/images/peace-of-mind.svg",
+              imageTone: "blood",
+              customizable: false,
+            }
+          : null);
+      return { ...item, test };
+    })
     .filter((item) => item.test);
 }
 

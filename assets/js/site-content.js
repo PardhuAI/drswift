@@ -198,13 +198,13 @@
 
   function renderCheckoutCoverageNote(root) {
     root.setAttribute("data-content-status", CONTENT.status);
+    /* No design-note badge here — checkout is patient-facing. */
     root.innerHTML = `
-      ${designNoteHtml()}
-      <p class="checkout-coverage-note">
-        <strong>Collection hours:</strong> ${escapeHtml(CONTENT.coverage.hours)}
-        <span>${escapeHtml(CONTENT.coverage.blackoutNote)}</span>
-        Service cities: ${escapeHtml(CONTENT.coverage.cities.join(", "))}. Availability is reconfirmed before payment.
-      </p>
+      <aside class="checkout-coverage-note" aria-label="Collection coverage">
+        <p><strong>Collection hours</strong> — ${escapeHtml(CONTENT.coverage.hours)}</p>
+        <p>${escapeHtml(CONTENT.coverage.blackoutNote)}</p>
+        <p>Available in ${escapeHtml(CONTENT.coverage.cities.join(", "))}. We reconfirm serviceability before payment.</p>
+      </aside>
     `;
   }
 
