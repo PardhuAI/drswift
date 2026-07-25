@@ -5,15 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Test details | Dr.Swift Diagnostics</title>
     <meta name="description" content="Review Dr.Swift test details, sample type, preparation, results timeline, pricing, and cart options.">
-    <link rel="stylesheet" href="assets/css/styles.css?v=fixed-nav-1">
-    <link rel="stylesheet" href="assets/css/mobile-ux.css?v=fixed-nav-1">
-    <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
+    <!-- Root base: /tests/:slug must not resolve assets under /tests/ (Vercel has no Worker rewrite). -->
+    <base href="/">
+    <link rel="stylesheet" href="/assets/css/styles.css?v=detail-base-1">
+    <link rel="stylesheet" href="/assets/css/mobile-ux.css?v=detail-base-1">
+    <link rel="icon" href="/assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
   <body class="test-detail-page">
     <header class="site-header" id="site-header">
       <nav class="navbar container" aria-label="Primary navigation">
-        <a class="brand" href="index.html" aria-label="Dr.Swift Diagnostics home">
-          <img class="brand-mark" src="assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="40" height="40">
+        <a class="brand" href="/" aria-label="Dr.Swift Diagnostics home">
+          <img class="brand-mark" src="/assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="40" height="40">
           <span>Dr.Swift Diagnostics</span>
         </a>
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu">
@@ -21,17 +23,17 @@
         </button>
         <div class="nav-menu" id="primary-menu">
           <div class="nav-links">
-            <a class="active" href="tests.html">Tests</a>
-            <a href="reports.html">Reports</a>
-            <a href="about.html">About</a>
+            <a class="active" href="/tests">Tests</a>
+            <a href="/reports">Reports</a>
+            <a href="/about">About</a>
           </div>
           <div class="nav-actions" aria-label="Account links">
-            <a class="cart-link" href="cart.html" aria-label="View cart">
-              <svg class="ui-icon" aria-hidden="true"><use href="assets/images/ui-icons.svg#icon-cart"></use></svg>
+            <a class="cart-link" href="/cart" aria-label="View cart">
+              <svg class="ui-icon" aria-hidden="true"><use href="/assets/images/ui-icons.svg#icon-cart"></use></svg>
               <span>Cart</span>
               <span class="cart-count" data-cart-count hidden>0</span>
             </a>
-            <a class="nav-account" data-nav-account href="login.html" aria-label="Sign in to My Account">Sign in</a>
+            <a class="nav-account" data-nav-account href="/login" aria-label="Sign in to My Account">Sign in</a>
           </div>
         </div>
       </nav>
@@ -51,63 +53,63 @@
     <footer class="site-footer">
       <div class="container footer-grid footer-grid--expanded">
         <div class="footer-brand-col">
-          <a class="brand footer-brand" href="index.html" aria-label="Dr.Swift Diagnostics home">
-            <img class="brand-mark" src="assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="40" height="40">
+          <a class="brand footer-brand" href="/" aria-label="Dr.Swift Diagnostics home">
+            <img class="brand-mark" src="/assets/images/drswift_leaf_logo_precise_trace.svg" alt="" width="40" height="40">
             <span>Dr.Swift Diagnostics</span>
           </a>
           <p class="footer-tagline">At-home lab tests, clear reports, and health insights for your whole family.</p>
           <div class="footer-social" aria-label="Contact shortcuts">
-            <a href="mailto:care@drswift.health" aria-label="Email Dr.Swift" title="Email"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-email"/></svg></a>
-            <a href="whatsapp.html" aria-label="Book on WhatsApp" title="WhatsApp"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-whatsapp"/></svg></a>
-            <a href="app.html" aria-label="Open customer app page" title="App"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-app"/></svg></a>
-            <a href="doctors.html" aria-label="Doctors portal" title="Doctors Portal"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="assets/icons/drswift-sprite.svg#icon-doctors"/></svg></a>
+            <a href="mailto:care@drswift.health" aria-label="Email Dr.Swift" title="Email"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="/assets/icons/drswift-sprite.svg#icon-email"/></svg></a>
+            <a href="/whatsapp" aria-label="Book on WhatsApp" title="WhatsApp"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="/assets/icons/drswift-sprite.svg#icon-whatsapp"/></svg></a>
+            <a href="/app" aria-label="Open customer app page" title="App"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="/assets/icons/drswift-sprite.svg#icon-app"/></svg></a>
+            <a href="/doctors" aria-label="Doctors portal" title="Doctors Portal"><svg class="ds-icon ds-icon--footer" aria-hidden="true"><use href="/assets/icons/drswift-sprite.svg#icon-doctors"/></svg></a>
           </div>
         </div>
         <div>
           <h2 class="footer-col-title">Our Tests</h2>
-          <a href="tests.html">Browse all tests</a>
-          <a href="tests.html#catalog">By category</a>
-          <a href="cart.html">Cart</a>
-          <a href="promotions.html">Promotions</a>
+          <a href="/tests">Browse all tests</a>
+          <a href="/tests#catalog">By category</a>
+          <a href="/cart">Cart</a>
+          <a href="/promotions">Promotions</a>
         </div>
         <div>
           <h2 class="footer-col-title">Resources</h2>
-          <a href="reports.html">View reports</a>
-          <a href="sample-report.html">Sample report</a>
-          <a href="index.html#faq">FAQs</a>
-          <a href="help.html">Help center</a>
+          <a href="/reports">View reports</a>
+          <a href="/sample-report">Sample report</a>
+          <a href="/#faq">FAQs</a>
+          <a href="/help">Help center</a>
         </div>
         <div>
           <h2 class="footer-col-title">Account</h2>
-          <a href="login.html">Login / Sign up</a>
-          <a href="doctors.html">Doctors portal</a>
-          <a href="app.html">Customer app</a>
-          <a href="whatsapp.html">WhatsApp booking</a>
+          <a href="/login">Login / Sign up</a>
+          <a href="/doctors">Doctors portal</a>
+          <a href="/app">Customer app</a>
+          <a href="/whatsapp">WhatsApp booking</a>
         </div>
         <div>
           <h2 class="footer-col-title">Company</h2>
-          <a href="about.html">About us</a>
-          <a href="about.html#lab-partners">Lab partners</a>
-          <a href="about.html#contact">Contact</a>
-          <a href="policies.html">Policies</a>
-          <a href="privacy.html">Privacy policy</a>
-          <a href="terms.html">Terms of service</a>
+          <a href="/about">About us</a>
+          <a href="/about#lab-partners">Lab partners</a>
+          <a href="/about#contact">Contact</a>
+          <a href="/policies">Policies</a>
+          <a href="/privacy">Privacy policy</a>
+          <a href="/terms">Terms of service</a>
         </div>
       </div>
       <div class="container footer-bottom">
         <p>&copy; 2026 Dr.Swift Diagnostics. All rights reserved.</p>
-        <a href="privacy-choices.html">Privacy choices</a>
+        <a href="/privacy-choices">Privacy choices</a>
       </div>
     </footer>
 
-    <script src="assets/js/panel-catalog.js"></script>
-    <script src="assets/js/test-data.js"></script>
-    <script src="assets/js/api.js?v=booking-prep-1"></script>
+    <script src="/assets/js/panel-catalog.js"></script>
+    <script src="/assets/js/test-data.js"></script>
+    <script src="/assets/js/api.js?v=booking-prep-1"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
-    <script src="assets/js/firebase-config.js?v=3"></script>
-    <script src="assets/js/google-auth.js?v=6"></script>
-    <script src="assets/js/cart-members.js?v=mm-design-2"></script>
-    <script src="assets/js/main.js?v=mm-design-2"></script>
+    <script src="/assets/js/firebase-config.js?v=3"></script>
+    <script src="/assets/js/google-auth.js?v=6"></script>
+    <script src="/assets/js/cart-members.js?v=mm-design-2"></script>
+    <script src="/assets/js/main.js?v=detail-base-1"></script>
   </body>
 </html>
