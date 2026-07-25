@@ -4,7 +4,7 @@
   "rewrites": [
     {
       "source": "/tests/:slug",
-      "destination": "/test-details.html"
+      "destination": "/test-details"
     }
   ]
 }
