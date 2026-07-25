@@ -182,7 +182,7 @@ export function securityHeaders(isHtml: boolean): Headers {
   if (isHtml) {
     headers.set(
       "Content-Security-Policy",
-      "default-src 'self'; img-src 'self' data: https: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com; worker-src 'self' blob:; connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com; frame-src 'self' https://accounts.google.com https://*.firebaseapp.com https://apis.google.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://accounts.google.com https://*.firebaseapp.com",
+      "default-src 'self'; img-src 'self' data: https: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com; worker-src 'self' blob:; connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com; frame-src 'self' https://accounts.google.com https://*.firebaseapp.com https://apis.google.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self' https://accounts.google.com https://*.firebaseapp.com",
     );
     headers.set("Cache-Control", "public, max-age=300, s-maxage=3600");
   }

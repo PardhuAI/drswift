@@ -6,9 +6,9 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <title>Checkout | Dr.Swift Diagnostics</title>
-    <link rel="stylesheet" href="assets/css/styles.css?v=confirm-beside-1">
-    <link rel="stylesheet" href="assets/css/checkout.css?v=confirm-beside-1">
-    <link rel="stylesheet" href="assets/css/mobile-ux.css?v=confirm-beside-1">
+    <link rel="stylesheet" href="assets/css/styles.css?v=mm-nav-14">
+    <link rel="stylesheet" href="assets/css/checkout.css?v=mm-nav-14">
+    <link rel="stylesheet" href="assets/css/mobile-ux.css?v=mm-checkout-1">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
   <body class="auth-page checkout-page">
@@ -22,107 +22,88 @@
           <span>Dr.Swift Diagnostics</span>
         </a>
         <h1 class="checkout-topbar__title">Checkout</h1>
-        <p class="checkout-topbar__secure">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
-          Secure booking
-        </p>
+        <ol class="checkout-progress" aria-label="Checkout progress" data-checkout-progress>
+          <li class="is-active" data-progress-step="members">
+            <span class="checkout-progress__ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>
+            </span>
+            <strong class="checkout-progress__label">Members</strong>
+          </li>
+          <li data-progress-step="address">
+            <span class="checkout-progress__ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>
+            </span>
+            <strong class="checkout-progress__label">Address</strong>
+          </li>
+          <li data-progress-step="slot">
+            <span class="checkout-progress__ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>
+            </span>
+            <strong class="checkout-progress__label">Slot</strong>
+          </li>
+        </ol>
       </div>
     </header>
 
     <main class="auth-shell checkout-shell">
       <div class="checkout-frame">
         <div class="checkout-wire-shell">
-          <ol class="checkout-progress" aria-label="Checkout progress">
-            <li class="is-complete" data-progress-step="cart">
-              <span>1</span>
-              <strong>Cart</strong>
-            </li>
-            <li class="is-active" data-progress-step="details">
-              <span>2</span>
-              <strong>Details</strong>
-            </li>
-            <li data-progress-step="payment">
-              <span>3</span>
-              <strong>Payment</strong>
-            </li>
-            <li data-progress-step="confirmation">
-              <span>4</span>
-              <strong>Done</strong>
-            </li>
-          </ol>
-
           <div class="checkout-wire-layout" data-checkout-flow>
             <div class="checkout-wire-main">
               <form class="checkout-wire-form" data-checkout-form id="book-form" novalidate>
 
               <div class="checkout-details-stack" data-checkout-details>
-              <section class="checkout-wire-panel checkout-card is-active" data-checkout-stage="patient">
+              <section class="checkout-wire-panel is-active" data-checkout-stage="members">
                 <div class="checkout-wire-head">
-                  <span class="checkout-card-ico" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5.5 19.5c1.8-3.2 4-4.8 6.5-4.8s4.7 1.6 6.5 4.8"/></svg>
-                  </span>
-                  <div>
-                    <h2>Patient details</h2>
-                    <p class="checkout-wire-lead">Who should we collect the sample for?</p>
-                  </div>
+                  <h2>Who is getting tested?</h2>
                 </div>
-                <div class="checkout-wire-field checkout-wire-field--wide">
-                  <label for="book-name">Full name</label>
-                  <input id="book-name" type="text" name="name" autocomplete="name" placeholder="Enter patient's full name" required>
-                </div>
-                <div class="checkout-gender-age-row">
-                  <div class="checkout-gender-block">
-                    <span class="checkout-gender-age-row__label" id="book-gender-label">Gender</span>
-                    <div class="checkout-segments checkout-segments--gender" role="radiogroup" aria-labelledby="book-gender-label">
-                      <input id="book-gender-male" type="radio" name="gender" value="Male" checked required>
-                      <label for="book-gender-male"><span class="seg-full">Male</span><span class="seg-short">M</span></label>
-                      <input id="book-gender-female" type="radio" name="gender" value="Female">
-                      <label for="book-gender-female"><span class="seg-full">Female</span><span class="seg-short">F</span></label>
-                      <input id="book-gender-other" type="radio" name="gender" value="Other">
-                      <label for="book-gender-other"><span class="seg-full">Other</span><span class="seg-short">Other</span></label>
+                <div data-checkout-members></div>
+                <div class="checkout-card checkout-card--members-footer">
+                  <div class="checkout-wire-field checkout-wire-field--phone checkout-members-phone">
+                    <label for="book-phone">Mobile for booking updates</label>
+                    <div class="phone-verify-row">
+                      <div class="input-with-prefix checkout-phone-prefix">
+                        <span class="input-prefix" aria-hidden="true">+91</span>
+                        <input id="book-phone" type="tel" name="phone" autocomplete="tel-national" inputmode="numeric" placeholder="10-digit mobile" maxlength="10" pattern="[6-9][0-9]{9}" required>
+                      </div>
+                      <button class="button secondary" type="button" data-otp-send disabled>Send OTP</button>
+                      <p class="phone-verified-badge" data-phone-verified-badge hidden>
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>
+                        Verified
+                      </p>
                     </div>
                   </div>
-                  <div class="checkout-age-block">
-                    <label for="book-age">Age</label>
-                    <input id="book-age" type="number" name="age" inputmode="numeric" min="1" max="120" placeholder="Years" required>
-                  </div>
-                </div>
-                <div class="checkout-wire-field checkout-wire-field--phone">
-                  <label for="book-phone">Mobile number</label>
-                  <div class="phone-verify-row">
-                    <div class="input-with-prefix checkout-phone-prefix">
-                      <span class="input-prefix" aria-hidden="true">+91</span>
-                      <input id="book-phone" type="tel" name="phone" autocomplete="tel-national" inputmode="numeric" placeholder="10-digit mobile" maxlength="10" pattern="[6-9][0-9]{9}" required>
+                  <div class="checkout-wire-field checkout-otp" data-otp-block hidden>
+                    <label for="book-otp">Enter OTP</label>
+                    <div class="phone-verify-row">
+                      <input id="book-otp" type="text" name="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code">
+                      <button class="button secondary" type="button" data-otp-verify>Verify</button>
                     </div>
-                    <button class="button secondary" type="button" data-otp-send disabled>Send OTP</button>
-                    <p class="phone-verified-badge" data-phone-verified-badge hidden>
-                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>
-                      Verified
-                    </p>
+                    <p class="field-hint checkout-otp-hint" data-otp-demo-hint>Use code <strong>123456</strong> to verify in demo.</p>
+                  </div>
+                  <p class="checkout-status" data-checkout-status hidden aria-live="polite"></p>
+                  <p class="checkout-verify-hint" data-verify-hint>Verify your mobile with OTP to continue.</p>
+                  <div class="checkout-wire-actions checkout-stage-actions">
+                    <a class="checkout-back-link" href="/cart"><span aria-hidden="true">←</span> Return to Cart</a>
+                    <button class="button primary" type="button" data-checkout-next="address" data-members-continue disabled>Continue</button>
+                  </div>
+                  <!-- Keep legacy patient fields for draft/API compatibility (synced from members) -->
+                  <div class="sr-only" aria-hidden="true">
+                    <input id="book-name" type="text" name="name" tabindex="-1">
+                    <input id="book-age" type="number" name="age" tabindex="-1">
+                    <input id="book-gender-male" type="radio" name="gender" value="Male" checked tabindex="-1">
+                    <input id="book-gender-female" type="radio" name="gender" value="Female" tabindex="-1">
+                    <input id="book-gender-other" type="radio" name="gender" value="Other" tabindex="-1">
                   </div>
                 </div>
-                <div class="checkout-wire-field checkout-otp" data-otp-block hidden>
-                  <label for="book-otp">Enter OTP</label>
-                  <div class="phone-verify-row">
-                    <input id="book-otp" type="text" name="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code">
-                    <button class="button secondary" type="button" data-otp-verify>Verify</button>
-                  </div>
-                  <p class="field-hint">Demo OTP: 123456</p>
-                </div>
-                <p class="checkout-status" data-checkout-status hidden aria-live="polite"></p>
-                <button class="sr-only" type="button" data-patient-continue data-checkout-next="address" disabled tabindex="-1">Continue</button>
               </section>
 
-              <section class="checkout-wire-panel checkout-card is-active" data-checkout-stage="address">
+              <section class="checkout-wire-panel" data-checkout-stage="address" hidden>
                 <div class="checkout-wire-head">
-                  <span class="checkout-card-ico" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>
-                  </span>
-                  <div>
-                    <h2>Collection address</h2>
-                    <p class="checkout-wire-lead">Where should the phlebotomist visit?</p>
-                  </div>
+                  <h2>Where shall we collect your sample?</h2>
                 </div>
+                <div class="checkout-card">
+                
                 <div class="checkout-address-row">
                   <div class="checkout-wire-field">
                     <label for="book-pin">PIN code</label>
@@ -137,21 +118,34 @@
                   <label for="book-address">Full address</label>
                   <textarea id="book-address" name="address" autocomplete="street-address" rows="3" placeholder="House/Flat No., Building Name, Street..." required></textarea>
                 </div>
-                <div data-site-content="checkout-coverage"></div>
-                <p class="checkout-status" data-address-status hidden aria-live="polite"></p>
-                <button class="sr-only" type="button" data-checkout-next="schedule" tabindex="-1">Continue</button>
-              </section>
-
-              <section class="checkout-wire-panel checkout-card is-active" data-checkout-stage="schedule">
-                <div class="checkout-wire-head">
-                  <span class="checkout-card-ico" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M8 3.5v3M16 3.5v3M3.5 10h17"/></svg>
-                  </span>
-                  <div>
-                    <h2>Collection slot</h2>
-                    <p class="checkout-wire-lead">Pick a day and time window for home collection.</p>
+                <div class="checkout-wire-field">
+                  <label for="book-landmark">Landmark / Directions <span class="field-optional">(optional)</span></label>
+                  <input id="book-landmark" type="text" name="landmark" maxlength="120" placeholder="e.g. Red gate next to supermarket">
+                </div>
+                <div class="checkout-wire-field">
+                  <span class="checkout-field-label" id="book-save-as-label">Save as</span>
+                  <div class="checkout-segments checkout-segments--saveas" role="radiogroup" aria-labelledby="book-save-as-label">
+                    <input id="book-save-home" type="radio" name="addressLabel" value="Home" checked>
+                    <label for="book-save-home">Home</label>
+                    <input id="book-save-other" type="radio" name="addressLabel" value="Other">
+                    <label for="book-save-other">Other</label>
                   </div>
                 </div>
+                <div data-site-content="checkout-coverage"></div>
+                <p class="checkout-status" data-address-status hidden aria-live="polite"></p>
+                <div class="checkout-wire-actions checkout-stage-actions">
+                  <button class="checkout-back-link" type="button" data-checkout-back="members"><span aria-hidden="true">←</span> Back</button>
+                  <button class="button primary" type="button" data-checkout-next="schedule">Continue</button>
+                </div>
+                </div>
+              </section>
+
+              <section class="checkout-wire-panel" data-checkout-stage="schedule" hidden>
+                <div class="checkout-wire-head">
+                  <h2>When should we collect the sample?</h2>
+                </div>
+                <div class="checkout-card">
+                
                 <div class="checkout-time-row">
                   <strong class="checkout-field-label">Select date</strong>
                   <div class="checkout-segments checkout-segments--dates" role="group" aria-label="Sample collection day">
@@ -178,35 +172,19 @@
 
                     <button class="checkout-select-date-btn checkout-date-tile checkout-date-tile--more" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="collection-calendar" data-cal-trigger>
                       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M8 3.5v3M16 3.5v3M3.5 10h17"/></svg>
-                      More
+                      <span data-cal-trigger-label>More</span>
                     </button>
 
                     <input id="book-day-custom" type="radio" name="sampleDay" value="" data-custom-day hidden>
-
-                    <div class="cal-popover" id="collection-calendar" role="dialog" aria-modal="false" aria-label="Choose collection date" hidden data-cal-popover>
-                      <div class="cal-popover__head">
-                        <p class="cal-popover__title" data-cal-month>Month</p>
-                        <div class="cal-nav">
-                          <button type="button" aria-label="Previous month" data-cal-prev>‹</button>
-                          <button type="button" aria-label="Next month" data-cal-next>›</button>
-                        </div>
-                      </div>
-                      <div class="cal-weekdays" aria-hidden="true">
-                        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
-                      </div>
-                      <div class="cal-grid" data-cal-grid role="grid" aria-label="Calendar dates"></div>
-                      <div class="cal-popover__foot">
-                        <p class="cal-popover__hint">Past dates disabled.<br>Book up to 30 days ahead.</p>
-                        <button class="button secondary" type="button" data-cal-close>Close</button>
-                      </div>
-                    </div>
                   </div>
 
                   <strong class="checkout-field-label">Select time window</strong>
                   <div class="checkout-segments checkout-segments--time" role="group" aria-label="Sample collection window">
                     <input id="book-time-morning" type="radio" name="sampleWindow" value="Morning" checked>
                     <label for="book-time-morning">
-                      <span class="checkout-time-ico" aria-hidden="true">☀</span>
+                      <span class="checkout-time-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+                      </span>
                       <span class="checkout-time-copy">
                         <strong>Morning</strong>
                         <small>6:00 AM – 10:00 AM</small>
@@ -214,7 +192,9 @@
                     </label>
                     <input id="book-time-afternoon" type="radio" name="sampleWindow" value="Afternoon">
                     <label for="book-time-afternoon">
-                      <span class="checkout-time-ico" aria-hidden="true">☀</span>
+                      <span class="checkout-time-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v1.5M12 19.5V21M4.2 4.2l1.1 1.1M18.7 18.7l1.1 1.1M3 12h1.5M19.5 12H21M4.2 19.8l1.1-1.1M18.7 5.3l1.1-1.1"/></svg>
+                      </span>
                       <span class="checkout-time-copy">
                         <strong>Afternoon</strong>
                         <small>12:00 PM – 4:00 PM</small>
@@ -222,35 +202,55 @@
                     </label>
                     <input id="book-time-evening" type="radio" name="sampleWindow" value="Evening">
                     <label for="book-time-evening">
-                      <span class="checkout-time-ico" aria-hidden="true">☾</span>
+                      <span class="checkout-time-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A7.5 7.5 0 0 1 9.5 4 7.5 7.5 0 1 0 20 14.5z"/></svg>
+                      </span>
                       <span class="checkout-time-copy">
                         <strong>Evening</strong>
                         <small>5:00 PM – 8:00 PM</small>
                       </span>
                     </label>
                   </div>
-                  <p class="checkout-slot-hint">Fasting for 10–12 hours is recommended for morning slots.</p>
-                  <p class="checkout-when-confirm" data-when-confirm aria-live="polite" hidden>
-                    <span class="checkout-when-confirm__tick" aria-hidden="true">✓</span>
-                    <strong data-when-confirm-value>Today · Morning</strong>
+                  <p class="checkout-when-confirm" data-when-confirm aria-live="polite">
+                    <span class="checkout-when-confirm__tick" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+                    </span>
+                    <span class="checkout-when-confirm__copy">
+                      <span class="checkout-when-confirm__label">Collection scheduled</span>
+                      <strong data-when-confirm-value>Today · Morning</strong>
+                    </span>
                   </p>
                 </div>
                 <p class="checkout-status" data-schedule-status hidden aria-live="polite"></p>
+                <div class="checkout-wire-actions checkout-stage-actions">
+                  <button class="checkout-back-link" type="button" data-checkout-back="address"><span aria-hidden="true">←</span> Back</button>
+                  <button class="button primary" type="button" data-checkout-next="review">Review order</button>
+                </div>
+                </div>
               </section>
 
-              <a class="checkout-return-cart" href="/cart">
-                <span aria-hidden="true">←</span> Return to Cart
-              </a>
+              <section class="checkout-wire-panel" data-checkout-stage="review" hidden>
+                <div class="checkout-wire-head">
+                  <h2>Review your order</h2>
+                </div>
+                <div class="checkout-card">
+                
+                <div data-checkout-review></div>
+                <div class="checkout-wire-actions checkout-stage-actions">
+                  <button class="checkout-back-link" type="button" data-checkout-back="schedule"><span aria-hidden="true">←</span> Back</button>
+                  <button class="button primary" type="submit" data-review-pay-cta>Continue to Payment <span aria-hidden="true">→</span></button>
+                </div>
+                </div>
+              </section>
               </div>
               </form>
 
               <section class="checkout-wire-panel" data-checkout-stage="pay-choose" hidden>
                 <div class="checkout-wire-head">
-                  <div>
-                    <h2>Payment</h2>
-                    <p class="checkout-wire-lead">Choose how you’d like to pay. Amount is locked from your cart.</p>
-                  </div>
+                  <h2>Payment</h2>
                 </div>
+                <div class="checkout-card">
+                
                 <p class="checkout-pay-trust">Secure checkout · Pay only after confirming patient, address, and slot.</p>
                 <div class="pay-method-list">
                   <button class="pay-method" type="button" data-pay-go="pay-card">
@@ -297,19 +297,20 @@
                   </button>
                 </div>
                 <div class="checkout-wire-actions">
-                  <button class="checkout-back-link" type="button" data-checkout-back="details">
-                    <span aria-hidden="true">←</span> Edit details
+                  <button class="checkout-back-link" type="button" data-checkout-back="review">
+                    <span aria-hidden="true">←</span> Edit review
                   </button>
                 </div>
                 <p class="pay-status" data-pay-status hidden></p>
+                </div>
               </section>
 
               <section class="checkout-wire-panel" data-checkout-stage="pay-card" hidden>
                 <div class="checkout-wire-head">
-                  <div>
-                    <h2>Debit / Credit Card</h2>
-                  </div>
+                  <h2>Pay by card</h2>
                 </div>
+                <div class="checkout-card">
+                
                 <div class="pay-tabs" role="tablist">
                   <button type="button" class="is-on" data-card-tab>Debit Card</button>
                   <button type="button" data-card-tab>Credit Card</button>
@@ -467,14 +468,15 @@
                   </button>
                   <button class="checkout-next-link" type="submit" form="checkout-card-form">Pay Now</button>
                 </div>
+                </div>
               </section>
 
               <section class="checkout-wire-panel" data-checkout-stage="pay-qr" hidden>
                 <div class="checkout-wire-head">
-                  <div>
-                    <h2 data-qr-title>Scan &amp; Pay</h2>
-                  </div>
+                  <h2>Scan & pay</h2>
                 </div>
+                <div class="checkout-card">
+                
                 <div class="pay-gateway" data-upi-pending>
                   <p class="pay-gateway__amount" data-pay-total>₹0</p>
                   <p class="pay-status" data-pay-status hidden></p>
@@ -501,14 +503,15 @@
                   </button>
                   <button class="checkout-next-link" type="button" data-pay-check>Check payment status</button>
                 </div>
+                </div>
               </section>
 
               <section class="checkout-wire-panel" data-checkout-stage="pay-bank" hidden>
                 <div class="checkout-wire-head">
-                  <div>
-                    <h2>Internet Banking</h2>
-                  </div>
+                  <h2>Internet banking</h2>
                 </div>
+                <div class="checkout-card">
+                
                 <p class="pay-gateway__amount" data-pay-total>₹0</p>
                 <div class="bank-list">
                   <button type="button" data-bank>HDFC Bank</button>
@@ -527,14 +530,15 @@
                   </button>
                   <button class="checkout-next-link" type="button" data-bank-continue disabled>Continue to bank</button>
                 </div>
+                </div>
               </section>
 
               <section class="checkout-wire-panel" data-checkout-stage="pay-processing" hidden>
                 <div class="checkout-wire-head">
-                  <div>
-                    <h2>Confirming payment</h2>
-                  </div>
+                  <h2>Processing payment</h2>
                 </div>
+                <div class="checkout-card">
+                
                 <div class="pay-processing">
                   <div class="pay-processing__spinner" aria-hidden="true"></div>
                   <p class="pay-processing__message" data-processing-message>Please wait…</p>
@@ -545,6 +549,7 @@
                   <button class="checkout-back-link" type="button" data-pay-cancel-wait>
                     <span aria-hidden="true">←</span> Choose another method
                   </button>
+                </div>
                 </div>
               </section>
 
@@ -783,12 +788,11 @@
                 </div>
                 <button
                   class="button primary checkout-summary-cta"
-                  type="submit"
-                  form="book-form"
+                  type="button"
                   data-details-pay-cta
-                  disabled
+                  data-checkout-next="address"
                 >
-                  Continue to Payment <span aria-hidden="true">→</span>
+                  Continue <span aria-hidden="true">→</span>
                 </button>
               </section>
               <section class="checkout-summary-panel" data-summary-customer hidden>
@@ -796,7 +800,7 @@
                   <h2>Booking details</h2>
                 </div>
                 <dl class="checkout-kv" data-inline-payment-patient></dl>
-                <button class="checkout-summary-edit" type="button" data-checkout-back="patient">Edit details</button>
+                <button class="checkout-summary-edit" type="button" data-checkout-back="review">Edit review</button>
               </section>
               <section class="checkout-summary-panel" data-summary-payment hidden>
                 <div class="checkout-summary-title">
@@ -824,8 +828,75 @@
           <strong data-pay-total>₹0</strong>
         </button>
         <button type="button" class="button primary checkout-sticky-bar__cta" data-checkout-sticky-cta>
-          Continue to Payment <span aria-hidden="true">→</span>
+          Continue <span aria-hidden="true">→</span>
         </button>
+      </div>
+    </div>
+
+    <div class="mm-modal" data-mm-member-modal hidden aria-hidden="true">
+      <div class="mm-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="mm-member-title">
+        <form class="mm-modal__form" data-mm-member-form>
+          <input type="hidden" name="memberId" value="">
+          <input type="hidden" name="mode" value="add">
+          <h3 class="mm-modal__title" id="mm-member-title">Add member details</h3>
+          <label class="mm-modal__field">
+            <span>Full name<span class="mm-req" aria-hidden="true">*</span></span>
+            <input name="name" type="text" required maxlength="80" autocomplete="name" placeholder="">
+          </label>
+          <div class="mm-modal__row">
+            <label class="mm-modal__field">
+              <span>Age<span class="mm-req" aria-hidden="true">*</span></span>
+              <input name="age" type="number" min="1" max="120" required placeholder="Years" inputmode="numeric">
+            </label>
+            <div class="mm-modal__field">
+              <span class="mm-modal__field-label">Select Gender<span class="mm-req" aria-hidden="true">*</span></span>
+              <div class="mm-modal__gender" role="radiogroup" aria-label="Gender">
+                <label>
+                  <input type="radio" name="gender" value="Male" required>
+                  <span class="mm-modal__gender-pill">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="14" r="5"/><path d="M14 10l5-5M15 5h4v4"/></svg>
+                    Male
+                  </span>
+                </label>
+                <label>
+                  <input type="radio" name="gender" value="Female">
+                  <span class="mm-modal__gender-pill">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="5"/><path d="M12 14v7M9 18h6"/></svg>
+                    Female
+                  </span>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="mm-modal__actions">
+            <button class="mm-modal__btn mm-modal__btn--ghost" type="button" data-mm-member-cancel>Cancel</button>
+            <button class="mm-modal__btn mm-modal__btn--primary" type="submit">Done</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="mm-modal cal-modal" id="collection-calendar" data-cal-modal hidden aria-hidden="true">
+      <div class="mm-modal__dialog cal-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="cal-modal-title">
+        <div class="cal-modal__head">
+          <h3 class="mm-modal__title" id="cal-modal-title">Select collection date</h3>
+          <button type="button" class="cal-modal__close" data-cal-close aria-label="Close calendar">×</button>
+        </div>
+        <div class="cal-popover__head">
+          <p class="cal-popover__title" data-cal-month>Month</p>
+          <div class="cal-nav">
+            <button type="button" aria-label="Previous month" data-cal-prev>‹</button>
+            <button type="button" aria-label="Next month" data-cal-next>›</button>
+          </div>
+        </div>
+        <div class="cal-weekdays" aria-hidden="true">
+          <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+        </div>
+        <div class="cal-grid" data-cal-grid role="grid" aria-label="Calendar dates"></div>
+        <div class="cal-popover__foot">
+          <p class="cal-popover__hint">Past dates disabled. Book up to 30 days ahead.</p>
+          <button class="mm-modal__btn mm-modal__btn--ghost" type="button" data-cal-close>Close</button>
+        </div>
       </div>
     </div>
 
@@ -837,9 +908,10 @@
     <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
     <script src="assets/js/firebase-config.js?v=3"></script>
     <script src="assets/js/google-auth.js?v=6"></script>
-    <script src="assets/js/main.js?v=checkout-summary-image-1"></script>
+    <script src="assets/js/cart-members.js?v=mm-nav-14"></script>
+    <script src="assets/js/main.js?v=mm-nav-14"></script>
     <script src="assets/js/checkout-api.js?v=production-ready-1"></script>
-    <script src="assets/js/checkout.js?v=confirm-order-1"></script>
+    <script src="assets/js/checkout.js?v=mm-nav-14"></script>
     <script>
       async function initBookingPage() {
         if (typeof window.DRSWIFT_BOOTSTRAP_CATALOG === "function") {

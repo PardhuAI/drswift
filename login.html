@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Sign in | Dr.Swift Diagnostics</title>
     <meta name="description" content="Customer and doctor login for Dr.Swift Diagnostics — reports, family health, and patient access.">
-    <link rel="stylesheet" href="assets/css/styles.css?v=fixed-nav-1">
-    <link rel="stylesheet" href="assets/css/mobile-ux.css?v=fixed-nav-1">
+    <link rel="stylesheet" href="assets/css/styles.css?v=login-overlay-1">
+    <link rel="stylesheet" href="assets/css/mobile-ux.css?v=login-overlay-1">
     <link rel="icon" href="assets/images/drswift_leaf_logo_precise_trace.svg" type="image/svg+xml">
   </head>
-  <body class="auth-page login-page auth-page--split" data-hide-nav-google="1">
-    <main class="auth-split">
+  <body class="auth-page login-page auth-page--split auth-page--overlay" data-hide-nav-google="1">
+    <div class="auth-overlay" data-login-overlay>
+      <button type="button" class="auth-overlay__scrim" data-login-overlay-dismiss aria-label="Close sign in"></button>
+      <div class="auth-overlay__sheet" role="dialog" aria-modal="true" aria-labelledby="login-dialog-title">
+        <main class="auth-split">
       <aside class="auth-split__visual" aria-hidden="true">
         <img
           class="auth-split__photo"
@@ -75,7 +78,7 @@
 
           <div class="login-panel is-active" id="panel-customer" role="tabpanel" aria-labelledby="tab-customer" data-panel="customer" data-login-chrome>
             <header class="auth-split__intro">
-              <h1 class="auth-split__title">Welcome back</h1>
+              <h1 class="auth-split__title" id="login-dialog-title">Welcome back</h1>
               <p class="auth-split__subtitle">Sign in with phone or Google. We’ll only ask for your details if you’re new.</p>
             </header>
 
@@ -259,7 +262,9 @@
           <p class="auth-split__fineprint">&copy; 2026 Dr.Swift Diagnostics</p>
         </div>
       </section>
-    </main>
+        </main>
+      </div>
+    </div>
 
     <script src="assets/js/site-content.js?v=design-content-2"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
@@ -267,8 +272,9 @@
     <script src="assets/js/firebase-config.js?v=3"></script>
     <script src="assets/js/auth-session.js?v=1"></script>
     <script src="assets/js/google-auth.js?v=7"></script>
-    <script src="assets/js/main.js?v=fixed-nav-1"></script>
+    <script src="assets/js/main.js?v=login-overlay-1"></script>
     <script src="assets/js/auth.js?v=auth-phone-google-1"></script>
     <script src="assets/js/login-tabs.js?v=auth-phone-google-1"></script>
+    <script src="assets/js/login-overlay.js?v=login-overlay-1"></script>
   </body>
 </html>

@@ -63,15 +63,22 @@
   function setPhoneVerifiedUi(form, verified, otpVisible = false) {
     const badge = form.querySelector("[data-phone-verified-badge]");
     const otpBlock = form.querySelector("[data-otp-block]");
-    const continueBtn = form.querySelector("[data-patient-continue]");
+    const continueBtns = form.querySelectorAll("[data-patient-continue], [data-members-continue]");
     const sendBtn = form.querySelector("[data-otp-send]");
     const phoneRow = form.querySelector(".checkout-wire-field--phone .phone-verify-row");
+    const verifyHint = form.querySelector("[data-verify-hint]");
     if (badge) badge.hidden = !verified;
     if (otpBlock) otpBlock.hidden = verified || !otpVisible;
-    if (continueBtn) continueBtn.disabled = !verified;
+    continueBtns.forEach((btn) => {
+      btn.disabled = !verified;
+    });
+    if (verifyHint) verifyHint.hidden = !!verified;
     if (phoneRow) phoneRow.classList.toggle("is-verified", !!verified);
     document.querySelectorAll("[data-details-pay-cta]").forEach((btn) => {
-      btn.disabled = !verified;
+      const stage =
+        document.querySelector(".checkout-wire-panel.is-active")?.getAttribute("data-checkout-stage") ||
+        "members";
+      if (stage === "members") btn.disabled = !verified;
     });
     if (sendBtn) {
       sendBtn.hidden = !!verified;
@@ -135,6 +142,9 @@
   }
 
   function cartLineItems() {
+    if (window.DrSwiftCart?.readCart) {
+      return window.DrSwiftCart.readCart();
+    }
     try {
       return JSON.parse(localStorage.getItem("drswift.cart.v1") || "[]");
     } catch {
@@ -286,7 +296,8 @@
 
   function cartItemsWithTests() {
     const tests = Array.isArray(window.DRSWIFT_TESTS) ? window.DRSWIFT_TESTS : [];
-    return cartLineItems()
+    const lines = window.DrSwiftCart?.readCart?.() || cartLineItems();
+    return lines
       .map((item) => {
         const test =
           tests.find((entry) => entry.slug === item.slug) ||
@@ -295,10 +306,12 @@
                 slug: item.slug,
                 name: item.name || item.slug,
                 price: Number(item.price || 0),
+                image: item.image || "assets/images/peace-of-mind.svg",
                 customizable: false,
               }
             : null);
         return {
+          ...item,
           test,
           customPanels: item.customPanels,
         };
@@ -365,8 +378,8 @@
     const cta = document.querySelector("[data-checkout-sticky-cta]");
     if (!bar || !cta) return;
 
-    const infoStages = new Set(["patient", "address", "schedule", "details"]);
-    const effective = infoStages.has(stageName) ? "details" : stageName;
+    const flowStages = new Set(["members", "patient", "address", "schedule", "review", "details"]);
+    const effective = flowStages.has(stageName) ? stageName : stageName;
     const isNarrow = window.matchMedia("(max-width: 900px)").matches;
     const hideStages = new Set(["confirmation", "pay-processing"]);
     const show = isNarrow && effective && !hideStages.has(effective);
@@ -383,12 +396,44 @@
     syncPayTotals();
 
     const configs = {
-      details: {
-        label: "Continue to Payment →",
+      members: {
+        label: "Continue →",
         disabled: !readVerified(),
         showToggle: true,
         run() {
+          document.querySelector("[data-members-continue]")?.click();
+        },
+      },
+      address: {
+        label: "Save address →",
+        disabled: false,
+        showToggle: true,
+        run() {
+          document.querySelector('[data-checkout-next="schedule"]')?.click();
+        },
+      },
+      schedule: {
+        label: "Review order →",
+        disabled: false,
+        showToggle: true,
+        run() {
+          document.querySelector('[data-checkout-next="review"]')?.click();
+        },
+      },
+      review: {
+        label: "Continue to Payment →",
+        disabled: false,
+        showToggle: true,
+        run() {
           document.querySelector("[data-checkout-form]")?.requestSubmit?.();
+        },
+      },
+      details: {
+        label: "Continue →",
+        disabled: !readVerified(),
+        showToggle: true,
+        run() {
+          document.querySelector("[data-members-continue]")?.click();
         },
       },
       "pay-choose": {
@@ -592,7 +637,7 @@
   async function startPaymentSession(methodMeta) {
     const details = readCheckoutDetails();
     if (!details) {
-      activateDeckCard("patient");
+      activateDeckCard("members");
       throw new Error("Complete customer details before paying.");
     }
     if (!cartItemsWithTests().length) {
@@ -826,7 +871,7 @@
       const details = readCheckoutDetails();
       if (!details) {
         setPayStatus("Checkout details expired. Please enter details again.", true);
-        activateDeckCard("patient");
+        activateDeckCard("members");
         return true;
       }
       if (status.status === "paid" || status.status === "captured" || status.status === "success") {
@@ -950,7 +995,7 @@
   function completeLocalPayment(methodLabel) {
     const details = readCheckoutDetails();
     if (!details) {
-      activateDeckCard("patient");
+      activateDeckCard("members");
       return;
     }
     const amount = cartItemsWithTests().reduce((sum, item) => sum + itemPrice(item), 0);
@@ -1042,6 +1087,7 @@
   }
 
   function updateWhenConfirm(form) {
+    const banner = form.querySelector("[data-when-confirm]");
     const valueEl = form.querySelector("[data-when-confirm-value]");
     if (!valueEl) return;
     const day =
@@ -1050,6 +1096,7 @@
       form.querySelector("input[name='sampleWindow']:checked")?.value || "";
     const dayLabel = formatSampleDayLabel(day);
     valueEl.textContent = window ? `${dayLabel} · ${window}` : dayLabel;
+    if (banner) banner.hidden = false;
   }
 
   /** Current clock in Asia/Kolkata (IST, UTC+5:30). */
@@ -1077,15 +1124,15 @@
 
   /**
    * Same-day window cutoffs (IST):
-   * Morning  — hidden once morning has passed (from 12:00)
-   * Afternoon — hidden from 12:00
-   * Evening — hidden from 16:00 (4 PM)
+   * Morning  — until 10:00 (collection window ends)
+   * Afternoon — until 16:00
+   * Evening — until 17:00 (must start booking before evening window)
    */
   function availableWindowsForIstHour(hour) {
     return {
-      Morning: hour < 12,
-      Afternoon: hour < 12,
-      Evening: hour < 16,
+      Morning: hour < 10,
+      Afternoon: hour < 16,
+      Evening: hour < 17,
     };
   }
 
@@ -1191,20 +1238,22 @@
   function initCollectionCalendar(form) {
     const MAX_AHEAD_DAYS = 30;
     const trigger = form.querySelector("[data-cal-trigger]");
-    const popover = form.querySelector("[data-cal-popover]");
-    const grid = form.querySelector("[data-cal-grid]");
-    const monthLabel = form.querySelector("[data-cal-month]");
+    const triggerLabel = form.querySelector("[data-cal-trigger-label]");
+    const modal = document.querySelector("[data-cal-modal]");
+    const grid = modal?.querySelector("[data-cal-grid]");
+    const monthLabel = modal?.querySelector("[data-cal-month]");
     const chip = form.querySelector("[data-date-chip]");
     const chipLabel = form.querySelector("[data-date-chip-label]");
     const customRadio = form.querySelector("[data-custom-day]");
     const todayRadio = form.querySelector("#book-day-today");
     const tomorrowRadio = form.querySelector("#book-day-tomorrow");
-    const prevBtn = form.querySelector("[data-cal-prev]");
-    const nextBtn = form.querySelector("[data-cal-next]");
-    const closeBtn = form.querySelector("[data-cal-close]");
+    const thirdRadio = form.querySelector("[data-third-day]");
+    const prevBtn = modal?.querySelector("[data-cal-prev]");
+    const nextBtn = modal?.querySelector("[data-cal-next]");
+    const closeBtns = modal?.querySelectorAll("[data-cal-close]") || [];
     const clearBtn = form.querySelector("[data-clear-date]");
 
-    if (!trigger || !popover || !grid || !customRadio || !todayRadio || !tomorrowRadio) {
+    if (!trigger || !modal || !grid || !customRadio || !todayRadio || !tomorrowRadio) {
       return;
     }
 
@@ -1258,14 +1307,20 @@
     }
 
     function openCal() {
-      popover.hidden = false;
+      if (selected) view = new Date(selected.getFullYear(), selected.getMonth(), 1);
+      else view = new Date(today.getFullYear(), today.getMonth(), 1);
+      modal.hidden = false;
+      modal.setAttribute("aria-hidden", "false");
       trigger.setAttribute("aria-expanded", "true");
+      document.body.classList.add("mm-modal-open");
       render();
     }
 
     function closeCal() {
-      popover.hidden = true;
+      modal.hidden = true;
+      modal.setAttribute("aria-hidden", "true");
       trigger.setAttribute("aria-expanded", "false");
+      document.body.classList.remove("mm-modal-open");
     }
 
     function clearCustom() {
@@ -1277,19 +1332,46 @@
         chip.classList.remove("is-visible");
       }
       if (chipLabel) chipLabel.textContent = "";
+      if (triggerLabel) triggerLabel.textContent = "More";
+      trigger.classList.remove("is-active");
     }
 
     function applyCustomDate(d) {
-      selected = startOfDay(d);
+      const day = startOfDay(d);
+      const tomorrow = addDays(today, 1);
+
+      if (sameDay(day, today) && !todayRadio.disabled) {
+        clearCustom();
+        todayRadio.checked = true;
+        if (thirdRadio) thirdRadio.checked = false;
+        closeCal();
+        syncSampleWindows(form);
+        saveDraft(form);
+        return;
+      }
+      if (sameDay(day, tomorrow)) {
+        clearCustom();
+        tomorrowRadio.checked = true;
+        if (thirdRadio) thirdRadio.checked = false;
+        closeCal();
+        syncSampleWindows(form);
+        saveDraft(form);
+        return;
+      }
+
+      selected = day;
       customRadio.value = formatValue(selected);
       customRadio.checked = true;
       todayRadio.checked = false;
       tomorrowRadio.checked = false;
+      if (thirdRadio) thirdRadio.checked = false;
       if (chipLabel) chipLabel.textContent = formatChip(selected);
       if (chip) {
         chip.hidden = false;
         chip.classList.add("is-visible");
       }
+      if (triggerLabel) triggerLabel.textContent = formatChip(selected);
+      trigger.classList.add("is-active");
       closeCal();
       render();
       syncSampleWindows(form);
@@ -1354,12 +1436,16 @@
     }
 
     trigger.addEventListener("click", (event) => {
+      event.preventDefault();
       event.stopPropagation();
-      if (popover.hidden) openCal();
+      if (modal.hidden) openCal();
       else closeCal();
     });
 
-    closeBtn?.addEventListener("click", closeCal);
+    closeBtns.forEach((btn) => btn.addEventListener("click", closeCal));
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) closeCal();
+    });
     prevBtn?.addEventListener("click", () => {
       view = new Date(view.getFullYear(), view.getMonth() - 1, 1);
       render();
@@ -1373,6 +1459,7 @@
       clearCustom();
       todayRadio.checked = true;
       syncSampleWindows(form);
+      saveDraft(form);
     });
 
     todayRadio.addEventListener("change", () => {
@@ -1387,14 +1474,15 @@
       closeCal();
       syncSampleWindows(form);
     });
-
-    document.addEventListener("click", (event) => {
-      if (popover.hidden) return;
-      if (popover.contains(event.target) || trigger.contains(event.target)) return;
+    thirdRadio?.addEventListener("change", () => {
+      if (!thirdRadio.checked) return;
+      clearCustom();
       closeCal();
+      syncSampleWindows(form);
     });
+
     document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") closeCal();
+      if (event.key === "Escape" && !modal.hidden) closeCal();
     });
 
     render();
@@ -1402,27 +1490,39 @@
   }
 
   function syncCheckoutProgress(stageName) {
+    // Orange-style top bar: only Members → Address → Slot.
+    // On Review, all three show complete. Payment / Done hide the bar.
     const steps = {
-      patient: "details",
-      address: "details",
-      schedule: "details",
-      details: "details",
-      "pay-choose": "payment",
-      "pay-card": "payment",
-      "pay-qr": "payment",
-      "pay-bank": "payment",
-      "pay-processing": "payment",
-      confirmation: "confirmation",
+      members: "members",
+      patient: "members",
+      address: "address",
+      schedule: "slot",
+      details: "members",
+      review: "review",
     };
-    const order = ["cart", "details", "payment", "confirmation"];
-    const activeKey = steps[stageName] || "details";
-    const activeIndex = order.indexOf(activeKey);
+    const order = ["members", "address", "slot"];
+    const progressEl = document.querySelector("[data-checkout-progress]");
+    const mapped = steps[stageName];
+    const hideProgress = !mapped;
+
+    if (progressEl) {
+      progressEl.hidden = hideProgress;
+      progressEl.setAttribute("aria-hidden", hideProgress ? "true" : "false");
+    }
+
+    if (hideProgress) return;
+
+    const activeKey = mapped === "review" ? null : mapped;
+    const activeIndex = mapped === "review" ? order.length : order.indexOf(activeKey);
 
     document.querySelectorAll("[data-progress-step]").forEach((step) => {
       const key = step.getAttribute("data-progress-step");
       const index = order.indexOf(key);
-      const complete = index >= 0 && activeIndex >= 0 && index < activeIndex;
-      const active = key === activeKey;
+      const complete =
+        mapped === "review"
+          ? true
+          : index >= 0 && activeIndex >= 0 && index < activeIndex;
+      const active = activeKey != null && key === activeKey;
       step.classList.toggle("is-complete", complete);
       step.classList.toggle("is-active", active);
       if (active) step.setAttribute("aria-current", "step");
@@ -1430,44 +1530,352 @@
     });
   }
 
+  function formatMemberLabel(group) {
+    const name = String(group.memberName || group.name || "Me").trim();
+    const relation = String(group.memberRelation || group.relation || "").trim();
+    return relation && relation !== "Self" ? `${name} · ${relation}` : name;
+  }
+
+  function syncPrimaryPatientFields(form) {
+    const groups = window.DrSwiftCart?.groupCartByMember?.(cartItemsWithTests()) || [];
+    const primary = groups[0];
+    if (!primary || !form) return primary;
+    const name = form.querySelector("#book-name");
+    const age = form.querySelector("#book-age");
+    if (name) name.value = primary.memberName || "";
+    if (age) age.value = primary.age || "";
+    const gender = String(primary.gender || "").trim();
+    if (gender) {
+      const input = form.querySelector(`input[name='gender'][value="${gender}"]`);
+      if (input) input.checked = true;
+    }
+    return primary;
+  }
+
+  const MEMBER_AVATAR_TONES = ["blue", "teal", "indigo", "sky"];
+
+  function memberAvatarTone(memberId, index) {
+    if (Number.isFinite(index) && index >= 0) {
+      return MEMBER_AVATAR_TONES[index % MEMBER_AVATAR_TONES.length];
+    }
+    const seed = String(memberId || "member");
+    let hash = 0;
+    for (let i = 0; i < seed.length; i += 1) hash = (hash + seed.charCodeAt(i) * (i + 1)) % 997;
+    return MEMBER_AVATAR_TONES[hash % MEMBER_AVATAR_TONES.length];
+  }
+
+  /** Orange-style person glyph (not letter initials). */
+  function memberAvatarHtml({ memberId = "", gender = "", index = 0, size = "" } = {}) {
+    const tone = memberAvatarTone(memberId, index);
+    const g = String(gender || "").toLowerCase();
+    const isFemale = g.startsWith("f");
+    const icon = isFemale
+      ? `<svg class="mm-avatar__ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.4"/><path d="M6.2 19.2c1.5-2.8 3.6-4.2 5.8-4.2s4.3 1.4 5.8 4.2"/><path d="M12 14.2v3.2M10.4 19h3.2"/></svg>`
+      : `<svg class="mm-avatar__ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 19.2c1.5-2.9 3.7-4.3 6.5-4.3s5 1.4 6.5 4.3"/></svg>`;
+    return `<span class="mm-avatar mm-avatar--${tone}${size ? ` mm-avatar--${size}` : ""}" aria-hidden="true">${icon}</span>`;
+  }
+
+  function closeMemberModal() {
+    const modal = document.querySelector("[data-mm-member-modal]");
+    if (!modal) return;
+    modal.hidden = true;
+    modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("mm-modal-open");
+  }
+
+  function openMemberModal({ mode = "add", memberId = "", form } = {}) {
+    const modal = document.querySelector("[data-mm-member-modal]");
+    const editForm = modal?.querySelector("[data-mm-member-form]");
+    const title = modal?.querySelector("#mm-member-title");
+    if (!modal || !editForm) return;
+
+    const isEdit = mode === "edit";
+    const profile = isEdit ? window.DrSwiftCart?.findProfile?.(memberId) : null;
+    if (isEdit && !profile) return;
+
+    editForm.querySelector("[name='mode']").value = isEdit ? "edit" : "add";
+    editForm.querySelector("[name='memberId']").value = profile?.id || "";
+    editForm.querySelector("[name='name']").value = profile?.name || "";
+    editForm.querySelector("[name='age']").value = profile?.age || "";
+    const gender = String(profile?.gender || "").trim();
+    editForm.querySelectorAll("input[name='gender']").forEach((input) => {
+      input.checked = input.value === gender;
+    });
+    if (title) title.textContent = isEdit ? "Edit member details" : "Add member details";
+
+    modal.hidden = false;
+    modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("mm-modal-open");
+    editForm.querySelector("[name='name']")?.focus();
+  }
+
+  function openMemberEditModal(memberId, form) {
+    openMemberModal({ mode: "edit", memberId, form });
+  }
+
+  function openMemberAddModal(form) {
+    openMemberModal({ mode: "add", form });
+  }
+
+  function saveMemberModal(form, statusEl) {
+    const editForm = document.querySelector("[data-mm-member-form]");
+    if (!editForm) return;
+    const mode = editForm.querySelector("[name='mode']")?.value || "add";
+    const id = editForm.querySelector("[name='memberId']")?.value;
+    const name = String(editForm.querySelector("[name='name']")?.value || "").trim();
+    const age = String(editForm.querySelector("[name='age']")?.value || "").trim();
+    const gender = editForm.querySelector("input[name='gender']:checked")?.value || "";
+
+    if (!name) {
+      editForm.querySelector("[name='name']")?.focus();
+      return;
+    }
+    if (!age) {
+      editForm.querySelector("[name='age']")?.focus();
+      return;
+    }
+    if (!gender) return;
+
+    if (mode === "edit") {
+      const profile = window.DrSwiftCart?.findProfile?.(id);
+      if (!profile) return;
+      window.DrSwiftCart.upsertMember({
+        id: profile.id,
+        name,
+        age,
+        gender,
+        relation: profile.relation || "Family member",
+      });
+      const cart = window.DrSwiftCart.readCart();
+      cart.forEach((line) => {
+        if (line.memberId === profile.id) {
+          line.memberName = name;
+        }
+      });
+      window.DrSwiftCart.writeCart(cart);
+      closeMemberModal();
+      renderCheckoutMembers();
+      syncPrimaryPatientFields(form);
+      return;
+    }
+
+    const member = window.DrSwiftCart?.upsertMember?.({
+      name,
+      age,
+      gender,
+      relation: "Family member",
+    });
+    if (member) {
+      window.DrSwiftCart?.addBookingMember?.(member.id);
+      closeMemberModal();
+      renderCheckoutMembers();
+      syncPrimaryPatientFields(form);
+      syncPayTotals();
+    }
+  }
+
+  function saveMemberEditModal(form) {
+    saveMemberModal(form);
+  }
+
+  function renderCheckoutMembers() {
+    const root = document.querySelector("[data-checkout-members]");
+    if (!root) return;
+    const items = cartItemsWithTests();
+    window.DrSwiftCart?.ensureBookingMembers?.();
+    const groups = window.DrSwiftCart?.groupBookingMembers?.(items) || [];
+    if (!groups.length && !items.length) {
+      root.innerHTML = `
+        <div class="mm-empty">
+          <p>Your cart is empty.</p>
+          <a class="button secondary" href="/tests">Browse tests</a>
+        </div>`;
+      return;
+    }
+    root.innerHTML = `
+      <div class="mm-stack">
+      ${groups
+        .map((group, index) => {
+          const displayName = String(group.memberName || "Me").trim();
+          const meta = [group.age ? `${group.age} Years` : "", group.gender || ""]
+            .filter(Boolean)
+            .join(" | ");
+          const lines = (group.lines || [])
+            .map((item) => {
+              const price = itemPrice(item);
+              return `
+              <div class="mm-line">
+                <div class="mm-line__copy">
+                  <strong>${escapeHtml(item.test?.name || item.name || item.slug)}</strong>
+                  <em>${escapeHtml(formatPrice(price))}</em>
+                </div>
+                <button type="button" class="mm-line__remove" data-mm-remove-line="${escapeHtml(item.lineId || "")}" aria-label="Remove test">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>
+                </button>
+              </div>`;
+            })
+            .join("");
+          const ready = Boolean(meta && (group.lines || []).length);
+          return `
+          <article class="mm-card" data-mm-member="${escapeHtml(group.memberId)}">
+            <header class="mm-card__head">
+              <div class="mm-card__identity">
+                ${memberAvatarHtml({
+                  memberId: group.memberId,
+                  gender: group.gender,
+                  index,
+                })}
+                <div class="mm-card__who">
+                  <h3>${escapeHtml(displayName)}</h3>
+                  ${meta ? `<p class="mm-card__meta">${escapeHtml(meta)}</p>` : `<p class="mm-card__meta mm-card__meta--warn">Add age &amp; gender</p>`}
+                </div>
+              </div>
+              <div class="mm-card__tools">
+                <button type="button" class="mm-edit-btn" data-mm-edit-member="${escapeHtml(group.memberId)}">Edit</button>
+                <span class="mm-check${ready ? " is-ready" : ""}" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+                </span>
+              </div>
+            </header>
+            <div class="mm-card__tests">
+              <p class="mm-card__label">Tests / Checkups added</p>
+              ${lines || `<p class="mm-card__empty">No tests added yet</p>`}
+              <a class="mm-add-test" href="/tests?for=${encodeURIComponent(group.memberId)}">+ Add test / checkup</a>
+            </div>
+            ${
+              group.isOwner
+                ? ""
+                : `<button type="button" class="mm-remove-member" data-mm-remove-member="${escapeHtml(group.memberId)}">Remove member ×</button>`
+            }
+          </article>`;
+        })
+        .join("")}
+      <button type="button" class="mm-add-member" data-mm-add-member>
+        Add another member
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+      </div>`;
+  }
+
+  function renderCheckoutReview(form) {
+    const root = document.querySelector("[data-checkout-review]");
+    if (!root) return;
+    const items = cartItemsWithTests();
+    const groups = window.DrSwiftCart?.groupCartByMember?.(items) || [];
+    const day = form?.querySelector("input[name='sampleDay']:checked")?.value || "";
+    const windowVal = form?.querySelector("input[name='sampleWindow']:checked")?.value || "";
+    const slot = [formatSampleDayLabel(day) || day, windowVal].filter(Boolean).join(" · ");
+    const address = form?.querySelector("#book-address")?.value || "";
+    const city = form?.querySelector("#book-city")?.value || "";
+    const pin = form?.querySelector("#book-pin")?.value || "";
+    const landmark = form?.querySelector("#book-landmark")?.value || "";
+    const label = form?.querySelector("input[name='addressLabel']:checked")?.value || "Home";
+    const place = [address, landmark, city, pin].filter(Boolean).join(", ");
+    const total = cartTotalAmount();
+
+    root.innerHTML = `
+      <div class="mm-review">
+        <section class="mm-review__block">
+          <div class="mm-review__title">
+            <h3>Order summary</h3>
+            <button type="button" class="mm-review-edit" data-checkout-back="members">Edit</button>
+          </div>
+          ${groups
+            .map((group, index) => {
+              const sum = group.lines.reduce((s, line) => s + itemPrice(line), 0);
+              const displayName = String(group.memberName || "Me").trim();
+              return `
+                <article class="mm-review-member">
+                  <header>
+                    <div class="mm-card__identity">
+                      ${memberAvatarHtml({
+                        memberId: group.memberId,
+                        gender: group.gender,
+                        index,
+                        size: "sm",
+                      })}
+                      <div>
+                        <strong>${escapeHtml(formatMemberLabel(group))}</strong>
+                        <p>${group.lines.length} test${group.lines.length === 1 ? "" : "s"}</p>
+                      </div>
+                    </div>
+                    <span class="mm-review-member__sum">${escapeHtml(formatPrice(sum))}</span>
+                  </header>
+                  <ul>
+                    ${group.lines
+                      .map(
+                        (line) =>
+                          `<li><span>${escapeHtml(line.test?.name || line.name || line.slug)}</span><em>${escapeHtml(formatPrice(itemPrice(line)))}</em></li>`
+                      )
+                      .join("")}
+                  </ul>
+                </article>`;
+            })
+            .join("")}
+        </section>
+        <section class="mm-review__block">
+          <div class="mm-review__title">
+            <h3>Sample collection</h3>
+            <button type="button" class="mm-review-edit" data-checkout-back="address">Edit</button>
+          </div>
+          <div class="mm-review__facts">
+            <div class="mm-review__fact">
+              <span class="mm-review__fact-label">From ${escapeHtml(label)}</span>
+              <p>${escapeHtml(place || "—")}</p>
+            </div>
+            <div class="mm-review__fact">
+              <span class="mm-review__fact-label">Collection slot</span>
+              <p>${escapeHtml(slot || "—")}
+                <button type="button" class="mm-review-edit mm-review-edit--inline" data-checkout-back="schedule">Change</button>
+              </p>
+            </div>
+          </div>
+        </section>
+        <section class="mm-review__block mm-review__total">
+          <span>Amount to pay</span>
+          <strong>${escapeHtml(formatPrice(total))}</strong>
+        </section>
+      </div>`;
+  }
+
   function activateDeckCard(name) {
     const paymentStages = ["pay-choose", "pay-card", "pay-qr", "pay-bank", "pay-processing"];
-    const infoStages = ["patient", "address", "schedule"];
-    const showingDetails = infoStages.includes(name) || name === "details";
-    if (name !== "pay-qr" && name !== "pay-processing" && name !== "confirmation") {
+    const flowStages = ["members", "address", "schedule", "review"];
+    const resolved = name === "details" || name === "patient" ? "members" : name;
+    if (resolved !== "pay-qr" && resolved !== "pay-processing" && resolved !== "confirmation") {
       stopPaymentPoll();
     }
+
+    if (resolved === "members") renderCheckoutMembers();
+    if (resolved === "review") {
+      renderCheckoutReview(document.querySelector("[data-checkout-form]"));
+    }
+    syncPayTotals();
+
     document.querySelectorAll("[data-checkout-stage]").forEach((stage) => {
       const stageName = stage.getAttribute("data-checkout-stage");
-      if (infoStages.includes(stageName)) {
-        stage.hidden = !showingDetails;
-        stage.classList.toggle("is-active", showingDetails);
-        return;
-      }
-      const isCurrent = stageName === name;
+      const isCurrent = stageName === resolved;
       stage.hidden = !isCurrent;
       stage.classList.toggle("is-active", isCurrent);
     });
 
     const detailsStack = document.querySelector("[data-checkout-details]");
-    if (detailsStack) detailsStack.hidden = !showingDetails;
+    if (detailsStack) detailsStack.hidden = !flowStages.includes(resolved);
 
     const orderSummary = document.querySelector("[data-summary-order]");
     const customerSummary = document.querySelector("[data-summary-customer]");
     const paymentSummary = document.querySelector("[data-summary-payment]");
-    if (orderSummary) orderSummary.hidden = !showingDetails;
-    if (customerSummary) customerSummary.hidden = showingDetails || name === "confirmation";
-    if (paymentSummary) paymentSummary.hidden = name !== "confirmation";
+    if (orderSummary) orderSummary.hidden = !flowStages.includes(resolved);
+    if (customerSummary) customerSummary.hidden = flowStages.includes(resolved) || resolved === "confirmation";
+    if (paymentSummary) paymentSummary.hidden = resolved !== "confirmation";
 
-    document.body.classList.toggle("checkout-on-details", showingDetails);
-    document.body.classList.toggle("checkout-on-payment", paymentStages.includes(name));
+    document.body.classList.toggle("checkout-on-details", flowStages.includes(resolved));
+    document.body.classList.toggle("checkout-on-payment", paymentStages.includes(resolved));
 
-    if (name === "pay-card") {
+    if (resolved === "pay-card") {
       syncBillingAddress(readCheckoutDetails());
     }
 
-    /* Scroll the stable frame, not the stage node — avoids left/right jumps
-       when panel height changes between steps. */
     const frame =
       document.querySelector(".checkout-frame") ||
       document.querySelector(".checkout-wire-shell");
@@ -1480,12 +1888,33 @@
       window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
     }
 
-    if (paymentStages.includes(name)) {
-      syncPayTotals();
+    if (paymentStages.includes(resolved)) {
+      /* totals already synced above */
     }
-    const progressName = showingDetails ? "details" : name;
-    syncCheckoutProgress(progressName);
-    syncStickyCheckoutBar(progressName);
+    syncCheckoutProgress(resolved);
+    syncStickyCheckoutBar(resolved);
+
+    const asideCta = document.querySelector("[data-details-pay-cta]");
+    if (asideCta) {
+      const labels = {
+        members: "Continue →",
+        address: "Continue →",
+        schedule: "Review order →",
+        review: "Continue to Payment →",
+      };
+      asideCta.innerHTML = (labels[resolved] || "Continue →").replace(
+        "→",
+        '<span aria-hidden="true">→</span>'
+      );
+      asideCta.disabled = resolved === "members" && !readVerified();
+      asideCta.onclick = (event) => {
+        event.preventDefault();
+        if (resolved === "members") document.querySelector("[data-members-continue]")?.click();
+        else if (resolved === "address") document.querySelector('[data-checkout-next="schedule"]')?.click();
+        else if (resolved === "schedule") document.querySelector('[data-checkout-next="review"]')?.click();
+        else if (resolved === "review") document.querySelector("[data-checkout-form]")?.requestSubmit?.();
+      };
+    }
   }
 
   function renderInlinePayment(details) {
@@ -1689,11 +2118,13 @@
           name: row.name || row.slug || "Test",
           price: Number(row.price || 0),
           image: row.image || "assets/images/peace-of-mind.svg",
+          memberName: row.memberName || row.member?.name || "",
         }))
       : liveItems.map((item) => ({
           name: item.test?.name || "Test",
           price: itemPrice(item),
           image: item.test?.image || "assets/images/peace-of-mind.svg",
+          memberName: item.memberName || "",
         }));
 
     if (!lines.length && !(Number(payment?.amount) > 0)) {
@@ -1711,7 +2142,7 @@
             </span>
             <span class="confirm-v2-order__name">
               ${escapeHtml(item.name)}
-              <span class="confirm-v2-order__sub">Home sample collection</span>
+              <span class="confirm-v2-order__sub">${escapeHtml(item.memberName ? `For ${item.memberName}` : "Home sample collection")}</span>
             </span>
             <span class="confirm-v2-order__price">${escapeHtml(formatPrice(item.price))}</span>
           </div>`
@@ -2010,9 +2441,10 @@
     resumePaymentReturn();
     syncStickyCheckoutBar(
       document.querySelector("[data-checkout-stage].is-active")?.getAttribute("data-checkout-stage") ||
-        "details"
+        "members"
     );
-    activateDeckCard("details");
+    activateDeckCard("members");
+    syncPrimaryPatientFields(form);
 
     form.querySelectorAll("input[name='sampleWindow']").forEach((input) => {
       input.addEventListener("change", () => {
@@ -2096,26 +2528,33 @@
       }
       syncOtpSendEnabled(form);
       saveDraft(form);
-      syncStickyCheckoutBar("patient");
+      syncStickyCheckoutBar("members");
     });
 
     syncOtpSendEnabled(form);
     saveDraft(form);
-    syncCheckoutProgress("details");
+    syncCheckoutProgress("members");
 
-    function validatePatientStep() {
+    function validateMembersStep() {
       setStatus(statusEl, "", false);
-      const name = form.querySelector("#book-name");
-      const age = form.querySelector("#book-age");
-      if (!name?.value.trim()) {
-        setStatus(statusEl, "Enter the patient’s full name.", true);
-        name?.focus();
+      window.DrSwiftCart?.ensureBookingMembers?.();
+      const groups = window.DrSwiftCart?.groupBookingMembers?.(cartItemsWithTests()) || [];
+      if (!groups.length) {
+        setStatus(statusEl, "Add at least one family member for this booking.", true);
         return false;
       }
-      const ageNum = Number(age?.value);
-      if (!age?.value || Number.isNaN(ageNum) || ageNum < 1 || ageNum > 120) {
-        setStatus(statusEl, "Enter a valid age between 1 and 120.", true);
-        age?.focus();
+      const incomplete = groups.find((g) => !String(g.memberName || "").trim() || !g.age || !g.gender);
+      if (incomplete) {
+        setStatus(statusEl, `Add age and gender for ${incomplete.memberName || "each member"}.`, true);
+        return false;
+      }
+      const withoutTests = groups.find((g) => !(g.lines || []).length);
+      if (withoutTests) {
+        setStatus(
+          statusEl,
+          `Add at least one test for ${withoutTests.memberName}.`,
+          true
+        );
         return false;
       }
       const verified = readVerified();
@@ -2124,7 +2563,12 @@
         phoneInput?.focus();
         return false;
       }
+      syncPrimaryPatientFields(form);
       return true;
+    }
+
+    function validatePatientStep() {
+      return validateMembersStep();
     }
 
     function validateAddressStep() {
@@ -2155,8 +2599,19 @@
       return true;
     }
 
-    form.querySelector("[data-patient-continue]")?.addEventListener("click", () => {
-      if (!validatePatientStep()) return;
+    function validateScheduleStep() {
+      setStatus(scheduleStatusEl, "", false);
+      const day = form.querySelector("input[name='sampleDay']:checked")?.value || "";
+      const windowVal = form.querySelector("input[name='sampleWindow']:checked")?.value || "";
+      if (!day || !windowVal) {
+        setStatus(scheduleStatusEl, "Choose a collection date and time window.", true);
+        return false;
+      }
+      return true;
+    }
+
+    form.querySelector("[data-members-continue]")?.addEventListener("click", () => {
+      if (!validateMembersStep()) return;
       saveDraft(form);
       activateDeckCard("address");
     });
@@ -2165,6 +2620,79 @@
       if (!validateAddressStep()) return;
       saveDraft(form);
       activateDeckCard("schedule");
+    });
+
+    form.querySelector('[data-checkout-next="review"]')?.addEventListener("click", () => {
+      if (!validateScheduleStep()) return;
+      saveDraft(form);
+      activateDeckCard("review");
+    });
+
+    form.querySelector("[data-patient-continue]")?.addEventListener("click", () => {
+      if (!validateMembersStep()) return;
+      saveDraft(form);
+      activateDeckCard("address");
+    });
+
+    document.addEventListener("click", (event) => {
+      const backBtn = event.target.closest("[data-checkout-back]");
+      if (backBtn) {
+        event.preventDefault();
+        activateDeckCard(backBtn.getAttribute("data-checkout-back") || "members");
+        return;
+      }
+      const removeBtn = event.target.closest("[data-mm-remove-line]");
+      if (removeBtn) {
+        event.preventDefault();
+        const lineId = removeBtn.getAttribute("data-mm-remove-line");
+        window.DrSwiftCart?.removeLine?.(lineId);
+        renderCheckoutMembers();
+        syncPayTotals();
+        return;
+      }
+      const removeMember = event.target.closest("[data-mm-remove-member]");
+      if (removeMember) {
+        event.preventDefault();
+        const memberId = removeMember.getAttribute("data-mm-remove-member");
+        window.DrSwiftCart?.removeBookingMember?.(memberId);
+        renderCheckoutMembers();
+        syncPayTotals();
+        return;
+      }
+      const addMember = event.target.closest("[data-mm-add-member]");
+      if (addMember) {
+        event.preventDefault();
+        openMemberAddModal(form);
+        return;
+      }
+      const editBtn = event.target.closest("[data-mm-edit-member]");
+      if (editBtn) {
+        event.preventDefault();
+        const id = editBtn.getAttribute("data-mm-edit-member");
+        openMemberEditModal(id, form);
+        return;
+      }
+      if (
+        event.target.closest("[data-mm-member-cancel]") ||
+        event.target.matches("[data-mm-member-modal]")
+      ) {
+        event.preventDefault();
+        closeMemberModal();
+      }
+    });
+
+    document.addEventListener("submit", (event) => {
+      const memberForm = event.target.closest("[data-mm-member-form]");
+      if (memberForm) {
+        event.preventDefault();
+        saveMemberModal(form, statusEl);
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      const memberModal = document.querySelector("[data-mm-member-modal]");
+      if (memberModal && !memberModal.hidden) closeMemberModal();
     });
 
     sendBtn?.addEventListener("click", () => {
@@ -2176,7 +2704,6 @@
         return;
       }
       if (phoneInput) phoneInput.value = digits;
-      // Local demo only — no backend OTP API call.
       setPhoneVerifiedUi(form, false, true);
       setStatus(statusEl, `Enter OTP ${LOCAL_DEMO_OTP} to verify.`, false);
       if (otpInput) {
@@ -2205,7 +2732,7 @@
       setPhoneVerifiedUi(form, true);
       setStatus(statusEl, "", false);
       saveDraft(form);
-      syncStickyCheckoutBar("patient");
+      syncStickyCheckoutBar("members");
     });
 
     form.addEventListener("submit", async (event) => {
@@ -2213,44 +2740,65 @@
       setStatus(scheduleStatusEl, "", false);
       if (successEl) successEl.hidden = true;
 
-      if (!validatePatientStep()) {
-        activateDeckCard("details");
+      if (!validateMembersStep()) {
+        activateDeckCard("members");
         return;
       }
       if (!validateAddressStep()) {
-        activateDeckCard("details");
+        activateDeckCard("address");
+        return;
+      }
+      if (!validateScheduleStep()) {
+        activateDeckCard("schedule");
         return;
       }
 
       const day = form.querySelector("input[name='sampleDay']:checked")?.value || "";
       const windowVal = form.querySelector("input[name='sampleWindow']:checked")?.value || "";
-      if (!day || !windowVal) {
-        setStatus(scheduleStatusEl, "Choose a collection date and time window.", true);
-        return;
-      }
-
       const submitBtn = form.querySelector("[type='submit']");
       if (submitBtn) submitBtn.disabled = true;
 
       const verified = readVerified();
+      syncPrimaryPatientFields(form);
       const name = form.querySelector("#book-name")?.value || "";
       const names = splitName(name);
-      const recipientProfile = selectedCartRecipientProfile();
-      const orderItems = cartItemsWithTests().map((item) => ({
-        slug: item.test?.slug || "",
-        name: item.test?.name || item.test?.slug || "Test",
-        price: itemPrice(item),
-        image: item.test?.image || "assets/images/peace-of-mind.svg",
-        customPanels: item.customPanels || null,
-      }));
+      const groups = window.DrSwiftCart?.groupCartByMember?.(cartItemsWithTests()) || [];
+      const orderItems = cartItemsWithTests().map((item) => {
+        const profile = window.DrSwiftCart?.findProfile?.(item.memberId);
+        return {
+          slug: item.test?.slug || item.slug || "",
+          name: item.test?.name || item.name || item.slug || "Test",
+          price: itemPrice(item),
+          image: item.test?.image || item.image || "assets/images/peace-of-mind.svg",
+          customPanels: item.customPanels || null,
+          lineId: item.lineId || "",
+          memberId: item.memberId || "",
+          memberName: item.memberName || profile?.name || "",
+          memberRelation: item.memberRelation || profile?.relation || "",
+          memberAge: profile?.age || "",
+          memberGender: profile?.gender || "",
+          member: {
+            id: item.memberId || "",
+            name: item.memberName || profile?.name || "",
+            relation: item.memberRelation || profile?.relation || "",
+            age: profile?.age || "",
+            gender: profile?.gender || "",
+          },
+        };
+      });
       const payload = {
         name,
         ...names,
-        recipientLabel: recipientProfile?.label || name,
-        recipientRelation: recipientProfile?.relation || "",
-        gender: form.querySelector("input[name='gender']:checked")?.value
-          || form.querySelector("#book-gender")?.value
-          || "",
+        members: groups.map((g) => ({
+          id: g.memberId,
+          name: g.memberName,
+          relation: g.memberRelation,
+          age: g.age,
+          gender: g.gender,
+        })),
+        recipientLabel: groups[0] ? formatMemberLabel(groups[0]) : name,
+        recipientRelation: groups[0]?.memberRelation || "",
+        gender: form.querySelector("input[name='gender']:checked")?.value || "",
         age: form.querySelector("#book-age")?.value || "",
         phone: verified.phone,
         phoneVerified: true,
@@ -2261,7 +2809,9 @@
         pin: digitsOnly(form.querySelector("#book-pin")?.value || ""),
         city: form.querySelector("#book-city")?.value || "",
         address: form.querySelector("#book-address")?.value || "",
-        cart: cartLineItems(),
+        landmark: form.querySelector("#book-landmark")?.value || "",
+        addressLabel: form.querySelector("input[name='addressLabel']:checked")?.value || "Home",
+        cart: window.DrSwiftCart?.readCart?.() || cartLineItems(),
         orderItems,
         lineItemsJson: cartLineItemsJson(),
         createdAt: new Date().toISOString(),
@@ -2275,12 +2825,6 @@
         setStatus(scheduleStatusEl, err.message || "Could not continue. Please try again.", true);
         if (submitBtn) submitBtn.disabled = false;
       }
-    });
-
-    document.querySelectorAll("[data-checkout-back]").forEach((button) => {
-      button.addEventListener("click", () => {
-        activateDeckCard(button.getAttribute("data-checkout-back") || "patient");
-      });
     });
   }
 

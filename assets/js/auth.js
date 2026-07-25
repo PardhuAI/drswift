@@ -454,6 +454,8 @@
 
     const nextMember = {
       ...member,
+      age: form.querySelector("[name='age']")?.value || member.age || "",
+      gender: form.querySelector("[name='gender']")?.value || member.gender || "",
       relation,
       id: `member-${Date.now().toString(36)}-${buildInitialsSeed(member.name)}`,
       addedAt: new Date().toISOString(),

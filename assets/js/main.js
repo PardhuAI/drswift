@@ -857,41 +857,23 @@ function resolveDetailSlug() {
 }
 
 function readCart() {
+  if (window.DrSwiftCart?.readCart) {
+    return window.DrSwiftCart.readCart();
+  }
   try {
     const parsed = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || "[]");
-    if (!Array.isArray(parsed)) {
-      return [];
-    }
-    // Keep every valid cart line. Catalog mismatches are resolved at render time
-    // so a demo/SSR catalog swap cannot wipe the customer's cart.
-    const seen = new Set();
-    return parsed
-      .filter((item) => item && item.slug)
-      .map((item) => ({
-        slug: item.slug,
-        quantity: 1,
-        ...(typeof item.name === "string" && item.name.trim() ? { name: item.name.trim() } : {}),
-        ...(Number.isFinite(Number(item.price)) ? { price: Number(item.price) } : {}),
-        ...(typeof item.image === "string" && item.image.trim() ? { image: item.image.trim() } : {}),
-        ...(typeof item.imageTone === "string" && item.imageTone.trim()
-          ? { imageTone: item.imageTone.trim() }
-          : {}),
-        ...(Array.isArray(item.customPanels) ? { customPanels: item.customPanels } : {}),
-        ...(typeof item.recipient === "string" && item.recipient.trim()
-          ? { recipient: item.recipient.trim() }
-          : {})
-      }))
-      .filter((item) => {
-        if (seen.has(item.slug)) return false;
-        seen.add(item.slug);
-        return true;
-      });
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
   }
 }
 
 function writeCart(cart) {
+  if (window.DrSwiftCart?.writeCart) {
+    window.DrSwiftCart.writeCart(cart);
+    updateCartBadges();
+    return;
+  }
   localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
   updateCartBadges();
 }
@@ -1072,8 +1054,23 @@ function addToCart(slug) {
   if (!test) {
     return;
   }
-  const cart = readCart();
   const customPanels = test.customizable ? readCustomSelectionForTest(test) : undefined;
+  const preferred =
+    window.DrSwiftCart?.preferredMemberFromQuery?.() ||
+    window.DrSwiftCart?.defaultMemberId?.() ||
+    "";
+  if (window.DrSwiftCart?.addToCartForMember) {
+    const result = window.DrSwiftCart.addToCartForMember(slug, preferred, {
+      name: test.name || slug,
+      price: getTestLivePrice(test, customPanels),
+      image: test.image || "",
+      imageTone: test.imageTone || "blood",
+      customPanels,
+    });
+    updateCartBadges();
+    return result.status === "exists" ? "exists" : "added";
+  }
+  const cart = readCart();
   const existing = cart.find((item) => item.slug === slug);
   if (existing) {
     if (customPanels) {
@@ -1089,37 +1086,28 @@ function addToCart(slug) {
     price: getTestLivePrice(test, customPanels),
     image: test.image || "",
     imageTone: test.imageTone || "blood",
-    ...(customPanels ? { customPanels } : {})
+    ...(customPanels ? { customPanels } : {}),
   });
   writeCart(cart);
   return "added";
 }
 
-function updateCartItem(slug, action) {
-  let cart = readCart();
-  const item = cart.find((entry) => entry.slug === slug);
-
+function updateCartItem(slugOrLineId, action) {
   if (action === "clear") {
     writeCart([]);
     renderCartPage();
     return;
   }
 
-  if (!item) {
-    return;
-  }
-
-  // Quantity +/- removed — diagnostics cart is one of each test.
-  if (action === "increase" || action === "decrease") {
-    return;
-  }
-
   if (action === "remove") {
-    cart = cart.filter((entry) => entry.slug !== slug);
+    if (window.DrSwiftCart?.removeLine && String(slugOrLineId || "").startsWith("line-")) {
+      window.DrSwiftCart.removeLine(slugOrLineId);
+    } else {
+      writeCart(readCart().filter((entry) => entry.slug !== slugOrLineId && entry.lineId !== slugOrLineId));
+    }
+    updateCartBadges();
+    renderCartPage();
   }
-
-  writeCart(cart);
-  renderCartPage();
 }
 
 function showCartToast(message) {
@@ -2204,8 +2192,8 @@ function cartLineItems() {
               price: Number(item.price || 0),
               category: "Test",
               summary: "Saved in your cart",
-              image: "assets/images/peace-of-mind.svg",
-              imageTone: "blood",
+              image: item.image || "assets/images/peace-of-mind.svg",
+              imageTone: item.imageTone || "blood",
               customizable: false,
             }
           : null);
@@ -2230,8 +2218,8 @@ function cartTotals(items) {
 }
 
 function cartHousehold() {
-  if (!hasLocalAccountSession()) {
-    return null;
+  if (window.DrSwiftCart?.ensureHousehold) {
+    return window.DrSwiftCart.ensureHousehold();
   }
   try {
     return (
@@ -2250,32 +2238,92 @@ function cartUserName() {
   return name || ownerName || "Me";
 }
 
-function cartRecipientOptions() {
-  const household = cartHousehold();
-  if (household?.owner || Array.isArray(household?.members)) {
-    const people = [
-      household.owner ? { ...household.owner, relation: "Self" } : { name: cartUserName(), relation: "Self" },
-      ...(Array.isArray(household.members) ? household.members : []),
-    ];
-    return people
-      .filter((person) => String(person.name || "").trim())
-      .map((person) => {
-        const name = String(person.name || "").trim();
-        const relation = String(person.relation || "").trim();
-        return relation && relation !== "Self" ? `${name} (${relation})` : name;
-      });
-  }
-  return [cartUserName(), "Parent", "Partner", "Child"];
-}
-
-function writeCartRecipient(slug, recipient) {
-  const cart = readCart();
-  const item = cart.find((entry) => entry.slug === slug);
-  if (!item) {
+function renderCartPage() {
+  const container = document.querySelector("[data-cart-page]");
+  const familySection = document.querySelector("[data-cart-family-section]");
+  const familyBanner = document.querySelector("[data-cart-family-banner]");
+  if (!container || !TESTS.length) {
     return;
   }
-  item.recipient = recipient;
-  writeCart(cart);
+
+  const items = cartLineItems();
+  if (!items.length) {
+    window.clearTimeout(cartRevealTimer);
+    cartBodyRevealed = false;
+    if (familySection) familySection.hidden = true;
+    if (familyBanner) familyBanner.innerHTML = "";
+    setCartBodyVisible(true);
+    container.innerHTML = `
+      <div class="empty-cart">
+        <div class="empty-cart__illustration" aria-hidden="true">
+          <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-basket-plus"></use></svg>
+        </div>
+        <p class="eyebrow">Empty cart</p>
+        <h2>Your cart is ready for tests.</h2>
+        <p>Add one or more panels, then continue to booking for patient and collection details.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="tests.html">Book a test</a>
+          <a class="button secondary" href="whatsapp.html">Book via WhatsApp</a>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  const totals = cartTotals(items);
+  const savings = Math.max(0, totals.original - totals.subtotal);
+
+  if (familyBanner) {
+    familyBanner.innerHTML = cartFamilyBannerHtml(totals.subtotal);
+  }
+  if (familySection) {
+    familySection.hidden = false;
+  }
+
+  container.innerHTML = `
+    <div class="cart-items" aria-label="Selected tests">
+      ${items
+        .map((item) => {
+          const { test } = item;
+          const unitPrice = getTestLivePrice(test, item.customPanels);
+          const removeKey = item.lineId || test.slug;
+          return `
+            <article class="cart-item">
+              <a class="cart-item__image photo-thumb photo-thumb--${escapeHtml(test.imageTone || "blood")}" href="${detailUrl(test.slug)}">
+                <img src="${escapeHtml(test.image)}" alt="" loading="lazy" decoding="async">
+              </a>
+              <div class="cart-item__body">
+                <p class="overline">${escapeHtml(test.category)}</p>
+                <h2><a href="${detailUrl(test.slug)}">${escapeHtml(test.name)}</a></h2>
+                <p>${escapeHtml(test.summary)}</p>
+              </div>
+              <div class="cart-item__controls">
+                <div class="price-row">
+                  <span class="price">${formatPrice(unitPrice)}</span>
+                  ${formatOldPriceHtml(test, unitPrice)}
+                </div>
+                <button class="cart-remove" type="button" data-cart-action="remove" data-cart-slug="${escapeHtml(removeKey)}">Remove</button>
+              </div>
+            </article>
+          `;
+        })
+        .join("")}
+    </div>
+    <aside class="cart-summary" aria-label="Cart summary">
+      <h2>Order summary</h2>
+      <p class="cart-summary__mobile-total"><span>Total</span><strong>${formatPrice(totals.subtotal)}</strong></p>
+      <dl>
+        <div><dt>Tests</dt><dd>${items.length}</dd></div>
+        <div><dt>Subtotal</dt><dd>${formatPrice(totals.original)}</dd></div>
+        <div><dt>Savings</dt><dd>-${formatPrice(savings)}</dd></div>
+        <div class="cart-summary__total"><dt>Total</dt><dd>${formatPrice(totals.subtotal)}</dd></div>
+      </dl>
+      <a class="button primary full" href="/book?cart=checkout">Continue to booking</a>
+      <button class="cart-clear-link" type="button" data-cart-action="clear">Clear cart</button>
+    </aside>
+  `;
+
+  scheduleCartBodyReveal();
 }
 
 function cartFamilyBannerHtml(cartTotal = 0) {
@@ -2357,133 +2405,6 @@ function scheduleCartBodyReveal() {
     setCartBodyVisible(true, true);
   }, 3000);
 }
-
-function cartRecipientControlHtml(item) {
-  const hasAccountProfiles = Boolean(window.DRSWIFT_USER) || Boolean(cartHousehold());
-  if (!hasAccountProfiles) {
-    return "";
-  }
-
-  const options = cartRecipientOptions();
-  const selected = options.includes(item.recipient) ? item.recipient : options[0];
-  if (selected && item.recipient !== selected) {
-    writeCartRecipient(item.slug, selected);
-  }
-  return `
-    <div class="cart-recipient">
-      <label for="cart-recipient-${escapeHtml(item.slug)}">Book for</label>
-      <select id="cart-recipient-${escapeHtml(item.slug)}" data-cart-recipient="${escapeHtml(item.slug)}">
-        ${options
-          .map(
-            (option) =>
-              `<option value="${escapeHtml(option)}"${option === selected ? " selected" : ""}>${escapeHtml(option)}</option>`
-          )
-          .join("")}
-      </select>
-      <a href="signup.html?mode=family">Add family member</a>
-    </div>
-  `;
-}
-
-function renderCartPage() {
-  const container = document.querySelector("[data-cart-page]");
-  const familySection = document.querySelector("[data-cart-family-section]");
-  const familyBanner = document.querySelector("[data-cart-family-banner]");
-  if (!container || !TESTS.length) {
-    return;
-  }
-
-  const items = cartLineItems();
-  if (!items.length) {
-    window.clearTimeout(cartRevealTimer);
-    cartBodyRevealed = false;
-    if (familySection) familySection.hidden = true;
-    if (familyBanner) familyBanner.innerHTML = "";
-    setCartBodyVisible(true);
-    container.innerHTML = `
-      <div class="empty-cart">
-        <div class="empty-cart__illustration" aria-hidden="true">
-          <svg class="ui-icon"><use href="assets/images/ui-icons.svg#icon-basket-plus"></use></svg>
-        </div>
-        <p class="eyebrow">Empty cart</p>
-        <h2>Your cart is ready for tests.</h2>
-        <p>Add one or more panels, then continue to booking for patient and collection details.</p>
-        <div class="hero-actions">
-          <a class="button primary" href="tests.html">Book a test</a>
-          <a class="button secondary" href="whatsapp.html">Book via WhatsApp</a>
-        </div>
-      </div>
-    `;
-    return;
-  }
-
-  const totals = cartTotals(items);
-  const savings = Math.max(0, totals.original - totals.subtotal);
-
-  if (familyBanner) {
-    familyBanner.innerHTML = cartFamilyBannerHtml(totals.subtotal);
-  }
-  if (familySection) {
-    familySection.hidden = false;
-  }
-
-  container.innerHTML = `
-    <div class="cart-items" aria-label="Selected tests">
-      ${items
-        .map((item) => {
-          const { test } = item;
-          const unitPrice = getTestLivePrice(test, item.customPanels);
-          return `
-            <article class="cart-item">
-              <a class="cart-item__image photo-thumb photo-thumb--${escapeHtml(test.imageTone || "blood")}" href="${detailUrl(test.slug)}">
-                <img src="${escapeHtml(test.image)}" alt="" loading="lazy" decoding="async">
-              </a>
-              <div class="cart-item__body">
-                <p class="overline">${escapeHtml(test.category)}</p>
-                <h2><a href="${detailUrl(test.slug)}">${escapeHtml(test.name)}</a></h2>
-                <p>${escapeHtml(test.summary)}</p>
-                ${cartRecipientControlHtml(item)}
-              </div>
-              <div class="cart-item__controls">
-                <div class="price-row">
-                  <span class="price">${formatPrice(unitPrice)}</span>
-                  ${formatOldPriceHtml(test, unitPrice)}
-                </div>
-                <button class="cart-remove" type="button" data-cart-action="remove" data-cart-slug="${escapeHtml(test.slug)}">Remove</button>
-              </div>
-            </article>
-          `;
-        })
-        .join("")}
-    </div>
-    <aside class="cart-summary" aria-label="Cart summary">
-      <h2>Order summary</h2>
-      <p class="cart-summary__mobile-total"><span>Total</span><strong>${formatPrice(totals.subtotal)}</strong></p>
-      <dl>
-        <div><dt>Tests</dt><dd>${items.length}</dd></div>
-        <div><dt>Subtotal</dt><dd>${formatPrice(totals.original)}</dd></div>
-        <div><dt>Savings</dt><dd>-${formatPrice(savings)}</dd></div>
-        <div class="cart-summary__total"><dt>Total</dt><dd>${formatPrice(totals.subtotal)}</dd></div>
-      </dl>
-      <a class="button primary full" href="/book?cart=checkout">Continue to booking</a>
-      <button class="cart-clear-link" type="button" data-cart-action="clear">Clear cart</button>
-    </aside>
-  `;
-
-  scheduleCartBodyReveal();
-}
-
-document.addEventListener("change", (event) => {
-  const recipientSelect = event.target.closest("[data-cart-recipient]");
-  if (!recipientSelect) {
-    return;
-  }
-  writeCartRecipient(
-    recipientSelect.getAttribute("data-cart-recipient"),
-    recipientSelect.value
-  );
-  showCartToast(`This test is set for ${recipientSelect.value}.`);
-});
 
 window.addEventListener("drswift:auth-changed", () => {
   syncAccountNav();
@@ -2621,3 +2542,11 @@ function renderPromotionsPage() {
 }
 
 bootStorefront();
+
+(function ensureLoginOverlayScript() {
+  if (document.querySelector('script[src*="login-overlay.js"]')) return;
+  const script = document.createElement("script");
+  script.src = "assets/js/login-overlay.js?v=login-overlay-1";
+  script.defer = true;
+  document.head.appendChild(script);
+})();

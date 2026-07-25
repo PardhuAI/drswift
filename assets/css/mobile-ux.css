@@ -111,6 +111,16 @@
     max-height: min(72dvh, calc(100dvh - var(--header-offset, 72px) - 24px));
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    transform: translateY(-10px);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 300ms ease, opacity 300ms ease, visibility 300ms;
+  }
+
+  body.nav-open .nav-menu {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
   }
 
   body.nav-open {
@@ -122,7 +132,10 @@
     position: fixed;
     inset: 0;
     z-index: 290;
-    background: rgba(15, 23, 42, 0.35);
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: opacity 300ms ease;
   }
 }
 
