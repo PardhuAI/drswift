@@ -1,23 +1,10 @@
 {
+  "cleanUrls": true,
+  "trailingSlash": false,
   "rewrites": [
-    { "source": "/about", "destination": "/about.html" },
-    { "source": "/reports", "destination": "/reports.html" },
-    { "source": "/cart", "destination": "/cart.html" },
-    { "source": "/whatsapp", "destination": "/whatsapp.html" },
-    { "source": "/promotions", "destination": "/promotions.html" },
-    { "source": "/privacy", "destination": "/privacy.html" },
-    { "source": "/terms", "destination": "/terms.html" },
-    { "source": "/policies", "destination": "/policies.html" },
-    { "source": "/help", "destination": "/help.html" },
-    { "source": "/login", "destination": "/login.html" },
-    { "source": "/book", "destination": "/book.html" },
-    { "source": "/doctors", "destination": "/doctors.html" },
-    { "source": "/signup", "destination": "/signup.html" },
-    { "source": "/forgot-password", "destination": "/forgot-password.html" },
-    { "source": "/sample-report", "destination": "/sample-report.html" },
-    { "source": "/privacy-choices", "destination": "/privacy-choices.html" },
-    { "source": "/account", "destination": "/account.html" },
-    { "source": "/app", "destination": "/app.html" },
-    { "source": "/tests/:slug", "destination": "/test-details.html" }
+    {
+      "source": "/tests/:slug",
+      "destination": "/test-details.html"
+    }
   ]
 }
